@@ -14,6 +14,7 @@ import BenefitsPage from "./pages/BenefitsPage";
 import DealsPage from "./components/Deals/DealsPage";
 import VerifyPage from "./pages/auth/Verify";
 import Otpverifypage from "./pages/auth/Otpverifypage";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -37,6 +38,9 @@ function App() {
             <Route path="verify" element={<VerifyPage />} />
             <Route path="otp-verify" element={<Otpverifypage />} />
           </Route>
+
+          {/* Catch-all route for 404 */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-center" reverseOrder={false} />

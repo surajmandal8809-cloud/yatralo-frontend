@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Homepage from "./pages/HomePage"
 import AppLayout from "./layouts/AppLayout";
 import LoginPage from "./pages/auth/LoginPage";
@@ -19,7 +19,7 @@ import NotFound from "./pages/NotFound";
 function App() {
   return (
     <>
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route path="/" element={<Homepage />} />
@@ -42,7 +42,7 @@ function App() {
           {/* Catch-all route for 404 */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
       <Toaster position="top-center" reverseOrder={false} />
     </>
   );

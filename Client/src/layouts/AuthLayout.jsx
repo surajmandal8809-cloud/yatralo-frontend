@@ -4,6 +4,7 @@ import Logo from "../components/common/Logo";
 
 const AuthLayout = () => {
   const navigate = useNavigate();
+  const footerImage = `${import.meta.env.BASE_URL}assets/img/bg/footer.svg`;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
@@ -38,7 +39,7 @@ const AuthLayout = () => {
         {/* Visible Footer Image */}
         <div className="w-full">
           <img
-            src="/assets/img/bg/footer.svg"
+            src={footerImage}
             alt="footer decoration"
             className="w-full h-28 object-cover"
           />

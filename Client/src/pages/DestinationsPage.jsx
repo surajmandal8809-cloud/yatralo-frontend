@@ -190,6 +190,8 @@ const DESTINATIONS = [
 
 /* ─────────────────────────────── component ─────────────────────────── */
 const DestinationsPage = () => {
+    const bannerVideo = `${import.meta.env.BASE_URL}assets/Banner.mp4`;
+    const bannerPoster = `${import.meta.env.BASE_URL}assets/Banner.jpg`;
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
     const [activeCategory, setActiveCategory] = useState("all");
@@ -218,9 +220,11 @@ const DestinationsPage = () => {
             <section className="relative h-[80vh] min-h-[520px] flex items-center justify-center overflow-hidden">
                 <video
                     autoPlay loop muted playsInline
+                    preload="auto"
+                    poster={bannerPoster}
                     className="absolute inset-0 w-full h-full object-cover"
                 >
-                    <source src="/assets/Banner.mp4" type="video/mp4" />
+                    <source src={bannerVideo} type="video/mp4" />
                 </video>
 
                 {/* gradient overlays */}

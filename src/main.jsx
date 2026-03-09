@@ -15,3 +15,12 @@ createRoot(document.getElementById('root')).render(
     </Provider>
   </StrictMode>,
 )
+
+const appLoader = document.getElementById('app-loader')
+
+if (appLoader) {
+  requestAnimationFrame(() => {
+    appLoader.classList.add('is-hidden')
+    setTimeout(() => appLoader.remove(), 260)
+  })
+}

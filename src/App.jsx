@@ -17,6 +17,7 @@ import Otpverifypage from "./pages/auth/Otpverifypage";
 import NotFound from "./pages/NotFound";
 import FlightsPage from "./pages/FlightsPage";
 import TrainsPage from "./pages/TrainsPage";
+import BookingsPage from "./pages/BookingsPage";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             <Route path="benefits" element={<BenefitsPage />} />
             <Route path="flights" element={<FlightsPage />} />
             <Route path="trains" element={<TrainsPage />} />
+            <Route path="bookings" element={<BookingsPage />} />
           </Route>
 
           {/* Auth routes */}

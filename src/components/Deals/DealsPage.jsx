@@ -136,7 +136,7 @@ const DealsPage = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [sortOption, setSortOption] = useState("none");
 
-  const categories = ["all", "flights", "hotels", "buses", "holiday-packages", "cruises"];
+  const categories = ["all", "flights", "hotels", "buses", "holiday-packages", "cruises", "experiences", "cars"];
 
   const deals = [
     // Flights
@@ -356,6 +356,56 @@ const DealsPage = () => {
       rating: 4.8,
       badge: "Luxury",
     },
+    // Experiences (Google-hosted sample images)
+    {
+      id: 17,
+      category: "experiences",
+      title: "Desert Safari Dubai",
+      operator: "Local Partner",
+      originalPrice: 7999,
+      discountedPrice: 4999,
+      discount: "37% OFF",
+      image: "https://www.gstatic.com/webp/gallery/1.jpg",
+      rating: 4.6,
+      badge: "Top Pick",
+    },
+    {
+      id: 18,
+      category: "experiences",
+      title: "Singapore Night Safari",
+      operator: "Wildlife Reserves",
+      originalPrice: 6999,
+      discountedPrice: 4499,
+      discount: "35% OFF",
+      image: "https://www.gstatic.com/webp/gallery/2.jpg",
+      rating: 4.7,
+      badge: "Family",
+    },
+    // Cars (Google-hosted sample images)
+    {
+      id: 19,
+      category: "cars",
+      title: "Self-drive SUV",
+      operator: "Hertz",
+      originalPrice: 4999,
+      discountedPrice: 3299,
+      discount: "34% OFF",
+      image: "https://www.gstatic.com/webp/gallery/3.jpg",
+      rating: 4.5,
+      badge: "Unlimited KM",
+    },
+    {
+      id: 20,
+      category: "cars",
+      title: "Luxury Sedan Chauffeur",
+      operator: "Avis",
+      originalPrice: 8999,
+      discountedPrice: 6299,
+      discount: "30% OFF",
+      image: "https://www.gstatic.com/webp/gallery/4.jpg",
+      rating: 4.8,
+      badge: "Premium",
+    },
   ];
 
   const filteredDeals = useMemo(() => {
@@ -403,6 +453,8 @@ const DealsPage = () => {
               >
                 {cat === "holiday-packages" ? "Holidays" : 
                  cat === "cruises" ? "Cruises" : 
+                 cat === "experiences" ? "Experiences" :
+                 cat === "cars" ? "Cars" :
                  cat.charAt(0).toUpperCase() + cat.slice(1)}
               </button>
             ))}

@@ -40,7 +40,7 @@ const SupportSection = () => {
         </motion.div>
 
         {/* Heading */}
-        <h2 className="mb-6 text-3xl font-black tracking-tight text-slate-900 md:text-5xl">
+        <h2 className="mb-6 text-2xl font-black tracking-tight text-slate-900 md:text-4xl">
           Your Private{" "}
           <span className="bg-[#CF3425] bg-clip-text text-transparent">
             Travel Desk
@@ -48,7 +48,7 @@ const SupportSection = () => {
         </h2>
 
         {/* Description */}
-        <p className="mx-auto mb-14 max-w-2xl text-lg text-slate-600 md:text-xl leading-relaxed">
+        <p className="mx-auto mb-14 max-w-2xl text-base text-slate-600 md:text-lg leading-relaxed">
           Whether it's a last-minute modification or a bespoke request,
           our elite support team ensures every journey remains seamless.
         </p>
@@ -101,7 +101,7 @@ const SupportSection = () => {
                   size={22}
                   className="mx-auto mb-4 text-orange-500"
                 />
-                <h3 className="mb-2 text-2xl font-black text-slate-900">
+                <h3 className="mb-2 text-xl font-black text-slate-900">
                   {item.value}
                 </h3>
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">

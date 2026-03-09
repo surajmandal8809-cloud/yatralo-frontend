@@ -100,11 +100,11 @@ const FAQ = () => {
             </span>
           </div>
 
-          <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-6">
             Frequently Asked <span className="text-[#c1372a]">Questions</span>
           </h2>
 
-          <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+          <p className="text-gray-500 max-w-2xl mx-auto text-base">
             Everything you need to confidently manage your premium travel
             experience.
           </p>
@@ -132,7 +132,7 @@ const FAQ = () => {
               <div key={i}>
                 <div className="flex items-center gap-3 mb-8 border-b pb-4">
                   <category.icon className="text-[#c1372a]" size={20} />
-                  <h3 className="font-bold uppercase tracking-widest text-sm text-gray-900">
+                  <h3 className="font-bold uppercase tracking-widest text-xs text-gray-900">
                     {category.title}
                   </h3>
                 </div>
@@ -154,7 +154,7 @@ const FAQ = () => {
                           onClick={() => toggle(item.id)}
                           className="w-full flex justify-between items-center px-6 py-5 text-left"
                         >
-                          <span className="font-semibold">
+                          <span className="font-semibold text-sm">
                             {item.question}
                           </span>
                           <ChevronDown
@@ -171,7 +171,7 @@ const FAQ = () => {
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: "auto", opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden px-6 pb-6 text-gray-300"
+                              className="overflow-hidden px-6 pb-6 text-gray-300 text-sm"
                             >
                               {item.answer}
                             </motion.div>

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import {
   ArrowRight,
   ArrowRightLeft,
@@ -20,6 +21,7 @@ import {
   Users,
   Coffee,
 } from "lucide-react";
+import { addBooking } from "../utils/bookingStore";
 
 const CITIES = [
   { code: "DEL", name: "New Delhi", station: "New Delhi Railway Station" },
@@ -114,12 +116,12 @@ function CityBox({ value, onChange, label }) {
           setOpen(!open);
           setQ("");
         }}
-        className="w-full flex items-center gap-2.5 px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-left transition-all hover:border-indigo-300"
+        className="w-full flex items-center gap-2 px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-left transition-all hover:border-indigo-300"
       >
         <MapPin size={14} className="text-slate-400 flex-shrink-0" />
         {sel ? (
           <div>
-            <p className="text-2xl font-black text-slate-900 leading-none tracking-tight">{sel.code}</p>
+            <p className="text-xl font-black text-slate-900 leading-none tracking-tight">{sel.code}</p>
             <p className="text-[11px] text-slate-400 truncate max-w-[140px] mt-0.5">{sel.name}</p>
           </div>
         ) : (
@@ -162,7 +164,7 @@ function CityBox({ value, onChange, label }) {
   );
 }
 
-function TrainCard({ t, index }) {
+function TrainCard({ t, index, onBook }) {
   const [open, setOpen] = useState(false);
   return (
     <motion.div
@@ -209,7 +211,10 @@ function TrainCard({ t, index }) {
           </div>
 
           <div className="flex flex-col items-end gap-1.5">
-            <button className="px-5 py-2.5 bg-slate-900 hover:bg-indigo-700 text-white text-sm font-black rounded-xl transition-all shadow">
+            <button
+              onClick={() => onBook(t)}
+              className="px-5 py-2.5 bg-slate-900 hover:bg-indigo-700 text-white text-sm font-black rounded-xl transition-all shadow"
+            >
               Book Now
             </button>
             <button onClick={() => setOpen(!open)} className="text-[11px] text-slate-400 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">
@@ -265,6 +270,7 @@ function TrainCard({ t, index }) {
 export default function TrainsPage() {
   const today = new Date().toISOString().split("T")[0];
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const initialFrom = resolveCityCode(searchParams.get("from")) || "DEL";
   const initialTo = resolveCityCode(searchParams.get("to")) || "BOM";
   const initialDate = searchParams.get("date") || today;
@@ -283,7 +289,7 @@ export default function TrainsPage() {
   const [showFilter, setShowFilter] = useState(false);
   const didAutoSearch = useRef(false);
 
-  const bannerVideo = `${import.meta.env.BASE_URL}assets/Banner.mp4`;
+  const bannerVideo = `${import.meta.env.BASE_URL}assets/video/Train.mp4`;
   const bannerPoster = `${import.meta.env.BASE_URL}assets/Banner.jpg`;
   const fromCity = CITIES.find((c) => c.code === from);
   const toCity = CITIES.find((c) => c.code === to);
@@ -297,6 +303,33 @@ export default function TrainsPage() {
       setSearched(true);
     }, 1100);
   }, [from, to, date, pax]);
+
+  const handleBookTrain = useCallback(
+    (train) => {
+      const booking = {
+        id: `BK-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+        bookingRef: `YT${Math.floor(100000 + Math.random() * 900000)}`,
+        type: "train",
+        fromCode: from,
+        toCode: to,
+        fromName: fromCity?.name || from,
+        toName: toCity?.name || to,
+        travelDate: date,
+        departTime: train.dep,
+        arriveTime: train.arr,
+        passengers: pax,
+        totalPrice: train.price,
+        providerName: train.name,
+        providerCode: train.trainNo,
+        status: "confirmed",
+        bookedAt: new Date().toISOString(),
+      };
+      addBooking(booking);
+      toast.success(`Booked ${train.name} ${train.trainNo}`);
+      navigate("/bookings");
+    },
+    [date, from, fromCity?.name, navigate, pax, to, toCity?.name]
+  );
 
   useEffect(() => {
     const shouldAutoSearch = searchParams.get("autoSearch") === "1";
@@ -327,8 +360,7 @@ export default function TrainsPage() {
         <video autoPlay loop muted playsInline preload="auto" poster={bannerPoster} className="absolute inset-0 w-full h-full object-cover">
           <source src={bannerVideo} type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-slate-50" />
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-900/35 via-transparent to-cyan-800/20" />
+        <div className="absolute inset-0 bg-black/35" />
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
           <motion.div
@@ -383,18 +415,19 @@ export default function TrainsPage() {
         </div>
       </section>
 
-      <div className="sticky top-16 z-30 bg-white/90 backdrop-blur-xl border-b border-slate-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_46px_1fr_150px_140px_auto] gap-3 items-end">
+      <div className="relative z-20 -mt-10 md:-mt-14">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-900/10 p-4 md:p-5">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_40px_1fr_140px_130px_auto] gap-2.5 items-end">
             <CityBox value={from} onChange={setFrom} label="From" />
             <button
               onClick={() => {
                 setFrom(to);
                 setTo(from);
               }}
-              className="self-end mb-0.5 w-11 h-11 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all hover:rotate-180 duration-300"
+              className="self-end mb-0.5 w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all hover:rotate-180 duration-300"
             >
-              <ArrowRightLeft size={16} />
+              <ArrowRightLeft size={15} />
             </button>
             <CityBox value={to} onChange={setTo} label="To" />
             <div>
@@ -406,7 +439,7 @@ export default function TrainsPage() {
                   value={date}
                   min={today}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full pl-9 pr-3 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 text-sm font-semibold outline-none focus:border-indigo-400"
+                  className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none focus:border-indigo-400"
                 />
               </div>
             </div>
@@ -417,7 +450,7 @@ export default function TrainsPage() {
                 <select
                   value={pax}
                   onChange={(e) => setPax(Number(e.target.value))}
-                  className="w-full pl-9 pr-3 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-slate-800 text-sm font-semibold outline-none appearance-none focus:border-indigo-400"
+                  className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none appearance-none focus:border-indigo-400"
                 >
                   {[1, 2, 3, 4, 5, 6].map((n) => (
                     <option key={n} value={n}>
@@ -430,7 +463,7 @@ export default function TrainsPage() {
             <button
               onClick={handleSearch}
               disabled={loading || from === to}
-              className="self-end h-[54px] flex items-center justify-center gap-2 px-6 bg-slate-900 text-white font-black rounded-2xl hover:bg-indigo-700 transition-all shadow-lg disabled:opacity-50"
+              className="self-end h-[48px] flex items-center justify-center gap-2 px-5 bg-slate-900 text-white text-sm font-black rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50"
             >
               {loading ? <RefreshCw size={17} className="animate-spin" /> : <Search size={17} />}
               Search
@@ -438,8 +471,9 @@ export default function TrainsPage() {
           </div>
         </div>
       </div>
+      </div>
 
-      <section className="max-w-7xl mx-auto px-6 py-12">
+      <section className="max-w-7xl mx-auto px-6 py-10">
         {loading && (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -536,7 +570,7 @@ export default function TrainsPage() {
 
             <div className="space-y-4">
               {results.length > 0 ? (
-                results.map((t, i) => <TrainCard key={t.id} t={t} index={i} />)
+                results.map((t, i) => <TrainCard key={t.id} t={t} index={i} onBook={handleBookTrain} />)
               ) : (
                 <div className="text-center py-24">
                   <Train size={48} className="mx-auto mb-3 text-slate-300" />

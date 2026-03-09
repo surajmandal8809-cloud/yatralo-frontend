@@ -98,15 +98,11 @@ const PopularServices = () => {
             </span>
           </div>
 
-          <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4">
-            Explore{" "}
-            <span className="text-[#cf3425]">
-              Popular
-            </span>{" "}
-            Services
+          <h2 className="text-2xl md:text-4xl font-extrabold text-slate-900 mb-4">
+            Explore <span className="text-[#cf3425]">Popular</span> Services
           </h2>
 
-          <p className="text-slate-500 text-base md:text-lg max-w-2xl mx-auto">
+          <p className="text-slate-500 text-sm md:text-base max-w-2xl mx-auto">
             Discover top-rated airlines, luxury stays, and premium travel options curated just for you.
           </p>
         </div>
@@ -159,7 +155,7 @@ const PopularServices = () => {
                 </div>
 
                 <div className="p-6">
-                  <h3 className="text-lg font-bold text-slate-800 mb-2">
+                  <h3 className="text-base font-bold text-slate-800 mb-2">
                     {item.name}
                   </h3>
 
@@ -193,7 +189,7 @@ const PopularServices = () => {
                       <span className="text-[9px] text-slate-400 block">
                         Starting From
                       </span>
-                      <span className="text-2xl font-bold text-black">
+                      <span className="text-xl font-bold text-black">
                         {item.price}
                       </span>
                     </div>
@@ -217,7 +213,7 @@ const PopularServices = () => {
           ].map((stat, i) => (
             <div key={i} className="bg-white p-8 rounded-3xl shadow text-center">
               <stat.icon className="mx-auto mb-4 text-black" size={28} />
-              <div className="text-3xl font-bold text-black">
+              <div className="text-2xl font-bold text-black">
                 {stat.value}
               </div>
               <div className="text-[10px] uppercase tracking-wider text-slate-400">

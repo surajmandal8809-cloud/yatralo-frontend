@@ -221,7 +221,6 @@ const DestinationsPage = () => {
                 <video
                     autoPlay loop muted playsInline
                     preload="auto"
-                    poster={destinationPoster}
                     className="absolute inset-0 w-full h-full object-cover"
                 >
                     <source src={destinationVideo} type="video/mp4" />

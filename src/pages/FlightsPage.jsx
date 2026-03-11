@@ -131,14 +131,35 @@ async function fetchAmadeusFlights({ from, to, date, pax, nonstop }) {
 function CityBox({ value, onChange, label }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
-  const sel = CITIES.find((c) => c.code === value);
-  const list = CITIES.filter(
-    (c) => c.name.toLowerCase().includes(q.toLowerCase()) || c.code.toLowerCase().includes(q.toLowerCase())
-  );
+  const [list, setList] = useState(CITIES);
+  const [loading, setLoading] = useState(false);
+  const sel = list.find((c) => c.code === value) || CITIES.find((c) => c.code === value);
+
+  useEffect(() => {
+    if (!q || q.length < 2) {
+      setList(CITIES);
+      return;
+    }
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${getBaseURL()}/flights/cities?keyword=${q}`);
+        const payload = await res.json();
+        if (payload.status && payload.data.length > 0) {
+          setList(payload.data);
+        }
+      } catch (err) {
+        console.error("City search failed:", err);
+      } finally {
+        setLoading(false);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [q]);
 
   return (
     <div className="relative">
-      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">{label}</p>
+      <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-1.5">{label}</p>
       <button
         type="button"
         onClick={() => {
@@ -151,7 +172,7 @@ function CityBox({ value, onChange, label }) {
         {sel ? (
           <div>
             <p className="text-xl font-black text-slate-900 leading-none tracking-tight">{sel.code}</p>
-            <p className="text-[11px] text-slate-400 truncate max-w-[140px] mt-0.5">{sel.name}</p>
+            <p className="text-xs text-slate-400 truncate max-w-[140px] mt-0.5">{sel.name}</p>
           </div>
         ) : (
           <p className="text-slate-500 text-sm">Select city</p>
@@ -159,19 +180,20 @@ function CityBox({ value, onChange, label }) {
       </button>
       {open && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl z-40 overflow-hidden border border-slate-100">
-          <div className="p-2.5 border-b border-slate-100">
+          <div className="p-2.5 border-b border-slate-100 flex items-center gap-2">
             <input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search city or airport code..."
+              placeholder="Search city or airport..."
               className="w-full text-sm px-3 py-2 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-300 border border-transparent focus:border-indigo-300"
             />
+            {loading && <RefreshCw size={14} className="animate-spin text-slate-400 mr-2" />}
           </div>
           <div className="max-h-52 overflow-y-auto">
             {list.map((c) => (
               <button
-                key={c.code}
+                key={`${c.code}-${c.airport}`}
                 type="button"
                 onClick={() => {
                   onChange(c.code);
@@ -179,10 +201,10 @@ function CityBox({ value, onChange, label }) {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50 text-left transition-colors"
               >
-                <span className="text-[11px] font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded min-w-[36px] text-center">{c.code}</span>
+                <span className="text-xs font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded min-w-[36px] text-center">{c.code}</span>
                 <div>
                   <p className="text-sm font-semibold text-slate-800">{c.name}</p>
-                  <p className="text-[10px] text-slate-400">{c.airport}</p>
+                  <p className="text-xs text-slate-400">{c.airport}</p>
                 </div>
               </button>
             ))}
@@ -210,20 +232,20 @@ function FlightCard({ f, index, onBook }) {
             </div>
             <div>
               <p className="text-sm font-black text-slate-800">{f.airline}</p>
-              <p className="text-[11px] text-slate-400 font-mono">{f.flightNo}</p>
+              <p className="text-xs text-slate-400 font-mono">{f.flightNo}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4 flex-1 justify-center min-w-[200px]">
             <p className="text-2xl font-black text-slate-900">{f.dep}</p>
             <div className="flex-1 flex flex-col items-center">
-              <p className="text-[10px] text-slate-400 font-semibold mb-1">{durLabel(f.duration)}</p>
+              <p className="text-xs text-slate-400 font-semibold mb-1">{durLabel(f.duration)}</p>
               <div className="w-full flex items-center gap-1.5">
                 <div className="flex-1 h-px bg-slate-200" />
                 <Plane size={13} className="text-indigo-600" />
                 <div className="flex-1 h-px bg-slate-200" />
               </div>
-              <p className={`text-[10px] font-bold mt-1 ${f.stops === 0 ? "text-emerald-600" : "text-amber-600"}`}>
+              <p className={`text-xs font-bold mt-1 ${f.stops === 0 ? "text-emerald-600" : "text-amber-600"}`}>
                 {f.stops === 0 ? "Non-stop" : `${f.stops} stop`}
               </p>
             </div>
@@ -232,10 +254,10 @@ function FlightCard({ f, index, onBook }) {
 
           <div className="text-right min-w-[110px]">
             <p className="text-2xl font-black text-indigo-700">Rs {f.price.toLocaleString()}</p>
-            <p className="text-[11px] text-slate-400">Rs {f.perPax.toLocaleString()} / person</p>
+            <p className="text-xs text-slate-400">Rs {f.perPax.toLocaleString()} / person</p>
             <div className="flex items-center justify-end gap-0.5 mt-1">
               <Star size={10} className="fill-amber-400 text-amber-400" />
-              <span className="text-[11px] text-slate-500 font-semibold">{f.rating}</span>
+              <span className="text-xs text-slate-500 font-semibold">{f.rating}</span>
             </div>
           </div>
 
@@ -246,26 +268,26 @@ function FlightCard({ f, index, onBook }) {
             >
               Book Now
             </button>
-            <button onClick={() => setOpen(!open)} className="text-[11px] text-slate-400 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">
+            <button onClick={() => setOpen(!open)} className="text-xs text-slate-400 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">
               Details {open ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-1.5 mt-3">
-          {f.seats <= 9 && <span className="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Only {f.seats} left</span>}
+          {f.seats <= 9 && <span className="text-xs font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Only {f.seats} left</span>}
           {f.refundable && (
-            <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+            <span className="text-xs font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
               <CheckCircle2 size={9} /> Refundable
             </span>
           )}
           {f.wifi && (
-            <span className="text-[10px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200 flex items-center gap-1">
+            <span className="text-xs font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200 flex items-center gap-1">
               <Wifi size={9} /> Wi-Fi
             </span>
           )}
           {f.meal && (
-            <span className="text-[10px] font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200 flex items-center gap-1">
+            <span className="text-xs font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200 flex items-center gap-1">
               <Coffee size={9} /> Meal
             </span>
           )}
@@ -276,19 +298,19 @@ function FlightCard({ f, index, onBook }) {
         <div className="border-t border-dashed border-slate-100 bg-slate-50/80 p-5">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <p className="text-[10px] font-black uppercase text-slate-400 mb-1 tracking-wider">Check-in</p>
+              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Check-in</p>
               <p className="font-semibold text-slate-700">15 kg included</p>
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase text-slate-400 mb-1 tracking-wider">Cabin</p>
+              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Cabin</p>
               <p className="font-semibold text-slate-700">7 kg included</p>
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase text-slate-400 mb-1 tracking-wider">Aircraft</p>
+              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Aircraft</p>
               <p className="font-semibold text-slate-700">Airbus A320neo</p>
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase text-slate-400 mb-1 tracking-wider">Cancellation</p>
+              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Cancellation</p>
               <p className={`font-semibold ${f.refundable ? "text-emerald-600" : "text-red-500"}`}>
                 {f.refundable ? "Free (24h before)" : "Non-refundable"}
               </p>
@@ -354,27 +376,24 @@ export default function FlightsPage() {
 
   const handleBookFlight = useCallback(
     (flight) => {
-      const booking = {
-        id: `BK-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-        bookingRef: `YT${Math.floor(100000 + Math.random() * 900000)}`,
-        type: "flight",
-        fromCode: from,
-        toCode: to,
-        fromName: fromCity?.name || from,
-        toName: toCity?.name || to,
-        travelDate: date,
-        departTime: flight.dep,
-        arriveTime: flight.arr,
-        passengers: pax,
-        totalPrice: flight.price,
-        providerName: flight.airline,
-        providerCode: flight.flightNo,
-        status: "confirmed",
-        bookedAt: new Date().toISOString(),
-      };
-      addBooking(booking);
-      toast.success(`Booked ${flight.airline} ${flight.flightNo}`);
-      navigate("/bookings");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please login to book your flight");
+        navigate("/auth/login");
+        return;
+      }
+      navigate("/checkout", {
+        state: {
+          flight,
+          type: "flight",
+          from,
+          to,
+          fromName: fromCity?.name || from,
+          toName: toCity?.name || to,
+          date,
+          pax,
+        },
+      });
     },
     [date, from, fromCity?.name, navigate, pax, to, toCity?.name]
   );
@@ -418,7 +437,7 @@ export default function FlightsPage() {
             className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-xl border border-white/25 px-5 py-2.5 rounded-full mb-8"
           >
             <Compass size={15} className="text-yellow-400" />
-            <span className="text-[10px] font-black tracking-[0.3em] uppercase text-white">Flight Discovery</span>
+            <span className="text-xs font-black tracking-[0.3em] uppercase text-white">Flight Discovery</span>
           </motion.div>
 
           <motion.h1
@@ -466,74 +485,73 @@ export default function FlightsPage() {
       <div className="relative z-20 -mt-10 md:-mt-14">
         <div className="max-w-6xl mx-auto px-4 md:px-6">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-900/10 p-4 md:p-5 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            {[["oneway", "One Way"], ["roundtrip", "Round Trip"]].map(([v, l]) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setTripType(v)}
-                className={`px-3.5 py-1.5 rounded-lg text-[11px] font-black uppercase tracking-wider transition-all ${
-                  tripType === v ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                }`}
-              >
-                {l}
-              </button>
-            ))}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_40px_1fr_140px_130px_auto] gap-2.5 items-end">
-            <CityBox value={from} onChange={setFrom} label="From" />
-            <button
-              onClick={() => {
-                setFrom(to);
-                setTo(from);
-              }}
-              className="self-end mb-0.5 w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all hover:rotate-180 duration-300"
-            >
-              <ArrowRightLeft size={15} />
-            </button>
-            <CityBox value={to} onChange={setTo} label="To" />
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Date</p>
-              <div className="relative">
-                <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="date"
-                  value={date}
-                  min={today}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none focus:border-indigo-400"
-                />
-              </div>
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Passengers</p>
-              <div className="relative">
-                <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <select
-                  value={pax}
-                  onChange={(e) => setPax(Number(e.target.value))}
-                  className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none appearance-none focus:border-indigo-400"
+            <div className="flex flex-wrap items-center gap-2">
+              {[["oneway", "One Way"], ["roundtrip", "Round Trip"]].map(([v, l]) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setTripType(v)}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${tripType === v ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                    }`}
                 >
-                  {[1, 2, 3, 4, 5, 6].map((n) => (
-                    <option key={n} value={n}>
-                      {n} Adult{n > 1 ? "s" : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  {l}
+                </button>
+              ))}
             </div>
-            <button
-              onClick={handleSearch}
-              disabled={loading || from === to}
-              className="self-end h-[48px] flex items-center justify-center gap-2 px-5 bg-slate-900 text-white text-sm font-black rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50"
-            >
-              {loading ? <RefreshCw size={17} className="animate-spin" /> : <Search size={17} />}
-              Search
-            </button>
+
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_40px_1fr_140px_130px_auto] gap-2.5 items-end">
+              <CityBox value={from} onChange={setFrom} label="From" />
+              <button
+                onClick={() => {
+                  setFrom(to);
+                  setTo(from);
+                }}
+                className="self-end mb-0.5 w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all hover:rotate-180 duration-300"
+              >
+                <ArrowRightLeft size={15} />
+              </button>
+              <CityBox value={to} onChange={setTo} label="To" />
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-1.5">Date</p>
+                <div className="relative">
+                  <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="date"
+                    value={date}
+                    min={today}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none focus:border-indigo-400"
+                  />
+                </div>
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-1.5">Passengers</p>
+                <div className="relative">
+                  <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <select
+                    value={pax}
+                    onChange={(e) => setPax(Number(e.target.value))}
+                    className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none appearance-none focus:border-indigo-400"
+                  >
+                    {[1, 2, 3, 4, 5, 6].map((n) => (
+                      <option key={n} value={n}>
+                        {n} Adult{n > 1 ? "s" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <button
+                onClick={handleSearch}
+                disabled={loading || from === to}
+                className="self-end h-[48px] flex items-center justify-center gap-2 px-5 bg-slate-900 text-white text-sm font-black rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50"
+              >
+                {loading ? <RefreshCw size={17} className="animate-spin" /> : <Search size={17} />}
+                Search
+              </button>
+            </div>
           </div>
         </div>
-      </div>
       </div>
 
       <section className="max-w-7xl mx-auto px-6 py-10">
@@ -582,9 +600,8 @@ export default function FlightsPage() {
                 </div>
                 <button
                   onClick={() => setShowFilter(!showFilter)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-all shadow-sm ${
-                    showFilter ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-200 text-slate-700 hover:border-indigo-300"
-                  }`}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-all shadow-sm ${showFilter ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-200 text-slate-700 hover:border-indigo-300"
+                    }`}
                 >
                   <Filter size={13} /> Filters
                 </button>

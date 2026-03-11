@@ -102,14 +102,43 @@ function generateTrains(from, to, date, pax) {
 function CityBox({ value, onChange, label }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
-  const sel = CITIES.find((c) => c.code === value);
-  const list = CITIES.filter(
-    (c) => c.name.toLowerCase().includes(q.toLowerCase()) || c.code.toLowerCase().includes(q.toLowerCase())
-  );
+  const [list, setList] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchCities = useCallback(async (keyword) => {
+    if (keyword.length < 2) return;
+    setLoading(true);
+    try {
+      const res = await fetch(`${getBaseURL()}/flights/cities?keyword=${keyword}`);
+      const data = await res.json();
+      if (data.status) {
+        setList(data.data.map(item => ({
+          code: item.iataCode,
+          name: item.name,
+          station: item.detailedName || "Central Station"
+        })));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (q) fetchCities(q);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [q, fetchCities]);
+
+  const sel = useMemo(() => {
+    return list.find(c => c.code === value) || { code: value, name: value, station: "" };
+  }, [value, list]);
 
   return (
     <div className="relative">
-      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">{label}</p>
+      <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-1.5">{label}</p>
       <button
         type="button"
         onClick={() => {
@@ -119,10 +148,10 @@ function CityBox({ value, onChange, label }) {
         className="w-full flex items-center gap-2 px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-left transition-all hover:border-indigo-300"
       >
         <MapPin size={14} className="text-slate-400 flex-shrink-0" />
-        {sel ? (
+        {value ? (
           <div>
-            <p className="text-xl font-black text-slate-900 leading-none tracking-tight">{sel.code}</p>
-            <p className="text-[11px] text-slate-400 truncate max-w-[140px] mt-0.5">{sel.name}</p>
+            <p className="text-xl font-black text-slate-900 leading-none tracking-tight">{value}</p>
+            <p className="text-xs text-slate-400 truncate max-w-[140px] mt-0.5">{sel.name}</p>
           </div>
         ) : (
           <p className="text-slate-500 text-sm">Select city</p>
@@ -135,11 +164,12 @@ function CityBox({ value, onChange, label }) {
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search city or station code..."
+              placeholder="Search city or station..."
               className="w-full text-sm px-3 py-2 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-300 border border-transparent focus:border-indigo-300"
             />
           </div>
           <div className="max-h-52 overflow-y-auto">
+            {loading && <div className="p-4 text-center"><RefreshCw className="animate-spin mx-auto text-indigo-400" size={16} /></div>}
             {list.map((c) => (
               <button
                 key={c.code}
@@ -150,10 +180,10 @@ function CityBox({ value, onChange, label }) {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50 text-left transition-colors"
               >
-                <span className="text-[11px] font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded min-w-[36px] text-center">{c.code}</span>
+                <span className="text-xs font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded min-w-[36px] text-center">{c.code}</span>
                 <div>
                   <p className="text-sm font-semibold text-slate-800">{c.name}</p>
-                  <p className="text-[10px] text-slate-400">{c.station}</p>
+                  <p className="text-xs text-slate-400">{c.station}</p>
                 </div>
               </button>
             ))}
@@ -181,20 +211,20 @@ function TrainCard({ t, index, onBook }) {
             </div>
             <div>
               <p className="text-sm font-black text-slate-800">{t.name}</p>
-              <p className="text-[11px] text-slate-400 font-mono">{t.trainNo}</p>
+              <p className="text-xs text-slate-400 font-mono">{t.trainNo}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-4 flex-1 justify-center min-w-[200px]">
             <p className="text-2xl font-black text-slate-900">{t.dep}</p>
             <div className="flex-1 flex flex-col items-center">
-              <p className="text-[10px] text-slate-400 font-semibold mb-1">{durLabel(t.duration)}</p>
+              <p className="text-xs text-slate-400 font-semibold mb-1">{durLabel(t.duration)}</p>
               <div className="w-full flex items-center gap-1.5">
                 <div className="flex-1 h-px bg-slate-200" />
                 <Train size={13} className="text-indigo-600" />
                 <div className="flex-1 h-px bg-slate-200" />
               </div>
-              <p className={`text-[10px] font-bold mt-1 ${t.stops === 0 ? "text-emerald-600" : "text-amber-600"}`}>
+              <p className={`text-xs font-bold mt-1 ${t.stops === 0 ? "text-emerald-600" : "text-amber-600"}`}>
                 {t.stops === 0 ? "Direct" : `${t.stops} stop`}
               </p>
             </div>
@@ -203,10 +233,10 @@ function TrainCard({ t, index, onBook }) {
 
           <div className="text-right min-w-[110px]">
             <p className="text-2xl font-black text-indigo-700">Rs {t.price.toLocaleString()}</p>
-            <p className="text-[11px] text-slate-400">Rs {t.perPax.toLocaleString()} / person</p>
+            <p className="text-xs text-slate-400">Rs {t.perPax.toLocaleString()} / person</p>
             <div className="flex items-center justify-end gap-0.5 mt-1">
               <Star size={10} className="fill-amber-400 text-amber-400" />
-              <span className="text-[11px] text-slate-500 font-semibold">{t.rating}</span>
+              <span className="text-xs text-slate-500 font-semibold">{t.rating}</span>
             </div>
           </div>
 
@@ -217,25 +247,25 @@ function TrainCard({ t, index, onBook }) {
             >
               Book Now
             </button>
-            <button onClick={() => setOpen(!open)} className="text-[11px] text-slate-400 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">
+            <button onClick={() => setOpen(!open)} className="text-xs text-slate-400 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">
               Details {open ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-1.5 mt-3">
-          {t.seats <= 20 && <span className="text-[10px] font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Only {t.seats} seats left</span>}
+          {t.seats <= 20 && <span className="text-xs font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Only {t.seats} seats left</span>}
           {t.refundable && (
-            <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
+            <span className="text-xs font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
               <CheckCircle2 size={9} /> Refundable
             </span>
           )}
           {t.pantry && (
-            <span className="text-[10px] font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200 flex items-center gap-1">
+            <span className="text-xs font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200 flex items-center gap-1">
               <Coffee size={9} /> Pantry
             </span>
           )}
-          {t.ac && <span className="text-[10px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">AC coach</span>}
+          {t.ac && <span className="text-xs font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">AC coach</span>}
         </div>
       </div>
 
@@ -243,19 +273,19 @@ function TrainCard({ t, index, onBook }) {
         <div className="border-t border-dashed border-slate-100 bg-slate-50/80 p-5">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <p className="text-[10px] font-black uppercase text-slate-400 mb-1 tracking-wider">Boarding</p>
+              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Boarding</p>
               <p className="font-semibold text-slate-700">30 min before departure</p>
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase text-slate-400 mb-1 tracking-wider">Classes</p>
+              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Classes</p>
               <p className="font-semibold text-slate-700">CC, 3A, 2A</p>
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase text-slate-400 mb-1 tracking-wider">Travel Time</p>
+              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Travel Time</p>
               <p className="font-semibold text-slate-700">{durLabel(t.duration)}</p>
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase text-slate-400 mb-1 tracking-wider">Cancellation</p>
+              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Cancellation</p>
               <p className={`font-semibold ${t.refundable ? "text-emerald-600" : "text-red-500"}`}>
                 {t.refundable ? "Free before 24h" : "Non-refundable"}
               </p>
@@ -306,27 +336,24 @@ export default function TrainsPage() {
 
   const handleBookTrain = useCallback(
     (train) => {
-      const booking = {
-        id: `BK-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-        bookingRef: `YT${Math.floor(100000 + Math.random() * 900000)}`,
-        type: "train",
-        fromCode: from,
-        toCode: to,
-        fromName: fromCity?.name || from,
-        toName: toCity?.name || to,
-        travelDate: date,
-        departTime: train.dep,
-        arriveTime: train.arr,
-        passengers: pax,
-        totalPrice: train.price,
-        providerName: train.name,
-        providerCode: train.trainNo,
-        status: "confirmed",
-        bookedAt: new Date().toISOString(),
-      };
-      addBooking(booking);
-      toast.success(`Booked ${train.name} ${train.trainNo}`);
-      navigate("/bookings");
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please login to book your train ticket");
+        navigate("/auth/login");
+        return;
+      }
+      navigate("/checkout", {
+        state: {
+          train,
+          type: "train",
+          from,
+          to,
+          fromName: fromCity?.name || from,
+          toName: toCity?.name || to,
+          date,
+          pax,
+        },
+      });
     },
     [date, from, fromCity?.name, navigate, pax, to, toCity?.name]
   );
@@ -370,7 +397,7 @@ export default function TrainsPage() {
             className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-xl border border-white/25 px-5 py-2.5 rounded-full mb-8"
           >
             <Compass size={15} className="text-yellow-400" />
-            <span className="text-[10px] font-black tracking-[0.3em] uppercase text-white">Rail Discovery</span>
+            <span className="text-xs font-black tracking-[0.3em] uppercase text-white">Rail Discovery</span>
           </motion.div>
 
           <motion.h1
@@ -418,59 +445,59 @@ export default function TrainsPage() {
       <div className="relative z-20 -mt-10 md:-mt-14">
         <div className="max-w-6xl mx-auto px-4 md:px-6">
           <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-900/10 p-4 md:p-5">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_40px_1fr_140px_130px_auto] gap-2.5 items-end">
-            <CityBox value={from} onChange={setFrom} label="From" />
-            <button
-              onClick={() => {
-                setFrom(to);
-                setTo(from);
-              }}
-              className="self-end mb-0.5 w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all hover:rotate-180 duration-300"
-            >
-              <ArrowRightLeft size={15} />
-            </button>
-            <CityBox value={to} onChange={setTo} label="To" />
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Date</p>
-              <div className="relative">
-                <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input
-                  type="date"
-                  value={date}
-                  min={today}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none focus:border-indigo-400"
-                />
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_40px_1fr_140px_130px_auto] gap-2.5 items-end">
+              <CityBox value={from} onChange={setFrom} label="From" />
+              <button
+                onClick={() => {
+                  setFrom(to);
+                  setTo(from);
+                }}
+                className="self-end mb-0.5 w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all hover:rotate-180 duration-300"
+              >
+                <ArrowRightLeft size={15} />
+              </button>
+              <CityBox value={to} onChange={setTo} label="To" />
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-1.5">Date</p>
+                <div className="relative">
+                  <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="date"
+                    value={date}
+                    min={today}
+                    onChange={(e) => setDate(e.target.value)}
+                    className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none focus:border-indigo-400"
+                  />
+                </div>
               </div>
-            </div>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1.5">Passengers</p>
-              <div className="relative">
-                <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <select
-                  value={pax}
-                  onChange={(e) => setPax(Number(e.target.value))}
-                  className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none appearance-none focus:border-indigo-400"
-                >
-                  {[1, 2, 3, 4, 5, 6].map((n) => (
-                    <option key={n} value={n}>
-                      {n} Adult{n > 1 ? "s" : ""}
-                    </option>
-                  ))}
-                </select>
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-1.5">Passengers</p>
+                <div className="relative">
+                  <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <select
+                    value={pax}
+                    onChange={(e) => setPax(Number(e.target.value))}
+                    className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none appearance-none focus:border-indigo-400"
+                  >
+                    {[1, 2, 3, 4, 5, 6].map((n) => (
+                      <option key={n} value={n}>
+                        {n} Adult{n > 1 ? "s" : ""}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
+              <button
+                onClick={handleSearch}
+                disabled={loading || from === to}
+                className="self-end h-[48px] flex items-center justify-center gap-2 px-5 bg-slate-900 text-white text-sm font-black rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50"
+              >
+                {loading ? <RefreshCw size={17} className="animate-spin" /> : <Search size={17} />}
+                Search
+              </button>
             </div>
-            <button
-              onClick={handleSearch}
-              disabled={loading || from === to}
-              className="self-end h-[48px] flex items-center justify-center gap-2 px-5 bg-slate-900 text-white text-sm font-black rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50"
-            >
-              {loading ? <RefreshCw size={17} className="animate-spin" /> : <Search size={17} />}
-              Search
-            </button>
           </div>
         </div>
-      </div>
       </div>
 
       <section className="max-w-7xl mx-auto px-6 py-10">
@@ -519,9 +546,8 @@ export default function TrainsPage() {
                 </div>
                 <button
                   onClick={() => setShowFilter(!showFilter)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-all shadow-sm ${
-                    showFilter ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-200 text-slate-700 hover:border-indigo-300"
-                  }`}
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-all shadow-sm ${showFilter ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-200 text-slate-700 hover:border-indigo-300"
+                    }`}
                 >
                   <Filter size={13} /> Filters
                 </button>

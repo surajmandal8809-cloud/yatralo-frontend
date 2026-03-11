@@ -14,6 +14,7 @@ import {
   MapPin,
   Calendar,
   X,
+  RefreshCw,
 } from "lucide-react";
 
 import toast from "react-hot-toast";
@@ -260,14 +261,17 @@ export default function ProfilePage() {
 
               <div className="relative">
 
-                <div className="w-28 h-28 rounded-2xl overflow-hidden">
-
+                <div className="w-28 h-28 rounded-2xl overflow-hidden relative">
                   <img
                     src={avatarPreview || DEFAULT_AVATAR}
                     alt="avatar"
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-cover transition-opacity ${isUploadingAvatar ? "opacity-30" : "opacity-100"}`}
                   />
-
+                  {isUploadingAvatar && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <RefreshCw className="animate-spin text-white" size={24} />
+                    </div>
+                  )}
                 </div>
 
                 <button
@@ -334,9 +338,9 @@ export default function ProfilePage() {
               value={
                 user?.createdAt
                   ? new Date(user.createdAt).toLocaleDateString("en-IN", {
-                      month: "short",
-                      year: "numeric",
-                    })
+                    month: "short",
+                    year: "numeric",
+                  })
                   : "N/A"
               }
             />

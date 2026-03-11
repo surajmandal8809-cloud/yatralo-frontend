@@ -18,6 +18,8 @@ import NotFound from "./pages/NotFound";
 import FlightsPage from "./pages/FlightsPage";
 import TrainsPage from "./pages/TrainsPage";
 import BookingsPage from "./pages/BookingsPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import HotelsPage from "./pages/HotelsPage";
 
 function App() {
   return (
@@ -32,8 +34,10 @@ function App() {
             <Route path="deals" element={<DealsPage />} />
             <Route path="benefits" element={<BenefitsPage />} />
             <Route path="flights" element={<FlightsPage />} />
+            <Route path="hotels" element={<HotelsPage />} />
             <Route path="trains" element={<TrainsPage />} />
             <Route path="bookings" element={<BookingsPage />} />
+            <Route path="checkout" element={<CheckoutPage />} />
           </Route>
 
           {/* Auth routes */}

@@ -259,16 +259,15 @@ export default function HotelsPage() {
         <div className="min-h-screen bg-slate-50">
             {/* Hero Section */}
             <section className="relative h-[65vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-                <video
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload="auto"
-                    className="absolute inset-0 w-full h-full object-cover"
-                >
-                    <source src="/assets/hotel.mp4" type="video/mp4" />
-                </video>
+             <video
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="absolute inset-0 w-full h-full object-cover"
+>
+  <source src="/assets/video/hotel.mp4" type="video/mp4" />
+</video>
                 <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
 
                 <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">

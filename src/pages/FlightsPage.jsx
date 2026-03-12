@@ -422,10 +422,15 @@ export default function FlightsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="relative h-[72vh] min-h-[520px] flex items-center justify-center overflow-hidden">
-        <video autoPlay loop muted playsInline preload="auto"  className="absolute inset-0 w-full h-full object-cover">
-          <source src="/assets/Banner.mp4" type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        <video
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="absolute inset-0 w-full h-full object-cover"
+>
+  <source src="/assets/Banner.mp4" type="video/mp4" />
+</video>
         <div className="absolute inset-0 bg-black/35" />
 
         <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">

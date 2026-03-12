@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+
 /* ─────────────────────────────── data ─────────────────────────────── */
 const CATEGORIES = [
     { id: "all", label: "All", icon: <Globe size={15} /> },
@@ -217,13 +218,15 @@ const DestinationsPage = () => {
 
             {/* ── HERO ── */}
             <section className="relative h-[80vh] min-h-[520px] flex items-center justify-center overflow-hidden">
-                <video
-                    autoPlay loop muted playsInline
-                    preload="auto"
-                    className="absolute inset-0 w-full h-full object-cover"
-                >
-                    <source src="/assets/Destination.mp4" type="video/mp4" />
-                </video>
+                 <video
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="absolute inset-0 w-full h-full object-cover"
+>
+  <source src="/assets/video/Destination.mp4" type="video/mp4" />
+</video>
 
                 {/* gradient overlays */}
                 <div className="absolute inset-0 bg-black/35" />

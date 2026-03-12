@@ -17,7 +17,7 @@ const HeroSection = () => {
           preload="auto"
           className="w-full h-full object-cover scale-110"
         >
-          <source src="/assets/Banner.mp4" type="video/mp4" />
+          <source src={`${import.meta.env.BASE_URL}assets/Banner.mp4`} type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/90"></div>

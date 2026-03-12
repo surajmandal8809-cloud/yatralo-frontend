@@ -345,8 +345,6 @@ export default function FlightsPage() {
   const [showFilter, setShowFilter] = useState(false);
   const didAutoSearch = useRef(false);
 
-  const bannerVideo = `${import.meta.env.BASE_URL}assets/Banner.mp4`;
-  const bannerPoster = `${import.meta.env.BASE_URL}assets/Banner.jpg`;
   const fromCity = CITIES.find((c) => c.code === from);
   const toCity = CITIES.find((c) => c.code === to);
 
@@ -424,8 +422,9 @@ export default function FlightsPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="relative h-[72vh] min-h-[520px] flex items-center justify-center overflow-hidden">
-        <video autoPlay loop muted playsInline preload="auto" poster={bannerPoster} className="absolute inset-0 w-full h-full object-cover">
-          <source src={bannerVideo} type="video/mp4" />
+        <video autoPlay loop muted playsInline preload="auto"  className="absolute inset-0 w-full h-full object-cover">
+          <source src="/assets/Banner.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-black/35" />
 

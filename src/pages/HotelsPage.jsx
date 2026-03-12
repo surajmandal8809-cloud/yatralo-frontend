@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import {
     Search,
     MapPin,
@@ -19,10 +19,23 @@ import {
 import toast from "react-hot-toast";
 import { getBaseURL } from "../services/baseApi";
 
+const DEFAULT_CITIES = [
+    { code: "DEL", name: "New Delhi" },
+    { code: "BOM", name: "Mumbai" },
+    { code: "BLR", name: "Bengaluru" },
+    { code: "HYD", name: "Hyderabad" },
+    { code: "MAA", name: "Chennai" },
+    { code: "CCU", name: "Kolkata" },
+    { code: "DXB", name: "Dubai" },
+    { code: "SIN", name: "Singapore" },
+    { code: "LHR", name: "London" },
+    { code: "PAR", name: "Paris" },
+];
+
 function CityBox({ label, value, onChange }) {
     const [open, setOpen] = useState(false);
     const [q, setQ] = useState("");
-    const [list, setList] = useState([]);
+    const [list, setList] = useState(DEFAULT_CITIES);
     const [loading, setLoading] = useState(false);
 
     const fetchCities = useCallback(async (keyword) => {
@@ -45,8 +58,12 @@ function CityBox({ label, value, onChange }) {
     }, []);
 
     useEffect(() => {
+        if (!q) {
+            setList(DEFAULT_CITIES);
+            return;
+        }
         const timer = setTimeout(() => {
-            if (q) fetchCities(q);
+            fetchCities(q);
         }, 400);
         return () => clearTimeout(timer);
     }, [q, fetchCities]);
@@ -121,9 +138,12 @@ function HotelCard({ hotel, index, onBook }) {
             <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/3 relative overflow-hidden">
                     <img
-                        src={hotel.images[0]}
+                        src={hotel.images && hotel.images.length > 0 ? hotel.images[0] : "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=60"}
                         alt={hotel.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 aspect-[4/3] md:aspect-auto"
+                        onError={(e) => {
+                            e.target.src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=60";
+                        }}
                     />
                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm">
                         <Star size={14} className="fill-amber-400 text-amber-400" />
@@ -142,7 +162,7 @@ function HotelCard({ hotel, index, onBook }) {
                         </div>
                         <div className="text-right">
                             <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Starting from</p>
-                            <p className="text-3xl font-black text-indigo-700">₹{hotel.price.toLocaleString()}</p>
+                            <p className="text-3xl font-black text-indigo-700">₹{hotel.price ? hotel.price.toLocaleString() : "N/A"}</p>
                             <p className="text-[10px] font-bold text-slate-500">Per Night + Taxes</p>
                         </div>
                     </div>
@@ -152,7 +172,7 @@ function HotelCard({ hotel, index, onBook }) {
                     </p>
 
                     <div className="flex flex-wrap gap-2 mb-8">
-                        {hotel.amenities.slice(0, 4).map((amt, i) => (
+                        {hotel.amenities && hotel.amenities.slice(0, 4).map((amt, i) => (
                             <span key={i} className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-lg text-[11px] font-bold text-slate-600">
                                 {amt.toLowerCase().includes('wifi') ? <Wifi size={12} /> :
                                     amt.toLowerCase().includes('pool') ? <Sparkles size={12} /> :
@@ -187,13 +207,29 @@ export default function HotelsPage() {
     const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
     const navigate = useNavigate();
 
-    const [city, setCity] = useState("DEL");
+    const [searchParams] = useSearchParams();
+    const [city, setCity] = useState(searchParams.get("cityCode") || searchParams.get("location") || "DEL");
     const [checkIn, setCheckIn] = useState(today);
     const [checkOut, setCheckOut] = useState(tomorrow);
     const [guests, setGuests] = useState(2);
     const [hotels, setHotels] = useState([]);
     const [loading, setLoading] = useState(false);
     const [searched, setSearched] = useState(false);
+    const [showFilter, setShowFilter] = useState(false);
+    const [priceRange, setPriceRange] = useState(50000);
+
+    const filteredHotels = useMemo(() => {
+        return hotels.filter(h => h.price <= priceRange);
+    }, [hotels, priceRange]);
+
+
+    useEffect(() => {
+        const location = searchParams.get("location");
+        const cityCode = searchParams.get("cityCode");
+        if (location || cityCode) {
+            handleSearch();
+        }
+    }, [searchParams]);
 
     const handleSearch = async () => {
         setLoading(true);
@@ -229,10 +265,9 @@ export default function HotelsPage() {
                     muted
                     playsInline
                     preload="auto"
-                    poster="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80"
                     className="absolute inset-0 w-full h-full object-cover"
                 >
-                    <source src={`${import.meta.env.BASE_URL}assets/video/hotel.mp4`} type="video/mp4" />
+                    <source src="/assets/hotel.mp4" type="video/mp4" />
                 </video>
                 <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
 
@@ -328,25 +363,73 @@ export default function HotelsPage() {
                         <div className="flex items-center justify-between mb-10">
                             <div>
                                 <h2 className="text-3xl font-black text-slate-900">Available Properties</h2>
-                                <p className="text-slate-400 font-bold text-sm mt-1">Found {hotels.length} hotels in {city}</p>
+                                <p className="text-slate-400 font-bold text-sm mt-1">Found {filteredHotels.length} hotels in {city}</p>
                             </div>
-                            <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold uppercase text-slate-600 hover:bg-[#cf3425] hover:text-white hover:border-[#cf3425] transition-all">
-                                <Filter size={14} /> Filter
+                            <button 
+                                onClick={() => setShowFilter(!showFilter)}
+                                className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold uppercase transition-all ${
+                                    showFilter ? "bg-[#cf3425] text-white border-[#cf3425]" : "bg-white border border-slate-200 text-slate-600 hover:bg-[#cf3425] hover:text-white hover:border-[#cf3425]"
+                                }`}
+                            >
+                                <Filter size={14} /> {showFilter ? "Hide Filter" : "Filter"}
                             </button>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-8">
-                            {hotels.length > 0 ? (
-                                hotels.map((h, i) => <HotelCard key={h.id} hotel={h} index={i} onBook={(hotel) => toast.success(`Viewing ${hotel.name}`)} />)
-                            ) : (
-                                <div className="text-center py-20">
-                                    <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
-                                        <Search size={32} />
+                        <AnimatePresence>
+                            {showFilter && (
+                                <motion.div
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    className="overflow-hidden mb-10"
+                                >
+                                    <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
+                                        <div className="max-w-md">
+                                            <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Max Price Per Night: <span className="text-indigo-600">₹{priceRange.toLocaleString()}</span></p>
+                                            <input
+                                                type="range"
+                                                min="1000"
+                                                max="100000"
+                                                step="1000"
+                                                value={priceRange}
+                                                onChange={(e) => setPriceRange(Number(e.target.value))}
+                                                className="w-full accent-[#cf3425]"
+                                            />
+                                            <div className="flex justify-between mt-2 text-[10px] font-bold text-slate-400">
+                                                <span>₹1,000</span>
+                                                <span>₹1,00,000</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <h3 className="text-xl font-black text-slate-800">No matching hotels found</h3>
-                                    <p className="text-slate-400 font-bold mt-1">Try different dates or location</p>
-                                </div>
+                                </motion.div>
                             )}
+                        </AnimatePresence>
+
+                        <div className="grid grid-cols-1 gap-8">
+                            <AnimatePresence mode="popLayout">
+                                {filteredHotels.length > 0 ? (
+                                    filteredHotels.map((h, i) => (
+                                        <HotelCard 
+                                            key={h.id} 
+                                            hotel={h} 
+                                            index={i} 
+                                            onBook={(hotel) => toast.success(`Viewing details for ${hotel.name}`)} 
+                                        />
+                                    ))
+                                ) : (
+                                    <motion.div 
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        className="text-center py-20"
+                                    >
+                                        <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
+                                            <Search size={32} />
+                                        </div>
+                                        <h3 className="text-xl font-black text-slate-800">No matching hotels found</h3>
+                                        <p className="text-slate-400 font-bold mt-1">Try increasing your price range or changing location</p>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     </>
                 )}

@@ -190,8 +190,7 @@ const DESTINATIONS = [
 
 /* ─────────────────────────────── component ─────────────────────────── */
 const DestinationsPage = () => {
-    const destinationVideo = `${import.meta.env.BASE_URL}assets/video/Destination.mp4`;
-    const destinationPoster = `${import.meta.env.BASE_URL}assets/flight-banner.jpg`;
+    
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
     const [activeCategory, setActiveCategory] = useState("all");
@@ -223,7 +222,7 @@ const DestinationsPage = () => {
                     preload="auto"
                     className="absolute inset-0 w-full h-full object-cover"
                 >
-                    <source src={destinationVideo} type="video/mp4" />
+                    <source src="/assets/Destination.mp4" type="video/mp4" />
                 </video>
 
                 {/* gradient overlays */}

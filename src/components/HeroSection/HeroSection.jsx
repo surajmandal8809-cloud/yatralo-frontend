@@ -3,8 +3,6 @@ import { motion } from "framer-motion";
 import SearchForm from "./SearchForm";
 
 const HeroSection = () => {
-  const bannerVideo = `${import.meta.env.BASE_URL}assets/Banner.mp4`;
-  const bannerPoster = `${import.meta.env.BASE_URL}assets/Banner.jpg`;
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
@@ -17,10 +15,9 @@ const HeroSection = () => {
           muted
           playsInline
           preload="auto"
-          poster={bannerPoster}
           className="w-full h-full object-cover scale-110"
         >
-          <source src={bannerVideo} type="video/mp4" />
+          <source src="/assets/Banner.mp4" type="video/mp4" />
           Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/90"></div>

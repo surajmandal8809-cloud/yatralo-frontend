@@ -258,47 +258,56 @@ export default function HotelsPage() {
     return (
         <div className="min-h-screen bg-slate-50">
             {/* Hero Section */}
-            <section className="relative h-[65vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-             <video
-  autoPlay
-  loop
-  muted
-  playsInline
-  className="absolute inset-0 w-full h-full object-cover"
->
-  <source src="/assets/video/hotel.mp4" type="video/mp4" />
-</video>
-                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+           <section className="relative h-[70vh] min-h-[520px] flex items-center justify-center overflow-hidden">
 
-                <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-xl border border-white/20 px-5 py-2 rounded-full mb-8"
-                    >
-                        <Compass size={16} className="text-yellow-400" />
-                        <span className="text-xs font-black tracking-[0.3em] uppercase text-white">Elite Stays</span>
-                    </motion.div>
+  {/* Background Video */}
+  <video
+    autoPlay
+    muted
+    loop
+    playsInline
+    preload="auto"
+    className="absolute inset-0 w-full h-full object-cover"
+  >
+    <source src="/assets/video/hotel.mp4" type="video/mp4" />
+  </video>
 
-                    <motion.h1
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none mb-6"
-                    >
-                        Find Your <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Sanctuary</span>
-                    </motion.h1>
+  {/* Gradient Overlay */}
+  <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
 
-                    <motion.p
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed"
-                    >
-                        Exclusive deals on the world's most luxurious hotels and resorts.
-                    </motion.p>
-                </div>
-            </section>
+  {/* Content */}
+  <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
+
+    <motion.h1
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      className="text-5xl md:text-7xl font-black text-white tracking-tight leading-tight mb-6"
+    >
+      Discover Luxury <br />
+      <span className="text-orange-400">Hotels Worldwide</span>
+    </motion.h1>
+
+    <motion.p
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3 }}
+      className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto mb-8"
+    >
+      Find exclusive deals on premium hotels, resorts and stays.
+    </motion.p>
+
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      className="px-8 py-4 bg-[#cf3425] hover:bg-[#b82e1f] text-white font-semibold rounded-xl shadow-xl"
+    >
+      Explore Hotels
+    </motion.button>
+
+  </div>
+
+</section>
 
             {/* Search Bar */}
             <div className="relative z-20 -mt-16 max-w-6xl mx-auto px-6">

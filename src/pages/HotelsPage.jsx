@@ -171,7 +171,7 @@ function HotelCard({ hotel, index, onBook }) {
                         </div>
                         <button
                             onClick={() => onBook(hotel)}
-                            className="bg-slate-900 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl text-sm font-black transition-all shadow-lg flex items-center gap-2"
+                            className="bg-[#cf3425] hover:bg-[#b82e1f] text-white px-8 py-3 rounded-xl text-sm font-semibold transition-all shadow-lg flex items-center gap-2"
                         >
                             View Details <ChevronRight size={16} />
                         </button>
@@ -223,11 +223,17 @@ export default function HotelsPage() {
         <div className="min-h-screen bg-slate-50">
             {/* Hero Section */}
             <section className="relative h-[65vh] min-h-[500px] flex items-center justify-center overflow-hidden">
-                <img
-                    src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80"
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto"
+                    poster="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1920&q=80"
                     className="absolute inset-0 w-full h-full object-cover"
-                    alt="Luxury Hotel"
-                />
+                >
+                    <source src={`${import.meta.env.BASE_URL}assets/video/hotel.mp4`} type="video/mp4" />
+                </video>
                 <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
 
                 <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
@@ -299,7 +305,7 @@ export default function HotelsPage() {
                     <button
                         onClick={handleSearch}
                         disabled={loading}
-                        className="w-full md:w-auto px-10 py-4 bg-slate-900 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                        className="w-full md:w-auto px-10 py-4 bg-[#cf3425] hover:bg-[#b82e1f] text-white font-semibold rounded-xl shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                     >
                         {loading ? <RefreshCw className="animate-spin" size={20} /> : <Search size={20} />}
                         Search
@@ -324,7 +330,7 @@ export default function HotelsPage() {
                                 <h2 className="text-3xl font-black text-slate-900">Available Properties</h2>
                                 <p className="text-slate-400 font-bold text-sm mt-1">Found {hotels.length} hotels in {city}</p>
                             </div>
-                            <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-black uppercase text-slate-600 hover:bg-slate-50 transition-all">
+                            <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold uppercase text-slate-600 hover:bg-[#cf3425] hover:text-white hover:border-[#cf3425] transition-all">
                                 <Filter size={14} /> Filter
                             </button>
                         </div>

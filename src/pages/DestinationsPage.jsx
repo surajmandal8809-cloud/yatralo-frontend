@@ -365,7 +365,7 @@ const DestinationsPage = () => {
                             <p className="text-slate-300 text-sm mt-1">Try a different search or category</p>
                             <button
                                 onClick={() => { setSearchTerm(""); setActiveCategory("all"); }}
-                                className="mt-6 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 transition"
+                                className="mt-6 px-6 py-3 bg-[#cf3425] hover:bg-[#b82e1f] text-white rounded-xl font-semibold text-sm transition"
                             >
                                 Clear Filters
                             </button>
@@ -408,7 +408,7 @@ const DestinationsPage = () => {
                     </p>
                     <button
                         onClick={() => navigate("/")}
-                        className="inline-flex items-center gap-3 bg-yellow-400 hover:bg-yellow-300 text-slate-900 font-black px-10 py-5 rounded-3xl text-sm uppercase tracking-widest transition-all shadow-2xl shadow-yellow-500/20 hover:shadow-yellow-400/30 group"
+                        className="inline-flex items-center gap-3 bg-[#cf3425] hover:bg-[#b82e1f] text-white font-semibold px-10 py-5 rounded-xl text-sm uppercase tracking-widest transition-all shadow-2xl shadow-red-500/20 group"
                     >
                         Start Planning
                         <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -513,7 +513,7 @@ const DestinationCard = ({ dest, index, liked, onLike, onClick }) => (
             </div>
 
             {/* Explore button */}
-            <button className="mt-4 w-full py-3 bg-slate-900 group-hover:bg-indigo-600 text-white rounded-2xl text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors duration-300">
+            <button className="mt-4 w-full py-3 bg-[#cf3425] hover:bg-[#b82e1f] text-white rounded-2xl text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors duration-300">
                 Explore
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </button>

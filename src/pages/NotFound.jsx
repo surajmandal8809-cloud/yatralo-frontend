@@ -23,7 +23,7 @@ const NotFound = () => {
                 <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                     <Link
                         to="/"
-                        className="flex items-center gap-2 rounded-full bg-slate-900 px-8 py-4 text-sm font-semibold text-white shadow-xl hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 transition-all duration-300 hover:scale-105 active:scale-95"
+                        className="flex items-center gap-2 rounded-xl bg-[#cf3425] px-8 py-4 text-sm font-semibold text-white shadow-xl hover:bg-[#b82e1f] transition-all duration-300 hover:scale-105 active:scale-95"
                     >
                         <Home className="w-4 h-4" />
                         Back to Home

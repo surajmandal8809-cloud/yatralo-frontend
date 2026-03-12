@@ -9,7 +9,21 @@ const ResetPassword = () => {
   const [resetPassword, { isLoading, isError, error, isSuccess, data }] =
     useResetPasswordMutation();
 
-  const token = window.location.search.split("token=")[1];
+  const [token, setToken] = useState("");
+
+  useEffect(() => {
+    // Check URL first
+    const urlToken = new URLSearchParams(window.location.search).get("token");
+    if (urlToken) {
+      setToken(urlToken);
+    } else {
+      // Check localStorage if not in URL (for mobile OTP flow)
+      const localToken = localStorage.getItem("token");
+      if (localToken) {
+        setToken(localToken);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (isSuccess && data) {
@@ -121,7 +135,7 @@ const ResetPassword = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 rounded-xl font-semibold text-white bg-[#cf3425] hover:opacity-90 transition shadow-md disabled:opacity-60"
+            className="w-full py-3 rounded-xl font-semibold text-white bg-[#cf3425] hover:bg-[#b82e1f] transition shadow-md disabled:opacity-60"
           >
             {isLoading ? "Resetting..." : "Reset Password"}
           </button>

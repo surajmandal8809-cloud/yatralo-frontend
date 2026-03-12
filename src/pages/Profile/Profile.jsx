@@ -276,7 +276,7 @@ export default function ProfilePage() {
 
                 <button
                   onClick={() => fileInputRef.current.click()}
-                  className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#CF3425] hover:bg-[#b22e20] text-white rounded-xl flex items-center justify-center shadow-md"
+                  className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#cf3425] hover:bg-[#b82e1f] text-white rounded-xl flex items-center justify-center shadow-md transition-all"
                 >
                   <Camera size={16} />
                 </button>
@@ -384,7 +384,7 @@ export default function ProfilePage() {
                       <button
                         onClick={() => handleCancelBooking(b.id, b.status)}
                         disabled={isCancelled}
-                        className={`px-3 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider ${isCancelled ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-[#CF3425] text-white hover:bg-[#b22e20]"}`}
+                        className={`px-3 py-2 rounded-xl text-[11px] font-semibold uppercase tracking-wider transition-all ${isCancelled ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-[#cf3425] text-white hover:bg-[#b82e1f]"}`}
                       >
                         Cancel
                       </button>

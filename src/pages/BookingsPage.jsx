@@ -120,7 +120,7 @@ export default function BookingsPage() {
               <p className="text-lg font-black text-slate-700 mt-3">No bookings found</p>
               <p className="text-slate-400 text-sm mt-1">Book a trip from Flights or Trains to see it here.</p>
               <div className="mt-5 flex justify-center gap-3">
-                <Link to="/flights" className="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-bold">
+                <Link to="/flights" className="px-4 py-2 rounded-xl bg-[#cf3425] hover:bg-[#b82e1f] text-white text-sm font-semibold">
                   Explore Flights
                 </Link>
                 <Link to="/trains" className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold">

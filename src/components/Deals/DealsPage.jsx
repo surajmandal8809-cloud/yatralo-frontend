@@ -118,7 +118,7 @@ const DealCard = ({ deal }) => {
           </div>
           <button
             onClick={handleBooking}
-            className="px-5 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition"
+            className="px-5 py-2 bg-[#cf3425] hover:bg-[#b82e1f] text-white text-sm rounded-xl font-semibold transition shadow-md"
           >
             Book Now
           </button>
@@ -445,10 +445,10 @@ const DealsPage = () => {
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-5 py-2 rounded-full text-sm transition ${
+                className={`px-5 py-2 rounded-xl text-sm font-semibold transition ${
                   activeCategory === cat
                     ? "bg-[#cf3425] text-white"
-                    : "bg-white border hover:bg-gray-100"
+                    : "bg-white border border-slate-200 hover:bg-slate-50 text-slate-600"
                 }`}
               >
                 {cat === "holiday-packages" ? "Holidays" : 

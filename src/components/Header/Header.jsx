@@ -60,10 +60,9 @@ const Header = () => {
     { name: "Flights", path: "/flights" },
     { name: "Hotels", path: "/hotels" },
     { name: "Trains", path: "/trains" },
-    { name: "Bookings", path: "/bookings" },
     { name: "Destinations", path: "/destinations" },
     { name: "Deals", path: "/deals" },
-    { name: "Benefits", path: "/benefits" },
+    { name: "Bookings", path: "/bookings" }
   ];
 
   const isHomePage = location.pathname === "/";
@@ -83,11 +82,11 @@ const Header = () => {
             const isActive = location.pathname === item.path;
             return (
               <Link key={item.name} to={item.path}
-                className={`relative text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-200 hover:text-[#C1372A] group/nav ${scrolled ? "text-slate-700" : "text-white/90"
+                className={`relative text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-200 hover:text-[#cf3425] group/nav ${scrolled ? "text-slate-700" : "text-white/90"
                   }`}
               >
                 {item.name}
-                <span className={`absolute -bottom-2 left-1/2 -translate-x-1/2 h-0.5 bg-[#C1372A] rounded-full transition-all duration-300 ${isActive ? "w-4" : "w-0 group-hover/nav:w-4"
+                <span className={`absolute -bottom-2 left-1/2 -translate-x-1/2 h-0.5 bg-[#cf3425] rounded-full transition-all duration-300 ${isActive ? "w-4" : "w-0 group-hover/nav:w-4"
                   }`} />
               </Link>
             );
@@ -105,7 +104,7 @@ const Header = () => {
                 Sign In
               </Link>
               <Link to="/auth/register"
-                className="px-4 py-2 text-sm font-semibold rounded-xl bg-[#C1372A] text-white hover:bg-[#a02e24] transition shadow-sm hover:shadow-md">
+                className="px-4 py-2 text-sm font-semibold rounded-xl bg-[#cf3425] text-white hover:bg-[#b82e1f] transition shadow-sm hover:shadow-md">
                 Get Started
               </Link>
             </>
@@ -114,13 +113,13 @@ const Header = () => {
               <Link to="/profile" className="flex items-center gap-2 group">
                 {user?.avatar ? (
                   <img src={user.avatar} alt="avatar"
-                    className="w-9 h-9 rounded-full border-2 border-[#C1372A] object-cover" />
+                    className="w-9 h-9 rounded-full border-2 border-[#cf3425] object-cover" />
                 ) : (
-                  <div className="w-9 h-9 rounded-full border-2 border-[#C1372A] bg-red-50 flex items-center justify-center text-xs font-black text-[#C1372A]">
+                  <div className="w-9 h-9 rounded-full border-2 border-[#cf3425] bg-red-50 flex items-center justify-center text-xs font-black text-[#cf3425]">
                     {user?.first_name?.[0] || user?.email?.[0]}
                   </div>
                 )}
-                <span className={`text-sm font-semibold group-hover:text-[#C1372A] transition ${scrolled ? "text-gray-800" : "text-white"}`}>
+                <span className={`text-sm font-semibold group-hover:text-[#cf3425] transition ${scrolled ? "text-gray-800" : "text-white"}`}>
                   {user?.first_name || "Account"}
                 </span>
               </Link>
@@ -148,9 +147,9 @@ const Header = () => {
               <div className="py-2 border-b border-gray-100 mb-1">
                 <div className="flex items-center gap-3">
                   {user?.avatar ? (
-                    <img src={user.avatar} alt="avatar" className="w-10 h-10 rounded-full border-2 border-[#C1372A] object-cover" />
+                    <img src={user.avatar} alt="avatar" className="w-10 h-10 rounded-full border-2 border-[#cf3425] object-cover" />
                   ) : (
-                    <div className="w-10 h-10 rounded-full border-2 border-[#C1372A] bg-red-50 flex items-center justify-center text-sm font-black text-[#C1372A]">
+                    <div className="w-10 h-10 rounded-full border-2 border-[#cf3425] bg-red-50 flex items-center justify-center text-sm font-black text-[#cf3425]">
                       {user?.first_name?.[0] || user?.email?.[0]}
                     </div>
                   )}
@@ -163,7 +162,7 @@ const Header = () => {
             )}
             {navItems.map((item) => (
               <Link key={item.name} to={item.path}
-                className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-600 hover:text-[#C1372A] transition py-1">
+                className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-600 hover:text-[#cf3425] transition py-1">
                 {item.name}
               </Link>
             ))}
@@ -171,13 +170,13 @@ const Header = () => {
               <>
                 <Link to="/auth/login" className="text-sm font-semibold text-gray-700 py-1">Sign In</Link>
                 <Link to="/auth/register"
-                  className="bg-[#C1372A] text-white px-4 py-2.5 rounded-xl text-sm text-center font-semibold hover:bg-[#a02e24] transition">
+                  className="bg-[#cf3425] text-white px-4 py-2.5 rounded-xl text-sm text-center font-semibold hover:bg-[#b82e1f] transition">
                   Get Started
                 </Link>
               </>
             ) : (
               <>
-                <Link to="/profile" className="text-sm font-semibold text-[#C1372A] py-1">My Profile</Link>
+                <Link to="/profile" className="text-sm font-semibold text-[#cf3425] py-1">My Profile</Link>
                 <button onClick={handleLogout}
                   className="text-left text-gray-500 text-sm font-semibold py-1 flex items-center gap-2 hover:text-gray-700">
                   <LuLogOut size={15} />

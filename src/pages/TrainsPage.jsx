@@ -243,7 +243,7 @@ function TrainCard({ t, index, onBook }) {
           <div className="flex flex-col items-end gap-1.5">
             <button
               onClick={() => onBook(t)}
-              className="px-5 py-2.5 bg-slate-900 hover:bg-indigo-700 text-white text-sm font-black rounded-xl transition-all shadow"
+              className="px-5 py-2.5 bg-[#cf3425] hover:bg-[#b82e1f] text-white text-sm font-semibold rounded-xl transition-all shadow"
             >
               Book Now
             </button>
@@ -490,7 +490,7 @@ export default function TrainsPage() {
               <button
                 onClick={handleSearch}
                 disabled={loading || from === to}
-                className="self-end h-[48px] flex items-center justify-center gap-2 px-5 bg-slate-900 text-white text-sm font-black rounded-xl hover:bg-indigo-700 transition-all disabled:opacity-50"
+                className="self-end h-[48px] flex items-center justify-center gap-2 px-5 bg-[#cf3425] text-white text-sm font-semibold rounded-xl hover:bg-[#b82e1f] transition-all disabled:opacity-50"
               >
                 {loading ? <RefreshCw size={17} className="animate-spin" /> : <Search size={17} />}
                 Search

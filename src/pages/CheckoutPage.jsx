@@ -316,7 +316,7 @@ export default function CheckoutPage() {
                                     </div>
                                     <button
                                         onClick={handleNext}
-                                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2 group"
+                                        className="w-full bg-[#cf3425] hover:bg-[#b82e1f] text-white font-semibold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 group"
                                     >
                                         Continue to Payment
                                         <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -413,7 +413,7 @@ export default function CheckoutPage() {
                                     <button
                                         onClick={handleNext}
                                         disabled={loading}
-                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-xl shadow-blue-200 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                                        className="w-full bg-[#cf3425] hover:bg-[#b82e1f] text-white font-semibold py-4 rounded-xl shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                                     >
                                         {loading ? (
                                             <>
@@ -568,7 +568,7 @@ export default function CheckoutPage() {
                                 </button>
                                 <button
                                     onClick={() => navigate("/bookings")}
-                                    className="flex items-center gap-2 px-8 py-3 bg-slate-900 text-white rounded-xl text-sm font-black hover:bg-blue-700 transition-all shadow-lg"
+                                    className="flex items-center gap-2 px-8 py-3 bg-[#cf3425] hover:bg-[#b82e1f] text-white rounded-xl text-sm font-semibold transition-all shadow-lg"
                                 >
                                     Go to My Bookings
                                 </button>

@@ -62,7 +62,7 @@ const SupportSection = () => {
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300 }}
             onClick={() => navigate("/help")}
-            className="group rounded-3xl bg-slate-900 px-10 py-5 text-xs font-bold uppercase tracking-[0.25em] text-white shadow-xl shadow-slate-900/20 transition-all hover:bg-[#c1372a]"
+            className="group rounded-xl bg-slate-900 px-10 py-5 text-xs font-semibold uppercase tracking-[0.25em] text-white shadow-xl shadow-slate-900/20 transition-all hover:bg-[#b82e1f]"
           >
             Access Help Center
             <ArrowRight

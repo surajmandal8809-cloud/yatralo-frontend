@@ -56,7 +56,7 @@ const Testimonials = () => {
       <div
         className="absolute top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none"
         style={{
-          backgroundImage: "radial-gradient(#c1372a 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(#cf3425 1px, transparent 1px)",
           backgroundSize: "40px 40px",
         }}
       />
@@ -70,14 +70,14 @@ const Testimonials = () => {
             whileInView={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 bg-white px-5 py-2 rounded-full mb-6 shadow-sm border border-slate-100"
           >
-            <Quote size={14} className="text-[#c1372a]" />
+            <Quote size={14} className="text-[#cf3425]" />
             <span className="text-[10px] font-black tracking-[0.3em] uppercase text-slate-400">
               Member Voices
             </span>
           </motion.div>
 
           <h2 className="text-2xl md:text-4xl font-black text-slate-900 mb-8 tracking-tight">
-            The <span className="text-[#c1372a]">Elite</span> Verdict
+            The <span className="text-[#cf3425]">Elite</span> Verdict
           </h2>
 
           <p className="text-slate-500 text-base md:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
@@ -102,7 +102,7 @@ const Testimonials = () => {
                   <Star
                     key={i}
                     size={14}
-                    className="text-[#c1372a] fill-[#c1372a]"
+                    className="text-[#cf3425] fill-[#cf3425]"
                   />
                 ))}
               </div>
@@ -124,7 +124,7 @@ const Testimonials = () => {
                   <h4 className="text-sm font-black text-slate-900">
                     {t.name}
                   </h4>
-                  <p className="text-[10px] font-black uppercase text-[#c1372a] tracking-widest mt-0.5">
+                  <p className="text-[10px] font-black uppercase text-[#cf3425] tracking-widest mt-0.5">
                     {t.role}
                   </p>
                 </div>
@@ -134,11 +134,11 @@ const Testimonials = () => {
         </div>
 
         {/* Stats */}
-        <div className="mt-32 pt-20 border-t border-slate-200/60">
+        <div className="mt-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
             {stats.map((stat, i) => (
               <div key={i}>
-                <h3 className="text-3xl font-black text-[#c1372a] tracking-tight mb-2">
+                <h3 className="text-3xl font-black text-[#cf3425] tracking-tight mb-2">
                   {stat.value}
                 </h3>
                 <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
@@ -151,7 +151,7 @@ const Testimonials = () => {
 
         {/* CTA */}
         <div className="text-center mt-20">
-          <button className="group px-10 py-5 bg-[#c1372a] text-white rounded-3xl font-black uppercase text-xs tracking-[0.3em] hover:opacity-90 transition-all shadow-xl">
+          <button className="group px-10 py-5 bg-[#cf3425] text-white rounded-xl font-semibold uppercase text-xs tracking-[0.3em] hover:bg-[#b82e1f] transition-all shadow-xl">
             Join the Elite Circle
             <ArrowRight
               size={18}

@@ -27,7 +27,7 @@ const BenefitsPage = () => {
                         Unlock prestigious advantages, from member rates to 24/7 personalized concierge.
                     </p>
 
-                    <button className="px-8 py-3 bg-[#CF3425] hover:bg-[#b22e20] text-white rounded-2xl font-black uppercase text-[11px] tracking-wider transition-all shadow-lg">
+                    <button className="px-8 py-3 bg-[#cf3425] hover:bg-[#b82e1f] text-white rounded-xl font-semibold uppercase text-[11px] tracking-wider transition-all shadow-lg">
                         Join Membership
                     </button>
                 </div>
@@ -64,7 +64,7 @@ const BenefitsPage = () => {
                             <h2 className="text-2xl md:text-3xl font-black mb-2 tracking-tight text-white">Ready to Begin Your Legacy?</h2>
                             <p className="text-white/80 text-sm font-medium leading-relaxed">Join Elite members and experience travel as it should be.</p>
                         </div>
-                        <button className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black uppercase text-[11px] tracking-wider hover:scale-105 transition-all shadow-lg">
+                        <button className="px-8 py-4 bg-white text-slate-900 rounded-xl font-semibold uppercase text-[11px] tracking-wider hover:scale-105 transition-all shadow-lg">
                             Join Now <ArrowRight className="inline ml-2" size={16} />
                         </button>
                     </div>

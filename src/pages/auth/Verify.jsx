@@ -93,7 +93,7 @@ const VerifyPage = () => {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full rounded-xl bg-[#cf3425] py-3 text-white font-semibold text-sm uppercase tracking-wide shadow-lg hover:opacity-90 transition"
+          className="w-full rounded-xl bg-[#cf3425] hover:bg-[#b82e1f] py-3 text-white font-semibold text-sm uppercase tracking-wide shadow-lg transition"
         >
           Verify Account
         </button>

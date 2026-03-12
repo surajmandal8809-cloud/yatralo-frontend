@@ -88,20 +88,20 @@ const FAQ = () => {
   };
 
   return (
-    <section className="py-28 bg-gray-100">
+    <section className=" bg-gray-100">
       <div className="max-w-7xl mx-auto px-6">
 
         {/* Header */}
         <div className="text-center mb-16">
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-gray-200 mb-6">
-            <HelpCircle size={14} className="text-[#c1372a]" />
+            <HelpCircle size={14} className="text-[#cf3425]" />
             <span className="text-xs font-bold uppercase tracking-[0.3em] text-gray-500">
               Knowledge Base
             </span>
           </div>
 
           <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-6">
-            Frequently Asked <span className="text-[#c1372a]">Questions</span>
+            Frequently Asked <span className="text-[#cf3425]">Questions</span>
           </h2>
 
           <p className="text-gray-500 max-w-2xl mx-auto text-base">
@@ -121,7 +121,7 @@ const FAQ = () => {
             placeholder="Search questions..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#c1372a]/20"
+            className="w-full pl-14 pr-6 py-4 rounded-2xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-[#cf3425]/20"
           />
         </div>
 
@@ -131,7 +131,7 @@ const FAQ = () => {
             filteredData.map((category, i) => (
               <div key={i}>
                 <div className="flex items-center gap-3 mb-8 border-b pb-4">
-                  <category.icon className="text-[#c1372a]" size={20} />
+                  <category.icon className="text-[#cf3425]" size={20} />
                   <h3 className="font-bold uppercase tracking-widest text-xs text-gray-900">
                     {category.title}
                   </h3>
@@ -160,7 +160,7 @@ const FAQ = () => {
                           <ChevronDown
                             size={16}
                             className={`transition-transform ${
-                              isOpen ? "rotate-180 text-[#c1372a]" : ""
+                              isOpen ? "rotate-180 text-[#cf3425]" : ""
                             }`}
                           />
                         </button>
@@ -196,7 +196,7 @@ const FAQ = () => {
         <div className="mt-28 text-center">
           <button
             onClick={() => navigate("/help")}
-            className="px-10 py-5 bg-gray-900 text-white rounded-3xl text-xs font-bold uppercase tracking-[0.3em] hover:bg-[#c1372a] transition-all"
+            className="px-10 py-5 bg-gray-900 text-white rounded-xl text-xs font-semibold uppercase tracking-[0.3em] hover:bg-[#b82e1f] transition-all shadow-md"
           >
             Contact Concierge
           </button>

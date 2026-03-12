@@ -96,8 +96,8 @@ const DestinationSection = () => {
 
             {/* Badge — same style as BenefitSection & Testimonials */}
             <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full mb-6 shadow-sm">
-              <Compass size={14} className="text-[#c1372a]" />
-              <span className="text-[10px] font-bold tracking-widest uppercase text-[#c1372a]">
+              <Compass size={14} className="text-[#cf3425]" />
+              <span className="text-[10px] font-bold tracking-widest uppercase text-[#cf3425]">
                 Global Expeditions
               </span>
             </div>
@@ -105,7 +105,7 @@ const DestinationSection = () => {
             {/* Heading — same size / weight / accent as other sections */}
             <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
               Icons of the{" "}
-              <span className="text-[#c1372a]">Global Map</span>
+              <span className="text-[#cf3425]">Global Map</span>
             </h2>
 
             {/* Subtext — slate-500 like other sections */}
@@ -126,7 +126,7 @@ const DestinationSection = () => {
             </button>
             <button
               onClick={() => swiperRef.current?.slideNext()}
-              className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center hover:bg-[#c1372a] transition-all group shadow-lg"
+              className="w-14 h-14 rounded-2xl bg-slate-900 text-white flex items-center justify-center hover:bg-[#cf3425] transition-all group shadow-lg"
               aria-label="Next slide"
             >
               <ArrowRight size={22} className="group-hover:translate-x-1 transition-transform" />
@@ -165,7 +165,7 @@ const DestinationSection = () => {
         <div className="text-center mt-4">
           <button
             onClick={() => navigate("/destinations")}
-            className="px-8 py-4 bg-[#c1372a] text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg hover:opacity-90 transition-all group"
+            className="px-8 py-4 bg-[#cf3425] text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg hover:bg-[#b82e1f] transition-all group"
           >
             Discover All Destinations
             <Globe
@@ -207,13 +207,13 @@ const DestinationCard = ({ img, name, rating, tag, flights, hotels }) => {
       <div className="absolute top-8 left-8 flex flex-col gap-3">
         {/* Tag — glass pill */}
         <div className="bg-white/10 backdrop-blur-xl px-4 py-2 rounded-2xl border border-white/20 flex items-center gap-2">
-          <Sparkles size={11} className="text-[#c1372a]" />
+          <Sparkles size={11} className="text-[#cf3425]" />
           <span className="text-[10px] font-black uppercase tracking-widest text-white">
             {tag}
           </span>
         </div>
         {/* Rating — brand red */}
-        <div className="bg-[#c1372a] px-3 py-1.5 rounded-xl flex items-center gap-1.5 w-fit shadow-lg">
+        <div className="bg-[#cf3425] px-3 py-1.5 rounded-xl flex items-center gap-1.5 w-fit shadow-lg">
           <Star size={10} className="fill-white text-white" />
           <span className="text-[10px] font-black text-white">{rating}</span>
         </div>
@@ -227,7 +227,7 @@ const DestinationCard = ({ img, name, rating, tag, flights, hotels }) => {
 
         <div className="flex items-center gap-6 border-t border-white/10 pt-6">
           <div className="flex flex-col">
-            <span className="text-xl font-black text-[#c1372a] leading-none">
+            <span className="text-xl font-black text-[#cf3425] leading-none">
               {flights}
             </span>
             <span className="text-[9px] font-black uppercase tracking-widest text-white/50 mt-1">
@@ -243,7 +243,7 @@ const DestinationCard = ({ img, name, rating, tag, flights, hotels }) => {
             </span>
           </div>
           {/* Arrow button — brand red on hover */}
-          <div className="group/btn ml-auto w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-900 group-hover:bg-[#c1372a] group-hover:text-white transition-all duration-300 shadow-lg">
+          <div className="group/btn ml-auto w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-slate-900 group-hover:bg-[#cf3425] group-hover:text-white transition-all duration-300 shadow-lg">
             <ArrowRight
               size={20}
               className="group-hover/btn:translate-x-1 transition-transform"

@@ -10,16 +10,14 @@ const HeroSection = () => {
       {/* Background Video */}
       <div className="absolute inset-0 overflow-hidden">
         <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          className="w-full h-full object-cover scale-110"
-        >
-          <source src={`${import.meta.env.BASE_URL}assets/Banner.mp4`} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+  autoPlay
+  loop
+  muted
+  playsInline
+  className="absolute inset-0 w-full h-full object-cover"
+>
+  <source src="/assets/Banner.mp4" type="video/mp4" />
+</video>
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/90"></div>
       </div>
 

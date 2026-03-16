@@ -20,6 +20,7 @@ import TrainsPage from "./pages/TrainsPage";
 import BookingsPage from "./pages/BookingsPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import HotelsPage from "./pages/HotelsPage";
+import BookingSelectionPage from "./pages/BookingSelectionPage";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route path="trains" element={<TrainsPage />} />
             <Route path="bookings" element={<BookingsPage />} />
             <Route path="checkout" element={<CheckoutPage />} />
+            <Route path="booking-selection" element={<BookingSelectionPage />} />
           </Route>
 
           {/* Auth routes */}

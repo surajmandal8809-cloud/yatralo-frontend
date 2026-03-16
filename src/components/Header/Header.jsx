@@ -129,19 +129,14 @@ const Header = () => {
                     className="w-9 h-9 rounded-full border-2 border-[#cf3425] object-cover" />
                 ) : (
                   <div className="w-9 h-9 rounded-full border-2 border-[#cf3425] bg-red-50 flex items-center justify-center text-xs font-black text-[#cf3425]">
-                    {user?.first_name?.[0] || user?.email?.[0]}
+                    {user?.first_name?.[0]  || user?.email?.[0]}
                   </div>
                 )}
                 <span className={`text-sm font-semibold group-hover:text-[#cf3425] transition ${scrolled ? "text-gray-800" : "text-white"}`}>
-                  {user?.first_name || "Account"}
+                  {user?.first_name ? `${user.first_name} ${user.last_name || ""}`.trim() : "Account"}
                 </span>
               </Link>
-              <button onClick={handleLogout}
-                className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border transition ${scrolled ? "border-gray-200 text-gray-500 hover:bg-gray-50" : "border-white/30 text-white hover:bg-white/10"
-                  }`}>
-                <LuLogOut size={13} />
-                Logout
-              </button>
+              
             </>
           )}
         </div>
@@ -167,7 +162,7 @@ const Header = () => {
                     </div>
                   )}
                   <div>
-                    <p className="text-sm font-bold text-gray-800">{user?.first_name || "Account"}</p>
+                    <p className="text-sm font-bold text-gray-800">{user?.first_name ? `${user.first_name} ${user.last_name || ""}`.trim() : "Account"}</p>
                     <p className="text-xs text-gray-400 truncate max-w-[160px]">{user?.email}</p>
                   </div>
                 </div>

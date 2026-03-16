@@ -15,24 +15,26 @@ import {
     Calendar,
     Clock,
     MapPin,
-    ArrowRight
+    ArrowRight,
+    Hotel,
+    Utensils
 } from "lucide-react";
-import { addBooking, formatInr } from "../utils/bookingStore";
 import toast from "react-hot-toast";
 import { useGetUserQuery } from "../services/userService";
+import { addBooking, formatInr, isInternational } from "../utils/bookingUtils";
 
 const STEPS = ["Review", "Payment", "Success"];
 
 export default function CheckoutPage() {
     const location = useLocation();
     const navigate = useNavigate();
-    const { flight, train, type, from, to, date, pax, fromName, toName } = location.state || {};
+    const { flight, train, hotel, type, from, to, date, pax, fromName, toName } = location.state || {};
 
     const [currentStep, setCurrentStep] = useState(0);
     const token = localStorage.getItem("token");
     const { data: userData } = useGetUserQuery(token, { skip: !token });
     const [passengers, setPassengers] = useState(
-        Array.from({ length: pax || 1 }, () => ({ name: "", age: "", gender: "Male" }))
+        Array.from({ length: pax || 1 }, () => ({ name: "", age: "", gender: "Male", passport: "" }))
     );
     const [loading, setLoading] = useState(false);
     const [bookingResult, setBookingResult] = useState(null);
@@ -56,23 +58,27 @@ export default function CheckoutPage() {
             return;
         }
 
-        if (!type || (!flight && !train)) {
+        if (!type || (!flight && !train && !hotel)) {
             navigate("/");
         }
-    }, [type, flight, train, navigate]);
+    }, [type, flight, train, hotel, navigate]);
 
-    if (!type || (!flight && !train)) return null;
-
-    const item = flight || train;
     const isFlight = type === "flight";
-    const Icon = isFlight ? Plane : Train;
+    const isTrain = type === "train";
+    const isHotel = type === "hotel";
+    const isGlobal = isFlight && isInternational(from, to);
+
+    if (!type || (!flight && !train && !hotel)) return null;
+
+    const item = flight || train || hotel;
+    const Icon = isFlight ? Plane : (isTrain ? Train : Hotel);
 
     const handleNext = () => {
         if (currentStep === 0) {
             // Validate passengers
-            const isValid = passengers.every(p => p.name && p.age);
+            const isValid = passengers.every(p => p.name && p.age && (!isGlobal || p.passport));
             if (!isValid) {
-                toast.error("Please fill all passenger details");
+                toast.error(isGlobal ? "Please fill name, age and passport details" : "Please fill all passenger details");
                 return;
             }
             setCurrentStep(1);
@@ -94,6 +100,8 @@ export default function CheckoutPage() {
                     passengers: pax,
                     passengerDetails: passengers,
                     totalPrice: item.price,
+                    meal: item.meal,
+                    class: item.class,
                     providerName: isFlight ? item.airline : item.name,
                     providerCode: isFlight ? item.flightNo : item.trainNo,
                     status: "confirmed",
@@ -123,7 +131,7 @@ export default function CheckoutPage() {
                         <React.Fragment key={step}>
                             <div className="flex flex-col items-center">
                                 <div
-                                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= index ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "bg-white text-slate-400 border border-slate-200"
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= index ? "bg-[#CF3425] text-white shadow-lg shadow-[#CF3425]/20" : "bg-white text-slate-400 border border-slate-200"
                                         }`}
                                 >
                                     {renderStepIcon(index)}
@@ -133,7 +141,7 @@ export default function CheckoutPage() {
                                 </span>
                             </div>
                             {index < STEPS.length - 1 && (
-                                <div className={`w-16 md:w-32 h-[2px] mx-2 -mt-6 transition-all duration-300 ${currentStep > index ? "bg-blue-600" : "bg-slate-200"}`} />
+                                <div className={`w-16 md:w-32 h-[2px] mx-2 -mt-6 transition-all duration-300 ${currentStep > index ? "bg-[#CF3425]" : "bg-slate-200"}`} />
                             )}
                         </React.Fragment>
                     ))}
@@ -146,7 +154,7 @@ export default function CheckoutPage() {
 
                             {/* Review Trip */}
                             <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100">
-                                <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-5 text-white">
+                                <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 p-5 text-white">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center">
                                             <Icon size={20} />
@@ -162,7 +170,7 @@ export default function CheckoutPage() {
                                     <div className="flex flex-col md:flex-row items-center justify-between gap-8 py-2">
                                         <div className="text-center md:text-left flex-1">
                                             <p className="text-3xl font-black text-slate-900 leading-none">{item.dep}</p>
-                                            <p className="text-sm font-bold text-blue-600 mt-1.5 uppercase tracking-wider">{from}</p>
+                                            <p className="text-sm font-bold text-[#CF3425] mt-1.5 uppercase tracking-wider">{from}</p>
                                             <p className="text-xs text-slate-500 font-medium mt-1">{fromName}</p>
                                         </div>
 
@@ -170,7 +178,7 @@ export default function CheckoutPage() {
                                             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Non-Stop</p>
                                             <div className="w-full flex items-center gap-2">
                                                 <div className="flex-1 h-px bg-slate-200 border-t border-dashed" />
-                                                <Icon size={18} className="text-blue-600 rotate-90 md:rotate-0" />
+                                                <Icon size={18} className="text-[#CF3425] rotate-90 md:rotate-0" />
                                                 <div className="flex-1 h-px bg-slate-200 border-t border-dashed" />
                                             </div>
                                             <p className="text-xs font-bold text-slate-900 mt-2">{item.duration}m</p>
@@ -178,14 +186,14 @@ export default function CheckoutPage() {
 
                                         <div className="text-center md:text-right flex-1">
                                             <p className="text-3xl font-black text-slate-900 leading-none">{item.arr}</p>
-                                            <p className="text-sm font-bold text-blue-600 mt-1.5 uppercase tracking-wider">{to}</p>
+                                            <p className="text-sm font-bold text-[#CF3425] mt-1.5 uppercase tracking-wider">{to}</p>
                                             <p className="text-xs text-slate-500 font-medium mt-1">{toName}</p>
                                         </div>
                                     </div>
 
                                     <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                                            <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-[#CF3425]">
                                                 <Calendar size={16} />
                                             </div>
                                             <div>
@@ -194,7 +202,7 @@ export default function CheckoutPage() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600">
+                                            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500">
                                                 <Info size={16} />
                                             </div>
                                             <div>
@@ -203,7 +211,7 @@ export default function CheckoutPage() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
+                                            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500">
                                                 <User size={16} />
                                             </div>
                                             <div>
@@ -212,14 +220,38 @@ export default function CheckoutPage() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                                <div className="text-xs font-black">{isFlight ? "15kg" : "AC"}</div>
+                                            <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500">
+                                                <div className="text-xs font-black">{isFlight ? "15kg" : (isTrain ? "AC" : "WiFi")}</div>
                                             </div>
                                             <div>
-                                                <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">{isFlight ? "Check-in" : "Coach"}</p>
+                                                <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">{isFlight ? "Check-in" : (isTrain ? "Coach" : "Amenity")}</p>
                                                 <p className="text-sm font-bold text-slate-800">{isFlight ? "Included" : "Available"}</p>
                                             </div>
                                         </div>
+
+                                        {item.seats && (
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+                                                    <div className="text-[10px] font-black">{isFlight ? "Seat" : "Berth"}</div>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">{isFlight ? "Seat" : "Berth"}</p>
+                                                    <p className="text-sm font-bold text-slate-800 truncate max-w-[80px]">{item.seats}</p>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {item.class && (
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-[#CF3425]">
+                                                    <div className="text-[10px] font-black">CLS</div>
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">Class / Type</p>
+                                                    <p className="text-sm font-bold text-slate-800">{item.class}</p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -228,7 +260,7 @@ export default function CheckoutPage() {
                             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <User className="text-blue-600" size={20} />
+                                        <User className="text-[#CF3425]" size={20} />
                                         <h3 className="text-lg font-black text-slate-900">Passenger Details</h3>
                                     </div>
                                     <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{pax} Traveller{pax > 1 ? 's' : ''}</span>
@@ -237,7 +269,7 @@ export default function CheckoutPage() {
                                 <div className="p-6 space-y-6">
                                     {passengers.map((p, i) => (
                                         <div key={i} className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                                            <p className="text-[11px] font-black text-blue-600 uppercase tracking-[0.2em] mb-4">Adult {i + 1}</p>
+                                            <p className="text-[11px] font-black text-[#CF3425] uppercase tracking-[0.2em] mb-4">Adult {i + 1}</p>
                                             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                                                 <div className="md:col-span-3">
                                                     <label className="text-[11px] font-black text-slate-500 uppercase mb-1.5 block">Full Name</label>
@@ -282,6 +314,22 @@ export default function CheckoutPage() {
                                                         <option>Female</option>
                                                     </select>
                                                 </div>
+                                                {isGlobal && (
+                                                    <div className="md:col-span-6">
+                                                        <label className="text-[11px] font-black text-slate-500 uppercase mb-1.5 block">Passport Number</label>
+                                                        <input
+                                                            type="text"
+                                                            placeholder="Passport ID (Required for International)"
+                                                            value={p.passport}
+                                                            onChange={(e) => {
+                                                                const newP = [...passengers];
+                                                                newP[i].passport = e.target.value;
+                                                                setPassengers(newP);
+                                                            }}
+                                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:bg-white focus:border-blue-400 outline-none text-sm font-bold transition-all"
+                                                        />
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
@@ -306,11 +354,11 @@ export default function CheckoutPage() {
                                     </div>
                                     <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
                                         <span className="text-lg font-black text-slate-900">Total Amount</span>
-                                        <span className="text-2xl font-black text-blue-700">{formatInr(item.price)}</span>
+                                        <span className="text-2xl font-black text-[#CF3425]">{formatInr(item.price)}</span>
                                     </div>
-                                    <div className="bg-blue-50 p-4 rounded-xl flex gap-3">
-                                        <Info size={16} className="text-blue-600 flex-shrink-0 mt-0.5" />
-                                        <p className="text-[11px] text-blue-700 font-bold leading-relaxed">
+                                    <div className="bg-rose-50 p-4 rounded-xl flex gap-3">
+                                        <Info size={16} className="text-[#CF3425] flex-shrink-0 mt-0.5" />
+                                        <p className="text-[11px] text-slate-500 font-bold leading-relaxed">
                                             By clicking continue, you agree to our booking policy and terms of service.
                                         </p>
                                     </div>
@@ -331,7 +379,7 @@ export default function CheckoutPage() {
                     <div className="max-w-2xl mx-auto">
                         <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
                             <div className="p-8 border-b border-slate-100 text-center">
-                                <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <div className="w-16 h-16 bg-rose-50 text-[#CF3425] rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <CreditCard size={32} />
                                 </div>
                                 <h2 className="text-2xl font-black text-slate-900">Payment Selection</h2>
@@ -344,9 +392,9 @@ export default function CheckoutPage() {
 
                             <div className="p-8 space-y-4">
                                 <div className="space-y-3">
-                                    <div className="p-5 border-2 border-blue-600 bg-blue-50/50 rounded-2xl flex items-center justify-between cursor-pointer">
+                                    <div className="p-5 border-2 border-[#CF3425] bg-rose-50/50 rounded-2xl flex items-center justify-between cursor-pointer">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-8 h-8 rounded-full border-4 border-blue-600 bg-white" />
+                                            <div className="w-8 h-8 rounded-full border-4 border-[#CF3425] bg-white" />
                                             <div>
                                                 <p className="text-sm font-black text-slate-900">Credit / Debit Card</p>
                                                 <p className="text-xs text-slate-500 font-bold">Visa, Mastercard, RuPay, Amex</p>
@@ -404,7 +452,7 @@ export default function CheckoutPage() {
                                         </div>
                                         <button
                                             onClick={() => setCurrentStep(0)}
-                                            className="text-xs font-black text-blue-600 hover:underline"
+                                            className="text-xs font-black text-[#CF3425] hover:underline"
                                         >
                                             Back to Review
                                         </button>
@@ -463,7 +511,7 @@ export default function CheckoutPage() {
                                     {/* Ticket Header */}
                                     <div className="bg-slate-900 p-6 flex items-center justify-between text-white">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                                            <div className="w-10 h-10 bg-[#CF3425] rounded-xl flex items-center justify-center shadow-lg">
                                                 <Icon size={20} />
                                             </div>
                                             <div>
@@ -483,7 +531,7 @@ export default function CheckoutPage() {
                                             <div>
                                                 <p className="text-3xl font-black text-slate-900 leading-none">{bookingResult.fromCode}</p>
                                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1.5">{fromName}</p>
-                                                <p className="text-lg font-black text-blue-600 mt-2">{bookingResult.departTime}</p>
+                                                <p className="text-lg font-black text-[#CF3425] mt-2">{bookingResult.departTime}</p>
                                             </div>
 
                                             <div className="flex flex-col items-center flex-1 mx-4">
@@ -502,7 +550,7 @@ export default function CheckoutPage() {
                                             <div className="text-right">
                                                 <p className="text-3xl font-black text-slate-900 leading-none">{bookingResult.toCode}</p>
                                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1.5">{toName}</p>
-                                                <p className="text-lg font-black text-blue-600 mt-2">{bookingResult.arriveTime}</p>
+                                                <p className="text-lg font-black text-[#CF3425] mt-2">{bookingResult.arriveTime}</p>
                                             </div>
                                         </div>
 
@@ -510,15 +558,15 @@ export default function CheckoutPage() {
                                             <div>
                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Date</p>
                                                 <p className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                                                    <Calendar size={14} className="text-blue-500" />
+                                                    <Calendar size={14} className="text-[#CF3425]" />
                                                     {new Date(bookingResult.travelDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
                                                 </p>
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Gate / Platform</p>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Meal / Service</p>
                                                 <p className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                                                    <MapPin size={14} className="text-emerald-500" />
-                                                    Main Terminal
+                                                    <Utensils size={14} className="text-[#CF3425]" />
+                                                    {bookingResult.meal || "Standard Meal"}
                                                 </p>
                                             </div>
                                         </div>
@@ -528,12 +576,12 @@ export default function CheckoutPage() {
                                             {passengers.map((p, i) => (
                                                 <div key={i} className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-xs">
+                                                        <div className="w-8 h-8 bg-rose-50 text-[#CF3425] rounded-full flex items-center justify-center font-bold text-xs">
                                                             {i + 1}
                                                         </div>
                                                         <div>
                                                             <p className="text-sm font-black text-slate-800">{p.name}</p>
-                                                            <p className="text-[10px] font-bold text-slate-400">{p.age} Yrs • {p.gender}</p>
+                                                            <p className="text-[10px] font-bold text-slate-400">{p.age} Yrs • {p.gender} {p.passport ? `• Pass: ${p.passport}` : ""}</p>
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
@@ -575,17 +623,17 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
-                        <div className="bg-blue-600 rounded-3xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-blue-200">
+                        <div className="bg-[#CF3425] rounded-3xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-blue-200">
                             <div className="flex items-center gap-4">
                                 <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white backdrop-blur-md">
                                     <Coffee size={24} />
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-black">Join our loyalty program</h3>
-                                    <p className="text-blue-100 text-sm font-medium">Earn points on every trip and get exclusive discounts.</p>
+                                    <p className="text-rose-100 text-sm font-medium">Earn points on every trip and get exclusive discounts.</p>
                                 </div>
                             </div>
-                            <button className="px-8 py-3 bg-white text-blue-600 rounded-xl text-sm font-black shadow-lg">Learn More</button>
+                            <button className="px-8 py-3 bg-white text-[#CF3425] rounded-xl text-sm font-black shadow-lg">Learn More</button>
                         </div>
                     </div>
                 )}

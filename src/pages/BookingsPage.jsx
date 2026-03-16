@@ -1,19 +1,25 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, CircleDot, Plane, Search, Ticket, Train, XCircle } from "lucide-react";
-import { formatInr, getBookings, cancelBooking } from "../utils/bookingStore";
+import { Calendar, CircleDot, Plane, Search, Ticket, Train, XCircle, Hotel } from "lucide-react";
+import { getBookings, cancelBooking, formatInr } from "../utils/bookingUtils";
+
 import toast from "react-hot-toast";
 
 const TYPE_STYLES = {
   flight: {
     icon: Plane,
-    badge: "bg-blue-50 text-blue-700 border-blue-200",
-    cardAccent: "from-blue-600 to-indigo-700",
+    badge: "bg-rose-50 text-red-700 border-red-200",
+    cardAccent: "from-[#CF3425] to-[#b82e1f]",
   },
   train: {
     icon: Train,
-    badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    cardAccent: "from-emerald-600 to-teal-700",
+    badge: "bg-orange-50 text-orange-700 border-orange-200",
+    cardAccent: "from-orange-600 to-amber-700",
+  },
+  hotel: {
+    icon: Hotel,
+    badge: "bg-indigo-50 text-indigo-700 border-indigo-200",
+    cardAccent: "from-indigo-600 to-blue-700",
   },
 };
 
@@ -99,7 +105,7 @@ export default function BookingsPage() {
               />
             </div>
             <div className="flex items-center gap-2">
-              {["all", "flight", "train"].map((type) => (
+              {["all", "flight", "train", "hotel"].map((type) => (
                 <button
                   key={type}
                   onClick={() => setTypeFilter(type)}

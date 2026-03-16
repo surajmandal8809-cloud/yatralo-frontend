@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useSearchFlightsQuery, useLazySearchAirportsQuery, useGetAirportsQuery } from "../services/flightService";
+
 import {
   ArrowRight,
   ArrowRightLeft,
@@ -21,141 +23,60 @@ import {
   Users,
   Wifi,
   Coffee,
+  Timer,
+  AlertCircle,
+  Zap,
+  X,
+  Check,
+  Award,
+  ShieldCheck,
+  TrendingDown,
+  Wind,
 } from "lucide-react";
-import { addBooking } from "../utils/bookingStore";
-import { getBaseURL } from "../services/baseApi";
 
-const CITIES = [
-  { code: "DEL", name: "New Delhi", airport: "Indira Gandhi International" },
-  { code: "BOM", name: "Mumbai", airport: "Chhatrapati Shivaji Maharaj Intl" },
-  { code: "BLR", name: "Bengaluru", airport: "Kempegowda International" },
-  { code: "MAA", name: "Chennai", airport: "Chennai International" },
-  { code: "CCU", name: "Kolkata", airport: "Netaji Subhas Chandra Bose Intl" },
-  { code: "HYD", name: "Hyderabad", airport: "Rajiv Gandhi International" },
-  { code: "PNQ", name: "Pune", airport: "Pune Airport" },
-  { code: "AMD", name: "Ahmedabad", airport: "Sardar Vallabhbhai Patel Intl" },
-  { code: "JAI", name: "Jaipur", airport: "Jaipur International" },
-  { code: "GOI", name: "Goa", airport: "Dabolim Airport" },
-  { code: "COK", name: "Kochi", airport: "Cochin International" },
-  { code: "LKO", name: "Lucknow", airport: "Chaudhary Charan Singh Intl" },
-  { code: "IXC", name: "Chandigarh", airport: "Chandigarh International" },
-  { code: "SXR", name: "Srinagar", airport: "Srinagar Airport" },
-  { code: "GAU", name: "Guwahati", airport: "Lokpriya Gopinath Bordoloi Intl" },
-];
 
-const AIRLINES = [
-  { name: "IndiGo", code: "6E", bg: "#1e3766" },
-  { name: "Air India", code: "AI", bg: "#C8102E" },
-  { name: "SpiceJet", code: "SG", bg: "#b22222" },
-  { name: "Vistara", code: "UK", bg: "#5c0057" },
-  { name: "AirAsia India", code: "I5", bg: "#d0112b" },
-  { name: "Akasa Air", code: "QP", bg: "#f97316" },
-];
 
-const resolveCityCode = (value) => {
-  if (!value) return null;
-  const q = value.trim().toLowerCase();
-  if (!q) return null;
-  const exact = CITIES.find((c) => c.code.toLowerCase() === q || c.name.toLowerCase() === q);
-  if (exact) return exact.code;
-  const partial = CITIES.find((c) => c.name.toLowerCase().includes(q));
-  return partial ? partial.code : null;
+
+/* -----------------------------
+   Static Cities
+--------------------------------*/
+
+
+/* -----------------------------
+   Helpers
+--------------------------------*/
+
+const resolveCityCode = (code) => {
+  if (!code) return null;
+  return code.toUpperCase();
 };
 
-const toTime = (m) => `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
-const durLabel = (m) => {
-  const h = Math.floor(m / 60);
-  const mn = m % 60;
-  return mn ? `${h}h ${mn}m` : `${h}h`;
+const formatDuration = (minutes) => {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return `${h ? `${h}h ` : ""}${m}m`;
 };
-
-function seededRand(seed) {
-  let s = seed;
-  return () => {
-    s = (s * 1664525 + 1013904223) & 0xffffffff;
-    return Math.abs(s) / 0x7fffffff;
-  };
-}
-
-function generateFlights(from, to, date, pax) {
-  const seed = [...(from + to + date)].reduce((a, c) => a + c.charCodeAt(0), 0);
-  const r = seededRand(seed);
-  return Array.from({ length: Math.floor(r() * 6) + 6 }, (_, i) => {
-    const airline = AIRLINES[Math.floor(r() * AIRLINES.length)];
-    const dep = Math.floor(r() * 18 * 60) + 5 * 60;
-    const dur = Math.floor(r() * 180) + 60;
-    const base = Math.floor(r() * 10000) + 3000;
-    return {
-      id: `F${i}-${seed}`,
-      airline: airline.name,
-      code: airline.code,
-      bg: airline.bg,
-      flightNo: `${airline.code}${Math.floor(r() * 900) + 100}`,
-      dep: toTime(dep),
-      arr: toTime(dep + dur),
-      depMins: dep,
-      duration: dur,
-      stops: r() < 0.55 ? 0 : 1,
-      price: Math.round((base * pax) / 100) * 100,
-      perPax: Math.round(base / 100) * 100,
-      seats: Math.floor(r() * 60) + 2,
-      wifi: r() > 0.5,
-      meal: r() > 0.45,
-      refundable: r() > 0.5,
-      rating: (3.5 + r() * 1.5).toFixed(1),
-    };
-  }).sort((a, b) => a.price - b.price);
-}
-
-async function fetchAmadeusFlights({ from, to, date, pax, nonstop }) {
-  const params = new URLSearchParams({
-    from,
-    to,
-    date,
-    adults: String(pax),
-    nonstop: String(Boolean(nonstop)),
-    max: "25",
-    currency: "INR",
-  });
-
-  const response = await fetch(`${getBaseURL()}/flights/search?${params.toString()}`);
-  const payload = await response.json();
-
-  if (!response.ok || !payload?.status) {
-    throw new Error(payload?.message || "Unable to fetch flights from Amadeus.");
-  }
-
-  return Array.isArray(payload.data) ? payload.data : [];
-}
 
 function CityBox({ value, onChange, label }) {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
-  const [list, setList] = useState(CITIES);
-  const [loading, setLoading] = useState(false);
-  const sel = list.find((c) => c.code === value) || CITIES.find((c) => c.code === value);
+  const [trigger, { data: searchData, isFetching }] = useLazySearchAirportsQuery();
+  const { data: defaultAirports } = useGetAirportsQuery();
 
   useEffect(() => {
-    if (!q || q.length < 2) {
-      setList(CITIES);
-      return;
+    if (q.length >= 2) {
+      const timer = setTimeout(() => {
+        trigger(q);
+      }, 400);
+      return () => clearTimeout(timer);
     }
-    const timer = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`${getBaseURL()}/flights/cities?keyword=${q}`);
-        const payload = await res.json();
-        if (payload.status && payload.data.length > 0) {
-          setList(payload.data);
-        }
-      } catch (err) {
-        console.error("City search failed:", err);
-      } finally {
-        setLoading(false);
-      }
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [q]);
+  }, [q, trigger]);
+
+  const list = q.length >= 2 ? (searchData?.data || []) : (defaultAirports?.data || []);
+
+  const sel = searchData?.data?.find(c => c.iata === value) || 
+              defaultAirports?.data?.find(c => c.iata === value) || 
+              { iata: value, city: value };
 
   return (
     <div className="relative">
@@ -166,13 +87,13 @@ function CityBox({ value, onChange, label }) {
           setOpen(!open);
           setQ("");
         }}
-        className="w-full flex items-center gap-2 px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-left transition-all hover:border-indigo-300"
+        className="w-full flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 rounded-xl text-left transition-all hover:border-[#CF3425]/40"
       >
-        <MapPin size={14} className="text-slate-400 flex-shrink-0" />
-        {sel ? (
+        <MapPin size={16} className="text-[#CF3425] flex-shrink-0" />
+        {value ? (
           <div>
-            <p className="text-xl font-black text-slate-900 leading-none tracking-tight">{sel.code}</p>
-            <p className="text-xs text-slate-400 truncate max-w-[140px] mt-0.5">{sel.name}</p>
+            <p className="text-xl font-black text-slate-900 leading-none tracking-tight">{value}</p>
+            <p className="text-[10px] text-slate-400 truncate max-w-[140px] mt-0.5">{sel.city || value}</p>
           </div>
         ) : (
           <p className="text-slate-500 text-sm">Select city</p>
@@ -180,34 +101,37 @@ function CityBox({ value, onChange, label }) {
       </button>
       {open && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl z-40 overflow-hidden border border-slate-100">
-          <div className="p-2.5 border-b border-slate-100 flex items-center gap-2">
+          <div className="p-2.5 border-b border-slate-100">
             <input
               autoFocus
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search city or airport..."
-              className="w-full text-sm px-3 py-2 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-300 border border-transparent focus:border-indigo-300"
+              className="w-full text-sm px-3 py-2 rounded-xl bg-slate-50 outline-none border border-transparent focus:border-[#CF3425]/20"
             />
-            {loading && <RefreshCw size={14} className="animate-spin text-slate-400 mr-2" />}
           </div>
           <div className="max-h-52 overflow-y-auto">
+            {isFetching && <div className="p-4 text-center text-xs text-slate-400">Searching...</div>}
             {list.map((c) => (
               <button
-                key={`${c.code}-${c.airport}`}
+                key={c.iata}
                 type="button"
                 onClick={() => {
-                  onChange(c.code);
+                  onChange(c.iata);
                   setOpen(false);
                 }}
-                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-indigo-50 text-left transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-left transition-colors"
               >
-                <span className="text-xs font-black bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded min-w-[36px] text-center">{c.code}</span>
+                <span className="text-xs font-black bg-slate-50 text-[#CF3425] px-1.5 py-0.5 rounded min-w-[36px] text-center">{c.iata}</span>
                 <div>
-                  <p className="text-sm font-semibold text-slate-800">{c.name}</p>
-                  <p className="text-xs text-slate-400">{c.airport}</p>
+                  <p className="text-sm font-semibold text-slate-800">{c.city}</p>
+                  <p className="text-[10px] text-slate-400">{c.name}</p>
                 </div>
               </button>
             ))}
+            {!isFetching && list.length === 0 && q.length >= 2 && (
+              <div className="p-4 text-center text-xs text-slate-400">No airports found</div>
+            )}
           </div>
         </div>
       )}
@@ -215,466 +139,524 @@ function CityBox({ value, onChange, label }) {
   );
 }
 
-function FlightCard({ f, index, onBook }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.04 }}
-      className="bg-white rounded-[1.75rem] border border-slate-100 shadow-lg shadow-slate-200/60 hover:border-indigo-200 transition-all overflow-hidden"
-    >
-      <div className="p-5">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-3 min-w-[130px]">
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white text-sm font-black shadow flex-shrink-0" style={{ background: f.bg }}>
-              {f.code}
-            </div>
-            <div>
-              <p className="text-sm font-black text-slate-800">{f.airline}</p>
-              <p className="text-xs text-slate-400 font-mono">{f.flightNo}</p>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-4 flex-1 justify-center min-w-[200px]">
-            <p className="text-2xl font-black text-slate-900">{f.dep}</p>
-            <div className="flex-1 flex flex-col items-center">
-              <p className="text-xs text-slate-400 font-semibold mb-1">{durLabel(f.duration)}</p>
-              <div className="w-full flex items-center gap-1.5">
-                <div className="flex-1 h-px bg-slate-200" />
-                <Plane size={13} className="text-indigo-600" />
-                <div className="flex-1 h-px bg-slate-200" />
-              </div>
-              <p className={`text-xs font-bold mt-1 ${f.stops === 0 ? "text-emerald-600" : "text-amber-600"}`}>
-                {f.stops === 0 ? "Non-stop" : `${f.stops} stop`}
-              </p>
-            </div>
-            <p className="text-2xl font-black text-slate-900">{f.arr}</p>
-          </div>
+function FlightCard({ flight, pax, onBook }) {
+    const [expanded, setExpanded] = useState(false);
+    
+    return (
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-[#CF3425]/20 transition-all overflow-hidden group"
+        >
+            {/* Status Ribbon if Delayed/Cancelled */}
+            {flight.status !== 'scheduled' && (
+                <div className={`py-1.5 px-6 text-[10px] font-black uppercase tracking-[0.2em] text-center ${
+                    flight.status === 'delayed' ? 'bg-amber-500 text-white' : 'bg-slate-900 text-white'
+                }`}>
+                    Flight Status: {flight.status}
+                </div>
+            )}
 
-          <div className="text-right min-w-[110px]">
-            <p className="text-2xl font-black text-indigo-700">Rs {f.price.toLocaleString()}</p>
-            <p className="text-xs text-slate-400">Rs {f.perPax.toLocaleString()} / person</p>
-            <div className="flex items-center justify-end gap-0.5 mt-1">
-              <Star size={10} className="fill-amber-400 text-amber-400" />
-              <span className="text-xs text-slate-500 font-semibold">{f.rating}</span>
-            </div>
-          </div>
+            <div className="p-6">
+                <div className="flex flex-wrap items-center gap-6">
+                    {/* Airline Info */}
+                    <div className="flex items-center gap-4 min-w-[180px]">
+                        <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white text-lg font-black shadow-lg shadow-[#CF3425]/20" style={{ background: flight.bg }}>
+                            {flight.code}
+                        </div>
+                        <div>
+                            <p className="text-sm font-black text-slate-900">{flight.airline}</p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{flight.flightNo}</p>
+                        </div>
+                    </div>
 
-          <div className="flex flex-col items-end gap-1.5">
-            <button
-              onClick={() => onBook(f)}
-              className="px-5 py-2.5 bg-[#cf3425] hover:bg-[#b82e1f] text-white text-sm font-semibold rounded-xl transition-all shadow"
-            >
-              Book Now
-            </button>
-            <button onClick={() => setOpen(!open)} className="text-xs text-slate-400 hover:text-indigo-700 flex items-center gap-0.5 transition-colors">
-              Details {open ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
-            </button>
-          </div>
-        </div>
+                    {/* Timeline */}
+                    <div className="flex-1 flex items-center justify-center gap-8 min-w-[280px]">
+                        <div className="text-center group">
+                            <p className="text-2xl font-black text-slate-900 group-hover:text-[#CF3425] transition-colors">{flight.dep}</p>
+                            <div className="flex flex-col items-center mt-1">
+                                <span className="text-[10px] font-bold text-slate-100 bg-[#CF3425] px-1.5 py-0.5 rounded uppercase tracking-widest leading-none mb-1">{flight.origin}</span>
+                                <span className="text-[9px] font-black text-[#CF3425]/60 uppercase tracking-tighter">{flight.depDate}</span>
+                            </div>
+                            <p className="text-[10px] font-bold text-slate-400 block mt-0.5 max-w-[80px] truncate mx-auto" title={flight.originName}>{flight.originCity}</p>
+                            <p className="text-[8px] font-medium text-slate-300 truncate max-w-[80px] mx-auto uppercase">{flight.originName}</p>
+                        </div>
 
-        <div className="flex flex-wrap gap-1.5 mt-3">
-          {f.seats <= 9 && <span className="text-xs font-bold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full border border-amber-200">Only {f.seats} left</span>}
-          {f.refundable && (
-            <span className="text-xs font-bold bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
-              <CheckCircle2 size={9} /> Refundable
-            </span>
-          )}
-          {f.wifi && (
-            <span className="text-xs font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200 flex items-center gap-1">
-              <Wifi size={9} /> Wi-Fi
-            </span>
-          )}
-          {f.meal && (
-            <span className="text-xs font-bold bg-orange-50 text-orange-700 px-2 py-0.5 rounded-full border border-orange-200 flex items-center gap-1">
-              <Coffee size={9} /> Meal
-            </span>
-          )}
-        </div>
-      </div>
+                        <div className="flex-1 max-w-[150px] flex flex-col items-center relative">
+                            <p className="text-[10px] font-black text-slate-400 mb-1.5 uppercase tracking-tighter">{formatDuration(flight.duration)}</p>
+                            <div className="w-full flex items-center gap-2">
+                                <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent via-slate-200 to-slate-200 rounded-full" />
+                                <Plane size={16} className="text-[#CF3425] transform rotate-90" />
+                                <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent via-slate-200 to-slate-200 rounded-full" />
+                            </div>
+                            <p className="text-[9px] font-black text-emerald-600 mt-1.5 uppercase tracking-widest bg-emerald-50 px-2 py-0.5 rounded-full">Non-stop</p>
+                        </div>
 
-      {open && (
-        <div className="border-t border-dashed border-slate-100 bg-slate-50/80 p-5">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div>
-              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Check-in</p>
-              <p className="font-semibold text-slate-700">15 kg included</p>
+                        <div className="text-center group">
+                            <p className="text-2xl font-black text-slate-900 group-hover:text-slate-700 transition-colors">{flight.arr}</p>
+                            <div className="flex flex-col items-center mt-1">
+                                <span className="text-[10px] font-bold text-slate-100 bg-slate-800 px-1.5 py-0.5 rounded uppercase tracking-widest leading-none mb-1">{flight.destination}</span>
+                                <div className="h-[13px]" /> {/* Spacer to match departure date height */}
+                            </div>
+                            <p className="text-[10px] font-bold text-slate-400 block mt-0.5 max-w-[80px] truncate mx-auto" title={flight.destinationName}>{flight.destinationCity}</p>
+                            <p className="text-[8px] font-medium text-slate-300 truncate max-w-[80px] mx-auto uppercase">{flight.destinationName}</p>
+                        </div>
+                    </div>
+
+                    {/* Price */}
+                    <div className="text-right min-w-[140px]">
+                        <p className="text-2xl font-black text-[#CF3425]">₹{flight.price.toLocaleString()}</p>
+                        <p className="text-[10px] font-bold text-slate-400">Total for {pax} traveler{pax > 1 ? 's' : ''}</p>
+                        <div className="flex items-center justify-end gap-1 mt-1">
+                            <Star size={10} className="fill-yellow-400 text-yellow-400" />
+                            <span className="text-[10px] font-bold text-slate-600">{flight.rating}</span>
+                        </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-col gap-2 relative pl-6 border-l border-dashed border-slate-200">
+                        <button 
+                            onClick={() => onBook(flight)}
+                            className="px-8 py-3 bg-[#CF3425] hover:bg-[#b82e1f] text-white text-[11px] font-black rounded-2xl transition-all shadow-xl shadow-[#CF3425]/20 uppercase tracking-widest active:scale-95"
+                        >
+                            Select Flight
+                        </button>
+                        <button 
+                            onClick={() => setExpanded(!expanded)}
+                            className="py-2 text-[10px] font-black text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center gap-1 uppercase tracking-widest"
+                        >
+                            {expanded ? 'Hide Details' : 'View Details'}
+                            {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                        </button>
+                    </div>
+                </div>
+
+                <div className="flex flex-wrap gap-2 mt-6">
+                    <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600">
+                        <Zap size={10} className="text-yellow-500 fill-yellow-500" /> 
+                        {flight.status === 'scheduled' ? 'On Time' : flight.status.toUpperCase()}
+                    </span>
+                    {flight.wifi && <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600"><Wifi size={10} className="text-indigo-500" /> Free Wifi</span>}
+                    {flight.meal && <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600"><Coffee size={10} className="text-orange-500" /> Meal Included</span>}
+                    {flight.refundable && <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-lg text-[10px] font-bold text-emerald-600"><CheckCircle2 size={10} /> Refundable</span>}
+                    <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 ml-auto">
+                        <Users size={10} /> Only {flight.seats} seats left
+                    </span>
+                </div>
             </div>
-            <div>
-              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Cabin</p>
-              <p className="font-semibold text-slate-700">7 kg included</p>
-            </div>
-            <div>
-              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Aircraft</p>
-              <p className="font-semibold text-slate-700">Airbus A320neo</p>
-            </div>
-            <div>
-              <p className="text-xs font-black uppercase text-slate-400 mb-1 tracking-wider">Cancellation</p>
-              <p className={`font-semibold ${f.refundable ? "text-emerald-600" : "text-red-500"}`}>
-                {f.refundable ? "Free (24h before)" : "Non-refundable"}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-    </motion.div>
-  );
+
+            <AnimatePresence>
+                {expanded && (
+                    <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="border-t border-slate-50 bg-slate-50/50 overflow-hidden"
+                    >
+                        <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+                            <div>
+                                <p className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Baggage</p>
+                                <p className="text-xs font-bold text-slate-700">7kg Cabin, 15kg Check-in</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Cabin</p>
+                                <p className="text-xs font-bold text-slate-700">Economy Class</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Aircraft</p>
+                                <p className="text-xs font-bold text-slate-700">Airbus A320-200</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Cancellation</p>
+                                <p className={`text-xs font-bold ${flight.refundable ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                    {flight.refundable ? 'Free before 24h' : 'Non-refundable'}
+                                </p>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
+    );
 }
 
+/* -----------------------------
+   Flights Page
+--------------------------------*/
+
 export default function FlightsPage() {
-  const today = new Date().toISOString().split("T")[0];
-  const [searchParams] = useSearchParams();
+
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  const today = new Date().toISOString().split("T")[0];
+
   const initialFrom = resolveCityCode(searchParams.get("from")) || "DEL";
   const initialTo = resolveCityCode(searchParams.get("to")) || "BOM";
   const initialDate = searchParams.get("date") || today;
   const initialPax = Math.max(1, Math.min(6, Number(searchParams.get("pax")) || 1));
 
+
   const [from, setFrom] = useState(initialFrom);
   const [to, setTo] = useState(initialTo);
   const [date, setDate] = useState(initialDate);
   const [pax, setPax] = useState(initialPax);
-  const [tripType, setTripType] = useState("oneway");
-  const [flights, setFlights] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searched, setSearched] = useState(false);
+
+  const [searched, setSearched] = useState(true);
+  const [searchParamsState, setSearchParamsState] = useState(null);
+
   const [sortBy, setSortBy] = useState("price");
   const [maxPrice, setMaxPrice] = useState(60000);
   const [nonstop, setNonstop] = useState(false);
-  const [showFilter, setShowFilter] = useState(false);
+
   const didAutoSearch = useRef(false);
 
-  const fromCity = CITIES.find((c) => c.code === from);
-  const toCity = CITIES.find((c) => c.code === to);
-
-  const handleSearch = useCallback(async () => {
-    if (!from || !to || from === to) return;
-    setLoading(true);
-    try {
-      const apiFlights = await fetchAmadeusFlights({
-        from,
-        to,
-        date,
-        pax,
-        nonstop,
-      });
-      setFlights(apiFlights);
-      if (apiFlights.length === 0) {
-        toast("No live offers found for selected route/date.");
-      }
-    } catch (error) {
-      toast.error(error.message || "Live search failed, showing sample fares.");
-      setFlights(generateFlights(from, to, date, pax));
-    } finally {
-      setLoading(false);
-      setSearched(true);
-    }
-  }, [from, to, date, pax, nonstop]);
-
-  const handleBookFlight = useCallback(
-    (flight) => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("Please login to book your flight");
-        navigate("/auth/login");
-        return;
-      }
-      navigate("/checkout", {
-        state: {
-          flight,
-          type: "flight",
-          from,
-          to,
-          fromName: fromCity?.name || from,
-          toName: toCity?.name || to,
-          date,
-          pax,
-        },
-      });
-    },
-    [date, from, fromCity?.name, navigate, pax, to, toCity?.name]
+  const { data: response, isLoading, error } = useSearchFlightsQuery(
+      searchParamsState || { from: "", to: "", date: "" },
+      // { skip: !searched }
   );
+
+
+  const { data: airports } = useGetAirportsQuery();
+  const fromCity = airports?.data?.find((c) => c.iata === from);
+  const toCity = airports?.data?.find((c) => c.iata === to);
+
+
+  const mappedFlights = useMemo(() => {
+    if (!response?.status) return [];
+
+    return (response.data || []).map((flight) => {
+        const dep = new Date(flight.departureTime);
+        const arr = new Date(flight.arrivalTime);
+        const duration = Math.round((arr - dep) / 60000);
+
+        // Derive code from flightNumber (e.g., "6E 123" -> "6E") or fallback to airline first letters
+        const derivedCode = flight.flightNumber?.split(' ')[0]?.substring(0, 2).toUpperCase() || 
+                            flight.airline?.substring(0, 2).toUpperCase() || "FL";
+
+        return {
+          id: flight._id,
+          airline: flight.airline,
+          code: derivedCode,
+          flightNo: flight.flightNumber,
+          origin: flight.origin,
+          destination: flight.destination,
+          originCity: flight.originCity || flight.origin,
+          destinationCity: flight.destinationCity || flight.destination,
+          originName: flight.originName || flight.origin,
+          destinationName: flight.destinationName || flight.destination,
+          dep: dep.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }),
+          arr: arr.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }),
+          depDate: dep.toLocaleDateString('en-US', { day: '2-digit', month: 'short' }),
+          depMins: dep.getHours() * 60 + dep.getMinutes(),
+          duration,
+          stops: 0,
+          price: flight.price * pax,
+          perPax: flight.price,
+          seats: flight.seatsAvailable || 10,
+          status: flight.status || 'scheduled',
+          rating: (Math.random() * (5 - 3.5) + 3.5).toFixed(1),
+          bg: ["#1e293b", "#CF3425", "#0284c7", "#4f46e5", "#7c3aed"][Math.floor(Math.random() * 5)],
+          refundable: Math.random() > 0.5,
+          wifi: Math.random() > 0.5,
+          meal: Math.random() > 0.5,
+        };
+      });
+  }, [response, pax]);
+
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error?.data?.message || "Search failed");
+    }
+  }, [error]);
+
+
+  const handleSearch = useCallback(() => {
+    if (!from || !to || from === to) {
+      toast.error("Please select valid cities");
+      return;
+    }
+    setSearchParamsState({ from, to, date });
+    setSearched(true);
+  }, [from, to, date]);
+
 
   useEffect(() => {
     const shouldAutoSearch = searchParams.get("autoSearch") === "1";
     if (!shouldAutoSearch || didAutoSearch.current) return;
+
     didAutoSearch.current = true;
     handleSearch();
   }, [handleSearch, searchParams]);
 
-  const results = useMemo(
-    () =>
-      [...flights]
-        .filter((f) => f.price <= maxPrice && (!nonstop || f.stops === 0))
-        .sort((a, b) =>
-          sortBy === "price"
-            ? a.price - b.price
-            : sortBy === "duration"
-              ? a.duration - b.duration
-              : sortBy === "dep"
-                ? a.depMins - b.depMins
-                : parseFloat(b.rating) - parseFloat(a.rating)
-        ),
-    [flights, maxPrice, nonstop, sortBy]
-  );
+
+  const results = useMemo(() => {
+    return [...mappedFlights]
+      .filter((f) => f.price <= maxPrice && (!nonstop || f.stops === 0))
+      .sort((a, b) => {
+        if (sortBy === "price") return a.price - b.price;
+        if (sortBy === "duration") return a.duration - b.duration;
+        if (sortBy === "dep") return a.depMins - b.depMins;
+        return parseFloat(b.rating) - parseFloat(a.rating);
+      });
+  }, [mappedFlights, sortBy, maxPrice, nonstop]);
+
+
+  /* -----------------------------
+     Booking Flow
+  --------------------------------*/
+  /* -----------------------------
+     Booking Flow
+  --------------------------------*/
+  const handleBookFlight = (flight) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login to book");
+      navigate("/auth/login");
+      return;
+    }
+
+    navigate("/booking-selection", {
+      state: {
+        type: "flight",
+        flight: flight,
+        from,
+        to,
+        fromName: fromCity?.name || flight.originCity,
+        toName: toCity?.name || flight.destinationCity,
+        date,
+        pax,
+      },
+    });
+  };
+
+
+
+
+
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <section className="relative h-[72vh] min-h-[520px] flex items-center justify-center overflow-hidden">
-        <video
-  autoPlay
-  loop
-  muted
-  playsInline
-  className="absolute inset-0 w-full h-full object-cover"
->
-  <source src="/assets/Banner.mp4" type="video/mp4" />
-</video>
-        <div className="absolute inset-0 bg-black/35" />
-
-        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-xl border border-white/25 px-5 py-2.5 rounded-full mb-8"
+      
+      {/* Hero Banner with Centered Aesthetic */}
+      <section className="relative h-[55vh] min-h-[450px] flex items-center justify-center overflow-hidden">
+          <video 
+            autoPlay 
+            muted 
+            loop 
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover scale-105"
           >
-            <Compass size={15} className="text-yellow-400" />
-            <span className="text-xs font-black tracking-[0.3em] uppercase text-white">Flight Discovery</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl md:text-6xl font-black text-white tracking-tighter leading-none mb-6"
-          >
-            Discover{" "}
-            <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-              Better
-            </span>{" "}
-            Flights
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-white/75 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-8"
-          >
-            Search, compare, and book with clear fares and fast confirmations.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-wrap justify-center gap-4"
-          >
-            {[
-              { icon: <Plane size={13} />, label: "100+ Airlines" },
-              { icon: <Sparkles size={13} />, label: "Best Price Picks" },
-              { icon: <Star size={13} />, label: "Top Rated Routes" },
-            ].map((s, i) => (
-              <div key={i} className="flex items-center gap-2 bg-white/15 backdrop-blur-xl border border-white/20 text-white text-xs font-bold px-4 py-2 rounded-full">
-                {s.icon}
-                {s.label}
-              </div>
-            ))}
-          </motion.div>
-        </div>
+              <source src="/assets/Banner.mp4" type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-slate-900/40 to-slate-900/60" />
+          
+          <div className="relative z-10 text-center px-6 -mt-10">
+              <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white/10 backdrop-blur-md border border-white/20 px-5 py-1.5 rounded-full inline-flex items-center gap-2 mb-8"
+              >
+                  <Sparkles size={14} className="text-amber-400" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white">The Art of Elite Aviation</span>
+              </motion.div>
+              <motion.h1 
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: "easeOut" }}
+                  className="text-4xl md:text-6xl font-black text-white tracking-tight leading-[0.9]"
+              >
+                  Beyond
+                  <span className="text-[#CF3425]">Horizon</span>
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="mt-6 text-white/70 text-sm font-medium tracking-wide uppercase"
+              >
+                Curated schedules for the modern explorer
+              </motion.p>
+          </div>
       </section>
 
-      <div className="relative z-20 -mt-10 md:-mt-14">
-        <div className="max-w-6xl mx-auto px-4 md:px-6">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-900/10 p-4 md:p-5 space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              {[["oneway", "One Way"], ["roundtrip", "Round Trip"]].map(([v, l]) => (
-                <button
-                  key={v}
-                  type="button"
-                  onClick={() => setTripType(v)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider transition-all ${tripType === v ? "bg-slate-900 text-white" : "bg-slate-100 text-slate-500 hover:bg-slate-200"
-                    }`}
-                >
-                  {l}
-                </button>
-              ))}
-            </div>
+      {/* Search Bar Float */}
+      <div className="relative z-20 -mt-12 max-w-6xl mx-auto px-6">
+          <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl p-4 md:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_40px_1fr_160px_180px_auto] gap-4 items-end">
+                  <CityBox label="From" value={from} onChange={setFrom} />
+                  
+                  <div className="flex justify-center mb-1">
+                      <button 
+                        onClick={() => { setFrom(to); setTo(from); }}
+                        className="h-10 w-10 flex items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:text-[#CF3425] hover:bg-red-50 transition-all hover:rotate-180 duration-500 shadow-sm border border-slate-100"
+                      >
+                          <ArrowRightLeft size={16} />
+                      </button>
+                  </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_40px_1fr_140px_130px_auto] gap-2.5 items-end">
-              <CityBox value={from} onChange={setFrom} label="From" />
-              <button
-                onClick={() => {
-                  setFrom(to);
-                  setTo(from);
-                }}
-                className="self-end mb-0.5 w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all hover:rotate-180 duration-300"
-              >
-                <ArrowRightLeft size={15} />
-              </button>
-              <CityBox value={to} onChange={setTo} label="To" />
-              <div>
-                <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-1.5">Date</p>
-                <div className="relative">
-                  <Calendar size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="date"
-                    value={date}
-                    min={today}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none focus:border-indigo-400"
-                  />
-                </div>
-              </div>
-              <div>
-                <p className="text-xs font-black uppercase tracking-widest text-slate-500 mb-1.5">Passengers</p>
-                <div className="relative">
-                  <Users size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <select
-                    value={pax}
-                    onChange={(e) => setPax(Number(e.target.value))}
-                    className="w-full pl-9 pr-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 text-sm font-semibold outline-none appearance-none focus:border-indigo-400"
+                  <CityBox label="To" value={to} onChange={setTo} />
+
+                  <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 ml-1">Departure</p>
+                      <div className="relative">
+                          <Calendar size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#CF3425]" />
+                          <input 
+                              type="date" 
+                              value={date} 
+                              min={today}
+                              onChange={(e) => setDate(e.target.value)}
+                              className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black outline-none focus:bg-white focus:border-[#CF3425]/30 focus:ring-4 focus:ring-[#CF3425]/5 transition-all text-slate-800"
+                          />
+                      </div>
+                  </div>
+
+                  <div>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 ml-1">Travelers</p>
+                      <div className="relative">
+                          <Users size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#CF3425]" />
+                          <select 
+                            value={pax}
+                            onChange={(e) => setPax(Number(e.target.value))}
+                            className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-black outline-none appearance-none focus:bg-white focus:border-[#CF3425]/30 focus:ring-4 focus:ring-[#CF3425]/5 transition-all text-slate-800"
+                          >
+                              {[1,2,3,4,5,6].map(n => <option key={n} value={n}>{n} Traveler{n>1?'s':''}</option>)}
+                          </select>
+                          <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                      </div>
+                  </div>
+
+                  <button 
+                    onClick={handleSearch}
+                    className="h-[56px] px-10 bg-[#CF3425] hover:bg-[#b82e1f] text-white font-black text-xs rounded-2xl transition-all shadow-xl shadow-[#CF3425]/30 flex items-center gap-3 mb-0.5 uppercase tracking-[0.2em] active:scale-95"
                   >
-                    {[1, 2, 3, 4, 5, 6].map((n) => (
-                      <option key={n} value={n}>
-                        {n} Adult{n > 1 ? "s" : ""}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                      <Search size={20} />
+                      Search
+                  </button>
               </div>
-              <button
-                onClick={handleSearch}
-                disabled={loading || from === to}
-                className="self-end h-[48px] flex items-center justify-center gap-2 px-5 bg-[#cf3425] text-white text-sm font-semibold rounded-xl hover:bg-[#b82e1f] transition-all disabled:opacity-50"
-              >
-                {loading ? <RefreshCw size={17} className="animate-spin" /> : <Search size={17} />}
-                Search
-              </button>
-            </div>
           </div>
-        </div>
       </div>
 
-      <section className="max-w-7xl mx-auto px-6 py-10">
-        {loading && (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-[1.75rem] border border-slate-100 p-5 animate-pulse">
-                <div className="flex gap-4 items-center">
-                  <div className="w-11 h-11 bg-slate-100 rounded-xl" />
-                  <div className="flex-1 h-5 bg-slate-100 rounded-lg" />
-                  <div className="w-28 h-10 bg-slate-100 rounded-xl" />
-                </div>
+      {/* Main Content */}
+      <section className="max-w-7xl mx-auto px-6 py-16">
+          
+          {isLoading ? (
+              <div className="space-y-6">
+                  {[1,2,3].map(i => (
+                      <div key={i} className="h-40 bg-white rounded-3xl border border-slate-200 animate-pulse" />
+                  ))}
               </div>
-            ))}
-          </div>
-        )}
+          ) : searched ? (
+              <div className="flex flex-col lg:grid lg:grid-cols-[280px_1fr] gap-10">
+                  {/* Sidebar Filters */}
+                  <aside className="space-y-8">
+                      <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm sticky top-24">
+                          <div className="flex items-center gap-2 mb-8 pb-4 border-b border-slate-100">
+                              <Filter size={16} className="text-[#CF3425]" />
+                              <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Filters</h3>
+                          </div>
 
-        {searched && !loading && (
-          <>
-            <motion.div layout className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-7">
-              <div>
-                <h2 className="text-2xl font-black text-slate-900">
-                  {fromCity?.name} <ArrowRight size={16} className="inline text-indigo-700" /> {toCity?.name}
-                </h2>
-                <p className="text-slate-400 text-sm mt-1">
-                  {new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
-                    weekday: "short",
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}{" "}
-                  | {pax} {pax === 1 ? "adult" : "adults"} |{" "}
-                  <span className="font-semibold text-slate-600">{results.length} flights found</span>
-                </p>
-              </div>
+                          <div className="space-y-10">
+                              <div>
+                                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6 flex justify-between">
+                                    Price Range 
+                                    <span className="text-[#CF3425]">₹{maxPrice.toLocaleString()}</span>
+                                  </p>
+                                  <input 
+                                      type="range" 
+                                      min="3000" 
+                                      max="100000" 
+                                      step="1000"
+                                      value={maxPrice}
+                                      onChange={(e) => setMaxPrice(Number(e.target.value))}
+                                      className="w-full accent-[#CF3425] h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
+                                  />
+                                  <div className="flex justify-between mt-3 text-[9px] font-bold text-slate-400 uppercase tracking-tighter">
+                                      <span>₹3,000</span>
+                                      <span>₹1,00,000+</span>
+                                  </div>
+                              </div>
 
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-xl px-3 py-2 shadow-sm">
-                  <SlidersHorizontal size={13} className="text-slate-400" />
-                  <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="text-sm font-semibold text-slate-700 outline-none bg-transparent">
-                    <option value="price">Cheapest</option>
-                    <option value="duration">Fastest</option>
-                    <option value="dep">Earliest</option>
-                    <option value="rating">Best Rated</option>
-                  </select>
-                </div>
-                <button
-                  onClick={() => setShowFilter(!showFilter)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-all shadow-sm ${showFilter ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-200 text-slate-700 hover:border-indigo-300"
-                    }`}
-                >
-                  <Filter size={13} /> Filters
-                </button>
-              </div>
-            </motion.div>
+                              <div className="pt-6 border-t border-slate-50">
+                                  <label className="flex items-center justify-between cursor-pointer group">
+                                      <span className="text-xs font-black text-slate-700">Non-stop Flights</span>
+                                      <div className={`w-10 h-5 rounded-full transition-all relative ${nonstop ? 'bg-[#CF3425]' : 'bg-slate-200'}`}>
+                                          <input 
+                                            type="checkbox" 
+                                            className="hidden" 
+                                            checked={nonstop}
+                                            onChange={() => setNonstop(!nonstop)}
+                                          />
+                                          <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all ${nonstop ? 'left-6' : 'left-1'}`} />
+                                      </div>
+                                  </label>
+                              </div>
+                          </div>
+                      </div>
+                  </aside>
 
-            <AnimatePresence>
-              {showFilter && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="bg-white rounded-[1.5rem] border border-slate-200 p-5 mb-5 shadow-sm space-y-4"
-                >
-                  <div className="flex justify-between">
-                    <p className="font-black text-slate-800">Filters</p>
-                    <button onClick={() => { setMaxPrice(60000); setNonstop(false); }} className="text-xs text-indigo-700 font-semibold hover:underline">
-                      Reset
-                    </button>
+                  {/* Results List */}
+                  <div className="space-y-6">
+                      <div className="flex items-end justify-between mb-4 px-2">
+                          <div>
+                            <h2 className="text-2xl font-black text-slate-900 leading-tight">
+                                {fromCity?.city || initialFrom} to {toCity?.city || initialTo}
+                            </h2>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                {results.length} results found • {new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-2 bg-slate-100/50 p-1 rounded-xl border border-slate-200">
+                              <select 
+                                value={sortBy}
+                                onChange={(e) => setSortBy(e.target.value)}
+                                className="bg-transparent text-[10px] font-black text-slate-600 px-3 py-1.5 outline-none cursor-pointer uppercase tracking-wider"
+                              >
+                                  <option value="price">Cheapest</option>
+                                  <option value="duration">Fastest</option>
+                                  <option value="dep">Earliest</option>
+                                  <option value="rating">Best Rated</option>
+                              </select>
+                          </div>
+                      </div>
+
+                      <div className="space-y-4">
+                          {results.length > 0 ? (
+                              results.map((flight) => (
+                                  <FlightCard 
+                                    key={flight.id} 
+                                    flight={flight} 
+                                    pax={pax}
+                                    onBook={handleBookFlight}
+                                  />
+                              ))
+                          ) : (
+                              <div className="text-center py-20 bg-white rounded-[3rem] border border-slate-200">
+                                  <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-slate-200">
+                                      <Search size={32} />
+                                  </div>
+                                  <h3 className="text-xl font-black text-slate-800">No matching flights</h3>
+                                  <p className="text-slate-400 font-bold text-sm mt-1">Try adjusting your filters or search criteria</p>
+                              </div>
+                          )}
+                      </div>
                   </div>
-                  <div>
-                    <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">
-                      Max Price: <span className="text-slate-700 normal-case">Rs {maxPrice.toLocaleString()}</span>
-                    </p>
-                    <input
-                      type="range"
-                      min={2000}
-                      max={60000}
-                      step={500}
-                      value={maxPrice}
-                      onChange={(e) => setMaxPrice(Number(e.target.value))}
-                      className="w-full accent-indigo-600"
-                    />
-                    <div className="flex justify-between text-xs text-slate-400 mt-1">
-                      <span>Rs 2,000</span>
-                      <span>Rs 60,000</span>
-                    </div>
+              </div>
+          ) : (
+              <div className="text-center py-20">
+                  <div className="w-24 h-24 bg-red-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8 text-[#CF3425]">
+                      <Compass size={48} />
                   </div>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={nonstop} onChange={(e) => setNonstop(e.target.checked)} className="accent-indigo-600 w-4 h-4" />
-                    <span className="text-sm font-semibold text-slate-700">Non-stop only</span>
-                  </label>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tighter">Start Your Elite Journey</h2>
+                  <p className="text-slate-400 font-bold text-lg max-w-md mx-auto">Enter your route above to explore curated flight options with premium hospitality.</p>
+              </div>
+          )}
 
-            <div className="space-y-4">
-              {results.length > 0 ? (
-                results.map((f, i) => <FlightCard key={f.id} f={f} index={i} onBook={handleBookFlight} />)
-              ) : (
-                <div className="text-center py-24">
-                  <Plane size={48} className="mx-auto mb-3 text-slate-300" />
-                  <p className="font-bold text-slate-500">No flights match your filters</p>
-                </div>
-              )}
-            </div>
-          </>
-        )}
-
-        {!searched && !loading && (
-          <div className="text-center py-24">
-            <div className="w-20 h-20 rounded-2xl bg-indigo-50 flex items-center justify-center mx-auto mb-5">
-              <Plane size={36} className="text-indigo-700" />
-            </div>
-            <p className="text-lg font-black text-slate-700">Search for available flights</p>
-            <p className="text-sm text-slate-400 mt-1">Select origin, destination and date above</p>
-          </div>
-        )}
       </section>
+
     </div>
   );
 }

@@ -42,7 +42,7 @@ const SupportSection = () => {
         {/* Heading */}
         <h2 className="mb-6 text-2xl font-black tracking-tight text-slate-900 md:text-4xl">
           Your Private{" "}
-          <span className="bg-[#CF3425] bg-clip-text text-transparent">
+          <span className="bg-[#cf3425] bg-clip-text text-transparent">
             Travel Desk
           </span>
         </h2>

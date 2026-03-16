@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { CITIES } from "../utils/bookingUtils";
 import {
     Search,
     MapPin,
@@ -19,23 +20,11 @@ import {
 import toast from "react-hot-toast";
 import { getBaseURL } from "../services/baseApi";
 
-const DEFAULT_CITIES = [
-    { code: "DEL", name: "New Delhi" },
-    { code: "BOM", name: "Mumbai" },
-    { code: "BLR", name: "Bengaluru" },
-    { code: "HYD", name: "Hyderabad" },
-    { code: "MAA", name: "Chennai" },
-    { code: "CCU", name: "Kolkata" },
-    { code: "DXB", name: "Dubai" },
-    { code: "SIN", name: "Singapore" },
-    { code: "LHR", name: "London" },
-    { code: "PAR", name: "Paris" },
-];
 
-function CityBox({ label, value, onChange }) {
+const CityBox = ({ label, value, onChange }) => {
     const [open, setOpen] = useState(false);
     const [q, setQ] = useState("");
-    const [list, setList] = useState(DEFAULT_CITIES);
+    const [list, setList] = useState(CITIES);
     const [loading, setLoading] = useState(false);
 
     const fetchCities = useCallback(async (keyword) => {
@@ -59,7 +48,7 @@ function CityBox({ label, value, onChange }) {
 
     useEffect(() => {
         if (!q) {
-            setList(DEFAULT_CITIES);
+            setList(CITIES);
             return;
         }
         const timer = setTimeout(() => {
@@ -68,12 +57,13 @@ function CityBox({ label, value, onChange }) {
         return () => clearTimeout(timer);
     }, [q, fetchCities]);
 
+
     const sel = useMemo(() => {
         return list.find(c => c.code === value) || { code: value, name: "Selected City" };
     }, [value, list]);
 
     return (
-        <div className="relative w-full">
+      <div className="relative w-full">
             <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">{label}</p>
             <button
                 type="button"
@@ -81,9 +71,9 @@ function CityBox({ label, value, onChange }) {
                     setOpen(!open);
                     setQ("");
                 }}
-                className="w-full flex items-center gap-3 px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-left transition-all hover:border-indigo-200"
+                className="w-full flex items-center gap-3 px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-left transition-all hover:border-[#CF3425]/40"
             >
-                <MapPin size={18} className="text-indigo-500 flex-shrink-0" />
+                <MapPin size={18} className="text-[#CF3425] flex-shrink-0" />
                 {value ? (
                     <div>
                         <p className="text-lg font-black text-slate-900 leading-none">{value}</p>
@@ -101,11 +91,11 @@ function CityBox({ label, value, onChange }) {
                             value={q}
                             onChange={(e) => setQ(e.target.value)}
                             placeholder="Enter city name..."
-                            className="w-full text-sm font-bold px-4 py-3 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-100 border border-transparent"
+                            className="w-full text-sm font-bold px-4 py-3 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-[#CF3425]/10 border border-transparent focus:border-[#CF3425]/40"
                         />
                     </div>
                     <div className="max-h-60 overflow-y-auto">
-                        {loading && <div className="p-6 text-center"><RefreshCw className="animate-spin mx-auto text-indigo-400" size={24} /></div>}
+                        {loading && <div className="p-6 text-center"><RefreshCw className="animate-spin mx-auto text-[#CF3425]" size={24} /></div>}
                         {list.map((c) => (
                             <button
                                 key={c.code}
@@ -116,7 +106,7 @@ function CityBox({ label, value, onChange }) {
                                 }}
                                 className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 text-left transition-colors"
                             >
-                                <span className="text-xs font-black bg-indigo-50 text-indigo-600 px-2 py-1 rounded min-w-[40px] text-center">{c.code}</span>
+                                <span className="text-xs font-black bg-rose-50 text-[#CF3425] px-2 py-1 rounded min-w-[40px] text-center">{c.code}</span>
                                 <p className="text-sm font-black text-slate-800">{c.name}</p>
                             </button>
                         ))}
@@ -133,7 +123,7 @@ function HotelCard({ hotel, index, onBook }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
-            className="bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden hover:border-indigo-200 transition-all group"
+            className="bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden hover:border-[#CF3425]/40 transition-all group"
         >
             <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/3 relative overflow-hidden">
@@ -156,13 +146,13 @@ function HotelCard({ hotel, index, onBook }) {
                         <div>
                             <h3 className="text-xl md:text-2xl font-black text-slate-900 leading-tight mb-1">{hotel.name}</h3>
                             <p className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
-                                <MapPin size={13} className="text-indigo-500" />
+                                <MapPin size={13} className="text-[#CF3425]" />
                                 {hotel.address}, {hotel.city}
                             </p>
                         </div>
                         <div className="text-right">
                             <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Starting from</p>
-                            <p className="text-3xl font-black text-indigo-700">₹{hotel.price ? hotel.price.toLocaleString() : "N/A"}</p>
+                            <p className="text-3xl font-black text-[#CF3425]">₹{hotel.price ? hotel.price.toLocaleString() : "N/A"}</p>
                             <p className="text-[10px] font-bold text-slate-500">Per Night + Taxes</p>
                         </div>
                     </div>
@@ -187,7 +177,7 @@ function HotelCard({ hotel, index, onBook }) {
                             {[1, 2, 3].map(i => (
                                 <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200" />
                             ))}
-                            <div className="w-8 h-8 rounded-full border-2 border-white bg-indigo-50 text-indigo-600 text-[10px] font-black flex items-center justify-center">+12k booked</div>
+                            <div className="w-8 h-8 rounded-full border-2 border-white bg-rose-50 text-[#CF3425] text-[10px] font-black flex items-center justify-center">+12k booked</div>
                         </div>
                         <button
                             onClick={() => onBook(hotel)}
@@ -320,7 +310,7 @@ export default function HotelsPage() {
                         <div>
                             <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Check In</p>
                             <div className="relative">
-                                <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500" />
+                                <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#CF3425]" />
                                 <input
                                     type="date"
                                     value={checkIn}
@@ -333,7 +323,7 @@ export default function HotelsPage() {
                         <div>
                             <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Check Out</p>
                             <div className="relative">
-                                <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-indigo-500" />
+                                <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#CF3425]" />
                                 <input
                                     type="date"
                                     value={checkOut}
@@ -393,7 +383,7 @@ export default function HotelsPage() {
                                 >
                                     <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
                                         <div className="max-w-md">
-                                            <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Max Price Per Night: <span className="text-indigo-600">₹{priceRange.toLocaleString()}</span></p>
+                                            <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Max Price Per Night: <span className="text-[#CF3425]">₹{priceRange.toLocaleString()}</span></p>
                                             <input
                                                 type="range"
                                                 min="1000"
@@ -421,7 +411,26 @@ export default function HotelsPage() {
                                             key={h.id} 
                                             hotel={h} 
                                             index={i} 
-                                            onBook={(hotel) => toast.success(`Viewing details for ${hotel.name}`)} 
+                                            onBook={(hotel) => {
+                                                const token = localStorage.getItem("token");
+                                                if (!token) {
+                                                    toast.error("Please login to book a hotel");
+                                                    navigate("/auth/login");
+                                                    return;
+                                                }
+                                                navigate("/booking-selection", {
+                                                    state: {
+                                                        type: "hotel",
+                                                        hotel: hotel,
+                                                        from: city,
+                                                        to: city,
+                                                        fromName: city,
+                                                        toName: city,
+                                                        date: checkIn,
+                                                        pax: guests,
+                                                    },
+                                                });
+                                            }} 
                                         />
                                     ))
                                 ) : (
@@ -444,7 +453,7 @@ export default function HotelsPage() {
 
                 {!searched && !loading && (
                     <div className="text-center py-20">
-                        <div className="w-24 h-24 bg-indigo-50 rounded-3xl flex items-center justify-center mx-auto mb-8 text-indigo-600">
+                        <div className="w-24 h-24 bg-rose-50 rounded-3xl flex items-center justify-center mx-auto mb-8 text-[#CF3425]">
                             <Sparkles size={40} />
                         </div>
                         <h2 className="text-3xl font-black text-slate-800">Ready for your next adventure?</h2>

@@ -454,7 +454,7 @@ const DestinationCard = ({ dest, index, liked, onLike, onClick }) => (
             >
                 <Heart
                     size={15}
-                    className={liked ? "fill-rose-500 text-rose-500" : "text-slate-400"}
+                    className={liked ? "fill-blue-500 text-[#CF3425]" : "text-slate-400"}
                 />
             </button>
 

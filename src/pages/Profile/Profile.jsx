@@ -24,8 +24,8 @@ import {
   useUpdateAvatarMutation,
   useUpdateUserMutation,
 } from "../../services/userService";
+import { getBookings, cancelBooking, formatInr } from "../../utils/bookingUtils";
 
-import { formatInr, getBookings, cancelBooking } from "../../utils/bookingStore";
 
 const DEFAULT_AVATAR =
   "https://ui-avatars.com/api/?background=cf3425&color=fff&name=Traveller&size=240";
@@ -158,12 +158,12 @@ export default function ProfilePage() {
     if (!user) return;
     setIsEditing(false);
     setFormData({
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      phone: user.mobile,
-      location: user.location,
-      bio: user.bio,
+      first_name: user.first_name || "",
+      last_name: user.last_name || "",
+      email: user.email || "",
+      phone: user.mobile || "",
+      location: user.location || "",
+      bio: user.bio || "",
     });
   };
 
@@ -231,7 +231,7 @@ export default function ProfilePage() {
   if (token && isError && error?.status !== 401) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <button onClick={refetch} className="text-red-600 font-bold">
+        <button onClick={refetch} className="text-[#CF3425] font-bold">
           Retry Loading Profile
         </button>
       </div>
@@ -302,7 +302,7 @@ export default function ProfilePage() {
                     {stats.total} Bookings
                   </span>
 
-                  <span className="bg-blue-50 text-blue-700 border border-blue-200 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider">
+                  <span className="bg-rose-50 text-blue-700 border border-blue-200 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider">
                     {stats.flights} Flights
                   </span>
 
@@ -316,35 +316,44 @@ export default function ProfilePage() {
 
             </div>
 
-            <button
-              onClick={handleLogout}
-              className="px-4 py-2 border border-slate-200 text-slate-700 rounded-xl flex items-center gap-2 text-[11px] font-black uppercase tracking-wider hover:bg-slate-50"
-            >
-              <LogOut size={16} />
-              Logout
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  setActiveTab("settings");
+                  setIsEditing(true);
+                }}
+                className="px-4 py-2 border border-slate-200 text-slate-700 rounded-xl flex items-center gap-2 text-[11px] font-black uppercase tracking-wider hover:bg-slate-50 transition-all"
+              >
+                <Edit3 size={16} />
+                Edit Profile
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 border border-slate-200 text-[#cf3425] border-[#cf3425]/20 bg-red-50/30 rounded-xl flex items-center gap-2 text-[11px] font-black uppercase tracking-wider hover:bg-red-50 transition-all"
+              >
+                <LogOut size={16} />
+                Logout
+              </button>
+            </div>
 
           </div>
 
-          {/* STATS */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8">
-
-            <Stat label="Total" value={stats.total} />
-            <Stat label="Upcoming" value={stats.upcoming} />
-            <Stat label="Spent" value={formatInr(stats.spent)} />
-
-            <Stat
-              label="Member Since"
-              value={
-                user?.createdAt
-                  ? new Date(user.createdAt).toLocaleDateString("en-IN", {
-                    month: "short",
-                    year: "numeric",
-                  })
-                  : "N/A"
-              }
-            />
-
+          {/* TABS */}
+          <div className="flex items-center gap-6 mt-8 border-b border-slate-100">
+            {["overview", "settings"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`pb-4 text-[11px] font-black uppercase tracking-widest transition-all relative ${
+                  activeTab === tab ? "text-[#cf3425]" : "text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                {tab}
+                {activeTab === tab && (
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#cf3425] rounded-full" />
+                )}
+              </button>
+            ))}
           </div>
 
         </div>
@@ -352,51 +361,227 @@ export default function ProfilePage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-6 mt-6">
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm">
-          <div className="p-5 border-b border-slate-200">
-            <p className="text-[11px] font-black uppercase tracking-widest text-slate-400">Recent Bookings</p>
+        {activeTab === "overview" ? (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 px-1">About Me</h3>
+                <p className="text-slate-600 text-sm leading-relaxed px-1">
+                  {formData.bio || "No bio added yet. Tell us about your travel preferences!"}
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+                  <InfoItem icon={<Mail size={16}/>} label="Email Address" value={formData.email} />
+                  <InfoItem icon={<Phone size={16}/>} label="Phone Number" value={formData.phone || "Not provided"} />
+                  <InfoItem icon={<MapPin size={16}/>} label="Location" value={formData.location || "Earth"} />
+                  <InfoItem icon={<Calendar size={16}/>} label="Birthday" value="Jan 15, 1995" />
+                </div>
+              </div>
+              <div className="bg-[#1e293b] rounded-3xl p-6 text-white relative overflow-hidden shadow-xl">
+                 <div className="relative z-10">
+                   <h3 className="text-sm font-black uppercase tracking-widest mb-6 opacity-60 text-white">Travel Status</h3>
+                   <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-4">
+                      <Plane size={32} className="text-blue-400" />
+                   </div>
+                   <p className="text-2xl font-black mb-1">Explorer</p>
+                   <p className="text-xs font-bold text-white/50 uppercase tracking-widest mb-8">Level 4 Member</p>
+                   <div className="space-y-4">
+                      <div>
+                        <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
+                          <span>Progress to Gold</span>
+                          <span>75%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/10 rounded-full">
+                          <div className="h-full bg-blue-500 rounded-full" style={{ width: '75%' }} />
+                        </div>
+                      </div>
+                      <p className="text-[10px] font-bold text-white/40 leading-relaxed">
+                        Complete 2 more trips to unlock Premium Lounge access and priority boarding.
+                      </p>
+                   </div>
+                 </div>
+                 <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-500/20 blur-3xl rounded-full" />
+              </div>
+            </div>
           </div>
-          <div className="divide-y divide-slate-200">
+        ) : (
+          <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-lg font-black text-slate-900">Personal Information</h3>
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Update your account details and preferences</p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCancel}
+                  className="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest text-slate-500 hover:bg-slate-50 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSave}
+                  disabled={isSaving}
+                  className="bg-[#cf3425] text-white px-8 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-red-500/20 hover:bg-[#b82e1f] transition-all flex items-center gap-2"
+                >
+                  {isSaving ? <RefreshCw className="animate-spin" size={14} /> : <Save size={14} />}
+                  Save Changes
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">First Name</label>
+                <input
+                  name="first_name"
+                  value={formData.first_name}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#cf3425]/30 outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Last Name</label>
+                <input
+                  name="last_name"
+                  value={formData.last_name}
+                  onChange={handleChange}
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#cf3425]/30 outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                <input
+                  name="email"
+                  value={formData.email}
+                  disabled
+                  className="w-full bg-slate-100 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-400 cursor-not-allowed outline-none"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
+                <input
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="+91 00000 00000"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#cf3425]/30 outline-none transition-all"
+                />
+              </div>
+              <div className="md:col-span-2 space-y-1.5">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bio</label>
+                <textarea
+                  name="bio"
+                  value={formData.bio}
+                  onChange={handleChange}
+                  rows={4}
+                  placeholder="Tell us about yourself..."
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#cf3425]/30 outline-none transition-all resize-none"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className="max-w-6xl mx-auto px-6 mt-6">
+        <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+          <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-black text-slate-900">Recent Bookings</h3>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Manage your upcoming and past trips</p>
+            </div>
+            <Ticket className="text-[#CF3425]" size={24} />
+          </div>
+          <div className="divide-y divide-slate-100">
             {recentBookings.length === 0 ? (
-              <div className="p-8 text-center">
-                <p className="text-sm text-slate-500">No bookings yet</p>
+              <div className="p-12 text-center">
+                <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-slate-300">
+                  <Ticket size={32} />
+                </div>
+                <p className="text-sm text-slate-500 font-bold">No bookings found</p>
+                <Link to="/flights" className="text-[#CF3425] text-xs font-black uppercase tracking-widest mt-4 inline-block hover:underline">Book your first trip</Link>
               </div>
             ) : (
               recentBookings.map((b) => {
                 const isCancelled = b.status === "cancelled";
+                const isFlight = b.type === "flight";
+                const TypeIcon = isFlight ? Plane : (b.type === "train" ? Train : Ticket);
+                
                 return (
-                  <div key={b.id} className="p-5 flex items-center justify-between gap-4">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-slate-900">
-                          {b.fromCode} • {b.toCode}
-                        </span>
-                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border ${isCancelled ? "bg-rose-50 text-rose-700 border-rose-200" : "bg-emerald-50 text-emerald-700 border-emerald-200"}`}>
-                          {isCancelled ? "cancelled" : b.status || "confirmed"}
-                        </span>
+                  <div key={b.id} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-slate-50 transition-colors">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isCancelled ? "bg-slate-100 text-slate-400" : "bg-red-50 text-[#CF3425]"}`}>
+                        <TypeIcon size={24} />
                       </div>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {b.providerName} • {b.departTime} to {b.arriveTime} • {b.travelDate}
-                      </p>
+                      <div>
+                        <div className="flex items-center gap-3 mb-1">
+                          <span className="text-sm font-black text-slate-900">
+                            {b.fromCode} → {b.toCode}
+                          </span>
+                          <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${
+                            isCancelled 
+                              ? "bg-slate-100 text-slate-500 border-slate-200" 
+                              : "bg-emerald-50 text-emerald-700 border-emerald-100"
+                          }`}>
+                            {isCancelled ? "cancelled" : b.status || "confirmed"}
+                          </span>
+                        </div>
+                        <p className="text-[11px] font-bold text-slate-500">
+                          {b.providerName} • {b.departTime} - {b.arriveTime} • {new Date(b.travelDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </p>
+                        {b.class && (
+                          <p className="text-[10px] font-black text-[#CF3425] uppercase tracking-tighter mt-1">
+                            {b.class} Class • {b.meal || "No Meal"}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <p className="text-sm font-bold text-slate-900">{formatInr(b.totalPrice)}</p>
-                      <button
-                        onClick={() => handleCancelBooking(b.id, b.status)}
-                        disabled={isCancelled}
-                        className={`px-3 py-2 rounded-xl text-[11px] font-semibold uppercase tracking-wider transition-all ${isCancelled ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "bg-[#cf3425] text-white hover:bg-[#b82e1f]"}`}
-                      >
-                        Cancel
-                      </button>
+                    
+                    <div className="flex items-center justify-between md:justify-end gap-6 border-t md:border-t-0 pt-4 md:pt-0">
+                      <div className="text-left md:text-right">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Total Paid</p>
+                        <p className="text-lg font-black text-slate-900">{formatInr(b.totalPrice)}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleCancelBooking(b.id, b.status)}
+                          disabled={isCancelled}
+                          className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                            isCancelled 
+                              ? "bg-slate-100 text-slate-300 cursor-not-allowed" 
+                              : "bg-white border-2 border-slate-200 text-slate-700 hover:border-red-200 hover:text-[#CF3425]"
+                          }`}
+                        >
+                          {isCancelled ? "Cancelled" : "Cancel trip"}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 );
               })
             )}
           </div>
+          {recentBookings.length > 0 && (
+            <div className="p-4 bg-slate-50 text-center border-t border-slate-100">
+              <Link to="/bookings" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-[#CF3425] transition-colors">View All Bookings</Link>
+            </div>
+          )}
         </div>
       </section>
 
+    </div>
+  );
+}
+
+function InfoItem({ icon, label, value }) {
+  return (
+    <div className="flex items-center gap-4">
+      <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400">
+        {icon}
+      </div>
+      <div>
+        <p className="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-0.5">{label}</p>
+        <p className="text-sm font-black text-slate-800">{value}</p>
+      </div>
     </div>
   );
 }

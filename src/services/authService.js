@@ -1,6 +1,7 @@
 import {createApi} from '@reduxjs/toolkit/query/react'
 import { baseQuery } from './baseApi'
 
+
 export const authService = createApi({
     reducerPath : "AuthAPI",
     baseQuery:baseQuery,
@@ -42,8 +43,11 @@ export const authService = createApi({
                
             })  
         })
-    })
+        
+       
+               
+        })
 
 })
 
-export const {useLoginMutation, useVerifyMutation, useRegisterMutation, useForgotPasswordMutation, useResetPasswordMutation } = authService
+export const {useLoginMutation, useVerifyMutation, useRegisterMutation, useForgotPasswordMutation, useResetPasswordMutation  } = authService

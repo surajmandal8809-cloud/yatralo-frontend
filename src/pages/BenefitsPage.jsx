@@ -15,12 +15,12 @@ const BenefitsPage = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         className="inline-flex items-center gap-2 bg-white border border-slate-200 px-5 py-2 rounded-full mb-6 shadow-sm"
                     >
-                        <Crown className="text-[#CF3425]" size={14} />
+                        <Crown className="text-[#cf3425]" size={14} />
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-700">Membership Tiers</span>
                     </motion.div>
 
                     <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tighter leading-tight">
-                        Elevate Your <span className="text-[#CF3425]">Voyage</span>
+                        Elevate Your <span className="text-[#cf3425]">Voyage</span>
                     </h1>
 
                     <p className="text-slate-600 text-sm md:text-base max-w-2xl mx-auto font-medium leading-relaxed mb-8">
@@ -35,11 +35,11 @@ const BenefitsPage = () => {
 
             <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
                 {[
-                    { label: "Insider Rates", desc: "Private pricing not available publicly.", icon: ShieldCheck, bg: "bg-orange-50", iconColor: "text-[#CF3425]" },
+                    { label: "Insider Rates", desc: "Private pricing not available publicly.", icon: ShieldCheck, bg: "bg-orange-50", iconColor: "text-[#cf3425]" },
                     { label: "Elite Upgrades", desc: "Complimentary upgrades when available.", icon: Award, bg: "bg-indigo-50", iconColor: "text-indigo-600" },
                     { label: "Priority Access", desc: "Priority boarding and express check-in.", icon: Zap, bg: "bg-slate-50", iconColor: "text-slate-600" },
                     { label: "Luxury Lounge", desc: "Access 1,200+ airport lounges globally.", icon: Layout, bg: "bg-indigo-50", iconColor: "text-indigo-600" },
-                    { label: "Concierge 24/7", desc: "Personal assistance for bookings and events.", icon: Crown, bg: "bg-orange-50", iconColor: "text-[#CF3425]" },
+                    { label: "Concierge 24/7", desc: "Personal assistance for bookings and events.", icon: Crown, bg: "bg-orange-50", iconColor: "text-[#cf3425]" },
                     { label: "Carbon Neutral", desc: "We offset every Elite voyage footprint.", icon: Sparkles, bg: "bg-emerald-50", iconColor: "text-emerald-600" },
                 ].map((benefit, i) => (
                     <motion.div

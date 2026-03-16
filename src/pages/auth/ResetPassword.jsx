@@ -1,39 +1,31 @@
 import React, { useState, useEffect } from "react";
 import { useResetPasswordMutation } from "../../services/authService";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { FaLock, FaArrowLeft } from "react-icons/fa";
 
 const ResetPassword = () => {
-
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [resetPassword, { isLoading, isError, error, isSuccess, data }] =
     useResetPasswordMutation();
 
-  const [token, setToken] = useState("");
-
-  useEffect(() => {
-    // Check URL first
+  const [token, setToken] = useState(() => {
+    // Prioritise URL token (email reset link), fall back to localStorage (mobile OTP flow)
     const urlToken = new URLSearchParams(window.location.search).get("token");
-    if (urlToken) {
-      setToken(urlToken);
-    } else {
-      // Check localStorage if not in URL (for mobile OTP flow)
-      const localToken = localStorage.getItem("token");
-      if (localToken) {
-        setToken(localToken);
-      }
-    }
-  }, []);
+    if (urlToken) return urlToken;
+    return localStorage.getItem("token") || "";
+  });
 
   useEffect(() => {
     if (isSuccess && data) {
       toast.success(data.message);
-      window.location.href = "/auth/login";
+      navigate("/auth/login");
     }
-    if (error) {
-      toast.error(error?.data?.message);
+    if (isError && error) {
+      toast.error(error?.data?.message || "Reset failed. Try again.");
     }
-  }, [isLoading, isSuccess, isError, error, data]);
+  }, [isSuccess, isError, error, data, navigate]);
 
   const [form, setForm] = useState({
     password: "",
@@ -42,28 +34,22 @@ const ResetPassword = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setForm(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.password || !form.confirm_password) {
-      toast.error("pls fill required input");
-      return;
+      return toast.error("Please fill all required fields");
     }
     if (form.password !== form.confirm_password) {
-      toast.error("Password and Confirm Password must be same");
-      return;
+      return toast.error("Passwords do not match");
     }
-    await resetPassword({ body: form, token }).unwrap();
+    await resetPassword({ body: form, token }).unwrap().catch(() => {});
   };
 
   return (
-    <div className="flex items-center justify-center bg-gray-100 px-4 py-16">
-
+    <div className="flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border">
 
         {/* Back */}

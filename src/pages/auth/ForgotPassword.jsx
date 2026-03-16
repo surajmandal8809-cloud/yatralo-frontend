@@ -53,7 +53,7 @@ const ForgotPassword = () => {
         ? { email: form.email }
         : { mobile: form.mobile };
 
-    await forgotPassword(payload).unwrap();
+    await forgotPassword(payload).unwrap().catch(() => {});
   };
 
   return (

@@ -98,11 +98,24 @@ const Header = () => {
             <div className="w-9 h-9 rounded-full bg-gray-200 animate-pulse" />
           ) : !user ? (
             <>
-              <Link to="/auth/login"
-                className={`px-4 py-2 text-sm font-semibold rounded-xl border transition ${scrolled ? "border-gray-200 text-gray-700 hover:bg-gray-50" : "border-white/30 text-white hover:bg-white/10"
-                  }`}>
-                Sign In
-              </Link>
+              <div className="relative group">
+                <button
+                  className={`px-4 py-2 text-sm font-semibold rounded-xl border transition flex items-center gap-1 ${scrolled ? "border-gray-200 text-gray-700 hover:bg-gray-50" : "border-white/30 text-white hover:bg-white/10"
+                    }`}>
+                  Sign In
+                  <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0 z-50">
+                  <div className="py-2">
+                    <Link to="/auth/login" className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#cf3425] transition">
+                      User Login
+                    </Link>
+                    <a href="http://localhost:5174/login" className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#cf3425] transition">
+                      Admin Login
+                    </a>
+                  </div>
+                </div>
+              </div>
               <Link to="/auth/register"
                 className="px-4 py-2 text-sm font-semibold rounded-xl bg-[#cf3425] text-white hover:bg-[#b82e1f] transition shadow-sm hover:shadow-md">
                 Get Started
@@ -168,7 +181,11 @@ const Header = () => {
             ))}
             {!user ? (
               <>
-                <Link to="/auth/login" className="text-sm font-semibold text-gray-700 py-1">Sign In</Link>
+                <div className="flex flex-col space-y-2 py-1">
+                  <span className="text-xs font-black uppercase tracking-[0.1em] text-gray-400">Sign In</span>
+                  <Link to="/auth/login" className="text-sm font-semibold text-gray-700 pl-2 hover:text-[#cf3425] transition">User Login</Link>
+                  <a href="http://localhost:5174/login" className="text-sm font-semibold text-gray-700 pl-2 hover:text-[#cf3425] transition">Admin Login</a>
+                </div>
                 <Link to="/auth/register"
                   className="bg-[#cf3425] text-white px-4 py-2.5 rounded-xl text-sm text-center font-semibold hover:bg-[#b82e1f] transition">
                   Get Started

@@ -63,7 +63,7 @@ const [activeTab, setActiveTab] = useState("email");
       if (!form.password)
       return toast.error("Password required");
    
-    await register(form).unwrap();
+    await register(form).unwrap().catch(() => {});
 
   }
     

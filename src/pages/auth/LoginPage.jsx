@@ -52,7 +52,7 @@ const Login = () => {
         ? { email: form.email, password: form.password }
         : { mobile: form.mobile, password: form.password };
 
-    await login(payload).unwrap();
+    await login(payload).unwrap().catch(() => {});
   };
 
 
@@ -140,6 +140,7 @@ const Login = () => {
             <div className="relative">
               <input
                 name="password"
+                type="password"
                 required
                 value={form.password}
                 onChange={handleChange}

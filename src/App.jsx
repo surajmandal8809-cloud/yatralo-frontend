@@ -15,12 +15,25 @@ import DealsPage from "./components/Deals/DealsPage";
 import VerifyPage from "./pages/auth/Verify";
 import Otpverifypage from "./pages/auth/Otpverifypage";
 import NotFound from "./pages/NotFound";
-import FlightsPage from "./pages/FlightsPage";
-import TrainsPage from "./pages/TrainsPage";
 import BookingsPage from "./pages/BookingsPage";
-import CheckoutPage from "./pages/CheckoutPage";
-import HotelsPage from "./pages/HotelsPage";
-import BookingSelectionPage from "./pages/BookingSelectionPage";
+
+// Flight Pages
+import FlightLandingPage from "./pages/flight/FlightLandingPage";
+import FlightSearchResultsPage from "./pages/flight/FlightSearchResultsPage";
+import CheckoutPage from "./pages/flight/CheckoutPage";
+import BookingSelectionPage from "./pages/flight/BookingSelectionPage";
+
+// Hotel Pages
+import HotelLandingPage from "./pages/hotel/HotelLandingPage";
+import HotelSearchResultsPage from "./pages/hotel/HotelSearchResultsPage";
+
+// Train Pages
+import TrainLandingPage from "./pages/train/TrainLandingPage";
+import TrainSearchResultsPage from "./pages/train/TrainSearchResultsPage";
+
+// Bus Pages
+import BusLandingPage from "./pages/bus/BusLandingPage";
+import BusSearchResultsPage from "./pages/bus/BusSearchResultsPage";
 
 function App() {
   return (
@@ -34,12 +47,27 @@ function App() {
             <Route path="destinations" element={<DestinationsPage />} />
             <Route path="deals" element={<DealsPage />} />
             <Route path="benefits" element={<BenefitsPage />} />
-            <Route path="flights" element={<FlightsPage />} />
-            <Route path="hotels" element={<HotelsPage />} />
-            <Route path="trains" element={<TrainsPage />} />
-            <Route path="bookings" element={<BookingsPage />} />
+            
+            {/* Flights */}
+            <Route path="flights" element={<FlightLandingPage />} />
+            <Route path="flights/results" element={<FlightSearchResultsPage />} />
+            
+            {/* Hotels */}
+            <Route path="hotels" element={<HotelLandingPage />} />
+            <Route path="hotels/results" element={<HotelSearchResultsPage />} />
+            
+            {/* Trains */}
+            <Route path="trains" element={<TrainLandingPage />} />
+            <Route path="trains/results" element={<TrainSearchResultsPage />} />
+            
+            {/* Buses */}
+            <Route path="buses" element={<BusLandingPage />} />
+            <Route path="buses/results" element={<BusSearchResultsPage />} />
+            
+            {/* Common Booking Flow */}
             <Route path="checkout" element={<CheckoutPage />} />
             <Route path="booking-selection" element={<BookingSelectionPage />} />
+            <Route path="bookings" element={<BookingsPage />} />
           </Route>
 
           {/* Auth routes */}

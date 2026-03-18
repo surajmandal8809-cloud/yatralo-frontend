@@ -23,7 +23,7 @@ import {
     ChevronDown
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { MEAL_OPTIONS, formatInr } from "../utils/bookingUtils";
+import { MEAL_OPTIONS, formatInr } from "../../utils/bookingUtils";
 
 const BookingSelectionPage = () => {
     const location = useLocation();
@@ -146,12 +146,12 @@ const BookingSelectionPage = () => {
                     <div>
                         <button 
                             onClick={() => navigate(-1)}
-                            className="flex items-center gap-2 text-slate-400 hover:text-[#CF3425] transition-colors mb-4 font-black uppercase text-[10px] tracking-widest"
+                            className="flex items-center gap-2 text-slate-400 hover:text-[#7c3aed] transition-colors mb-4 font-black uppercase text-[10px] tracking-widest"
                         >
                             <ChevronLeft size={16} /> Back to Search
                         </button>
                         <h1 className="text-4xl font-black text-slate-900 tracking-tighter">
-                            Customize Your <span className="text-[#CF3425]">Experience</span>
+                            Customize Your <span className="text-[#f97316]">Experience</span>
                         </h1>
                         <p className="text-slate-400 font-bold text-sm mt-1">
                             {type.charAt(0).toUpperCase() + type.slice(1)} Selection for {fromName} to {toName}
@@ -162,11 +162,11 @@ const BookingSelectionPage = () => {
                         <div className="text-right">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Total Payable</p>
                             <p className="text-3xl font-black text-slate-900 leading-none">₹{totalPrice.toLocaleString()}</p>
-                            <p className="text-[10px] font-black text-[#CF3425] mt-1.5 uppercase tracking-tighter">Inclusive of all taxes</p>
+                            <p className="text-[10px] font-black text-[#f97316] mt-1.5 uppercase tracking-tighter">Inclusive of all taxes</p>
                         </div>
                         <button 
                             onClick={handleConfirm}
-                            className="bg-[#CF3425] hover:bg-[#b82e1f] text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-[#CF3425]/20 flex items-center gap-3 transition-all active:scale-95"
+                            className="bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:opacity-90 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-violet-100 flex items-center gap-3 transition-all active:scale-95"
                         >
                             Confirm Booking <ArrowRight size={16} />
                         </button>
@@ -185,7 +185,7 @@ const BookingSelectionPage = () => {
                             
                             <div className="relative z-10">
                                 <div className="flex items-center gap-4 mb-8">
-                                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-lg" style={{ background: item.bg || '#CF3425' }}>
+                                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-lg" style={{ background: item.bg || '#7c3aed' }}>
                                         {item.code || (type === "hotel" ? <Hotel /> : "T")}
                                     </div>
                                     <div>
@@ -202,7 +202,7 @@ const BookingSelectionPage = () => {
                                         </div>
                                         <div className="flex-1 px-4 flex flex-col items-center">
                                             <div className="w-full h-px bg-white/10 relative">
-                                                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#CF3425]" />
+                                                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#f97316]" />
                                             </div>
                                         </div>
                                         <div className="text-right">
@@ -238,12 +238,12 @@ const BookingSelectionPage = () => {
                                             onClick={() => setSelectedClass(c)}
                                             className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${
                                                 selectedClass === c 
-                                                ? "border-[#CF3425] bg-red-50/50 shadow-lg" 
+                                                ? "border-[#7c3aed] bg-violet-50/50 shadow-lg" 
                                                 : "border-slate-50 hover:border-slate-200 bg-white"
                                             }`}
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedClass === c ? "bg-[#CF3425] text-white" : "bg-slate-100 text-slate-400"}`}>
+                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedClass === c ? "bg-[#7c3aed] text-white" : "bg-slate-100 text-slate-400"}`}>
                                                     <Armchair size={18} />
                                                 </div>
                                                 <div className="text-left">
@@ -251,7 +251,7 @@ const BookingSelectionPage = () => {
                                                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Availability: High</p>
                                                 </div>
                                             </div>
-                                            {selectedClass === c && <Check size={16} className="text-[#CF3425]" />}
+                                            {selectedClass === c && <Check size={16} className="text-[#7c3aed]" />}
                                         </button>
                                     ))}
                                 </div>
@@ -260,7 +260,7 @@ const BookingSelectionPage = () => {
                             {type !== "hotel" && (
                                 <div>
                                     <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
-                                        <Utensils size={16} className="text-[#CF3425]" /> Meal Selection
+                                        <Utensils size={16} className="text-[#f97316]" /> Meal Selection
                                     </h3>
                                     
                                     {type === "flight" && selectedClass === "Business" ? (
@@ -270,7 +270,7 @@ const BookingSelectionPage = () => {
                                                     <button
                                                         key={cat}
                                                         onClick={() => setActiveCategory(cat)}
-                                                        className={`flex-1 py-2 text-[10px] font-black rounded-xl transition-all ${activeCategory === cat ? "bg-white text-[#CF3425] shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
+                                                        className={`flex-1 py-2 text-[10px] font-black rounded-xl transition-all ${activeCategory === cat ? "bg-white text-[#7c3aed] shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
                                                     >
                                                         {cat}
                                                     </button>
@@ -280,7 +280,7 @@ const BookingSelectionPage = () => {
                                             <div className="relative">
                                                 <button 
                                                     onClick={() => setShowMealMenu(!showMealMenu)}
-                                                    className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-slate-100 bg-slate-50 hover:bg-white hover:border-[#CF3425]/30 transition-all font-bold text-sm text-slate-800"
+                                                    className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-slate-100 bg-slate-50 hover:bg-white hover:border-[#7c3aed]/30 transition-all font-bold text-sm text-slate-800"
                                                 >
                                                     <div className="flex items-center gap-3">
                                                         <span>{selectedMeal.icon}</span>
@@ -304,7 +304,7 @@ const BookingSelectionPage = () => {
                                                                         setSelectedMeal(m);
                                                                         setShowMealMenu(false);
                                                                     }}
-                                                                    className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${selectedMeal.id === m.id ? "bg-red-50 text-[#CF3425]" : "hover:bg-slate-50 text-slate-700"}`}
+                                                                    className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${selectedMeal.id === m.id ? "bg-violet-50 text-[#7c3aed]" : "hover:bg-slate-50 text-slate-700"}`}
                                                                 >
                                                                     <div className="flex items-center gap-3">
                                                                         <span className="text-lg">{m.icon}</span>
@@ -369,7 +369,7 @@ const BookingSelectionPage = () => {
                                     <p className="text-sm font-black text-slate-900">{selectedItems.length} / {pax}</p>
                                 </div>
                                 <div className="text-left">
-                                     <p className="text-[9px] font-black text-[#CF3425] uppercase mb-0.5">Items</p>
+                                     <p className="text-[9px] font-black text-[#f97316] uppercase mb-0.5">Items</p>
                                      <p className="text-[10px] font-black text-slate-800 truncate max-w-[100px]">{selectedItems.join(", ") || "-"}</p>
                                 </div>
                             </div>
@@ -402,7 +402,7 @@ const BookingSelectionPage = () => {
                                                     s.isOccupied 
                                                     ? "bg-slate-200 border-slate-300 cursor-not-allowed" 
                                                     : selectedItems.includes(s.label)
-                                                    ? "bg-[#CF3425] border-[#CF3425] shadow-lg shadow-[#CF3425]/30 scale-110"
+                                                    ? "bg-[#7c3aed] border-[#7c3aed] shadow-lg shadow-[#7c3aed]/30 scale-110"
                                                     : s.isPremium 
                                                     ? "bg-amber-50 border-amber-200 hover:border-amber-400"
                                                     : "bg-white border-slate-100 hover:border-slate-300"
@@ -436,7 +436,7 @@ const BookingSelectionPage = () => {
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Premium</span>
                                     </div>
                                     <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 rounded-md bg-[#CF3425]" />
+                                        <div className="w-4 h-4 rounded-md bg-[#7c3aed]" />
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Selected</span>
                                     </div>
                                     <div className="flex items-center gap-2">
@@ -453,7 +453,7 @@ const BookingSelectionPage = () => {
                                 
                                 <div className="space-y-4">
                                     {Array.from({ length: 4 }).map((_, cabinIdx) => (
-                                        <div key={cabinIdx} className="bg-slate-50 border-2 border-slate-100 rounded-[2rem] p-8 grid grid-cols-2 gap-10 relative group hover:border-[#CF3425]/10 transition-colors">
+                                        <div key={cabinIdx} className="bg-slate-50 border-2 border-slate-100 rounded-[2rem] p-8 grid grid-cols-2 gap-10 relative group hover:border-[#7c3aed]/10 transition-colors">
                                            <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-200 -translate-y-1/2 pointer-events-none z-0" />
                                            
                                            {/* Main Cubicle (LB, MB, UB) */}
@@ -470,8 +470,8 @@ const BookingSelectionPage = () => {
                                                                 isOccupied 
                                                                 ? "bg-slate-200 border-slate-300"
                                                                 : selectedItems.includes(label)
-                                                                ? "bg-[#CF3425] border-[#CF3425] text-white shadow-xl scale-105"
-                                                                : "bg-white border-slate-200 hover:border-[#CF3425]/40"
+                                                                ? "bg-[#7c3aed] border-[#7c3aed] text-white shadow-xl scale-105"
+                                                                : "bg-white border-slate-200 hover:border-[#7c3aed]/40"
                                                             }`}
                                                         >
                                                             <div className="w-2 h-8 rounded-full bg-slate-200/20" />
@@ -524,7 +524,7 @@ const BookingSelectionPage = () => {
                                         onClick={() => toggleSelection(room.id)}
                                         className={`group rounded-[2rem] border-2 overflow-hidden transition-all text-left ${
                                             selectedItems.includes(room.id) 
-                                            ? "border-[#CF3425] bg-white shadow-2xl scale-[1.02]" 
+                                            ? "border-[#7c3aed] bg-white shadow-2xl scale-[1.02]" 
                                             : "border-slate-100 hover:border-slate-200 bg-white"
                                         }`}
                                     >
@@ -538,7 +538,7 @@ const BookingSelectionPage = () => {
                                         <div className="p-6">
                                             <div className="flex justify-between items-start mb-2">
                                                 <h4 className="text-lg font-black text-slate-800">{room.id} Room</h4>
-                                                <p className="text-sm font-black text-[#CF3425]">+ ₹{room.price.toLocaleString()}</p>
+                                                <p className="text-sm font-black text-[#f97316]">+ ₹{room.price.toLocaleString()}</p>
                                             </div>
                                             <p className="text-xs text-slate-400 font-bold leading-relaxed mb-6">
                                                 Premium bedding, high-speed WiFi, and 24/7 room service included.
@@ -554,7 +554,7 @@ const BookingSelectionPage = () => {
                         )}
                         
                         {/* Decorative background circle */}
-                        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#CF3425]/5 blur-[100px] rounded-full pointer-events-none" />
+                        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#7c3aed]/5 blur-[100px] rounded-full pointer-events-none" />
                     </main>
                 </div>
             </div>
@@ -563,7 +563,7 @@ const BookingSelectionPage = () => {
             <div className="md:hidden fixed bottom-6 left-6 right-6 z-50">
                 <button 
                     onClick={handleConfirm}
-                    className="w-full bg-[#CF3425] text-white py-5 rounded-[2rem] font-black uppercase tracking-widest shadow-2xl flex items-center justify-center gap-3"
+                    className="w-full bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white py-5 rounded-[2rem] font-black uppercase tracking-widest shadow-2xl flex items-center justify-center gap-3"
                 >
                     Pay ₹{totalPrice.toLocaleString()} <ArrowRight size={18} />
                 </button>

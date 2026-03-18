@@ -172,6 +172,7 @@ export default function BookingsPage() {
                           onClick={() => {
                             if (window.confirm("Are you sure you want to cancel this booking?")) {
                               cancelBooking(booking.id);
+                              setBookings(getBookings());
                               toast.success("Booking cancelled successfully");
                             }
                           }}

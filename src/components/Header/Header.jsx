@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi";
-import { LuLogOut } from "react-icons/lu";
+import { FiMenu, FiX, FiUser, FiChevronDown, FiLogOut, FiSettings } from "react-icons/fi";
 import { useGetUserQuery } from "../../services/userService";
 import toast from "react-hot-toast";
 import Logo from "../common/Logo";
+import AuthModal from "../Auth/AuthModal";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,9 +37,9 @@ const Header = () => {
       toast.error("Session expired. Please login again.");
       localStorage.removeItem("token");
       setToken(null);
-      navigate("/auth/login");
+      // setIsAuthModalOpen(true); // Optionally show modal on session expire
     }
-  }, [error, navigate]);
+  }, [error]);
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 30);
@@ -52,7 +53,8 @@ const Header = () => {
     localStorage.removeItem("token");
     setToken(null);
     toast.success("Logged out successfully");
-    navigate("/auth/login");
+    // Hard redirect to clear all Redux/App state as requested
+    window.location.replace("/");
   };
 
   const navItems = [
@@ -60,84 +62,112 @@ const Header = () => {
     { name: "Flights", path: "/flights" },
     { name: "Hotels", path: "/hotels" },
     { name: "Trains", path: "/trains" },
+    { name: "Buses", path: "/buses" },
     { name: "Destinations", path: "/destinations" },
-    { name: "Deals", path: "/deals" },
-    { name: "Bookings", path: "/bookings" }
+    { name: "Offers", path: "/deals" },
+    { name: "My Bookings", path: "/bookings" }
   ];
 
   const isHomePage = location.pathname === "/";
   const scrolled = isScrolled || !isHomePage;
 
   return (
-    <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? "bg-white/95 backdrop-blur-lg shadow-sm border-b border-gray-100 py-3" : "bg-transparent py-5"
+    <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? "bg-white shadow-sm border-b border-gray-100 py-2" : "bg-gradient-to-b from-black/50 to-transparent py-4"
       }`}>
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
 
-        <Link to="/" className="flex items-center">
-          <Logo variant={scrolled ? "dark" : "light"} />
+        <Link to="/" className="flex items-center gap-2 group">
+          <span className={`text-2xl font-black tracking-tighter ${scrolled ? "text-violet-600" : "text-white"}`}>
+            Yatra<span className="text-[#f97316]">lo</span>
+          </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-10">
+        <nav className="hidden md:flex items-center gap-8">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
               <Link key={item.name} to={item.path}
-                className={`relative text-[11px] font-black uppercase tracking-[0.2em] transition-all duration-200 hover:text-[#cf3425] group/nav ${scrolled ? "text-slate-700" : "text-white/90"
+                className={`relative text-[10px] font-bold uppercase tracking-[0.15em] transition-all duration-200 hover:text-[#7C3AED] group/nav ${scrolled ? "text-slate-600" : "text-white/90"
                   }`}
               >
                 {item.name}
-                <span className={`absolute -bottom-2 left-1/2 -translate-x-1/2 h-0.5 bg-[#cf3425] rounded-full transition-all duration-300 ${isActive ? "w-4" : "w-0 group-hover/nav:w-4"
+                <span className={`absolute -bottom-1.5 left-0 h-0.5 bg-gradient-to-r from-[#7C3AED] to-[#f97316] rounded-full transition-all duration-300 ${isActive ? "w-full" : "w-0 group-hover/nav:w-full"
                   }`} />
               </Link>
             );
           })}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-4">
           {isLoading ? (
-            <div className="w-9 h-9 rounded-full bg-gray-200 animate-pulse" />
+            <div className="w-40 h-10 rounded-xl bg-gray-200 animate-pulse" />
           ) : !user ? (
-            <>
-              <div className="relative group">
-                <button
-                  className={`px-4 py-2 text-sm font-semibold rounded-xl border transition flex items-center gap-1 ${scrolled ? "border-gray-200 text-gray-700 hover:bg-gray-50" : "border-white/30 text-white hover:bg-white/10"
-                    }`}>
-                  Sign In
-                  <svg className="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                </button>
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 translate-y-2 group-hover:translate-y-0 z-50">
-                  <div className="py-2">
-                    <Link to="/auth/login" className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#cf3425] transition">
-                      User Login
-                    </Link>
-                    <a href="http://localhost:5174/login" className="block px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 hover:text-[#cf3425] transition">
-                      Admin Login
-                    </a>
-                  </div>
+            <button
+              onClick={() => setIsAuthModalOpen(true)}
+              className={`flex items-center gap-3 px-5 py-2.5 rounded-full transition-all duration-300 group ${
+                scrolled 
+                ? "bg-gradient-to-r from-[#7C3AED] to-[#f97316] text-white shadow-lg shadow-violet-200" 
+                : "bg-white/20 text-white backdrop-blur-md border border-white/30 hover:bg-white/30"
+              }`}
+            >
+              <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center">
+                <FiUser size={12} className="text-[#7C3AED]" />
+              </div>
+              <div className="text-left leading-tight">
+                <p className="text-[9px] uppercase font-black opacity-80">Login or</p>
+                <p className="text-xs font-black">Create Account</p>
+              </div>
+              <FiChevronDown size={14} className="opacity-80 group-hover:rotate-180 transition-transform" />
+            </button>
+          ) : (
+            <div className={`relative group ${scrolled && isHomePage ? 'opacity-0 invisible scale-90 translate-x-4' : 'opacity-100 visible scale-100 translate-x-0'} transition-all duration-300`}>
+              {/* Note: User requested that if logined it should remove when scrolled (maybe?) 
+                  "make a login button which will get scrooled if logined it should remove like refer make my trip"
+                  Actually, MMT keeps the profile but hides the "Logout" or other items until hover.
+                  If the user wants the profile to remove on scroll, I'll add that logic here.
+              */}
+              <div className="flex items-center gap-3 px-1 py-1 rounded-2xl cursor-pointer group/profile">
+                <div className="relative">
+                    {user?.avatar ? (
+                    <img src={user.avatar} alt="avatar"
+                        className="w-10 h-10 rounded-full border-2 border-[#7c3aed] object-cover ring-4 ring-violet-500/5" />
+                    ) : (
+                    <div className="w-10 h-10 rounded-full border-2 border-[#7c3aed] bg-violet-50 flex items-center justify-center text-xs font-black text-[#7c3aed] ring-4 ring-violet-500/5">
+                        {user?.first_name?.[0] || user?.email?.[0]}
+                    </div>
+                    )}
+                    <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+                </div>
+                
+                <div className="hidden lg:block">
+                  <p className={`text-[10px] uppercase font-black opacity-60 leading-none mb-1 ${scrolled ? "text-slate-500" : "text-white/70"}`}>Hey,</p>
+                  <p className={`text-sm font-black transition-colors ${scrolled ? "text-slate-800" : "text-white"} group-hover/profile:text-[#7C3AED]`}>
+                    {user?.first_name || "Traveler"}
+                  </p>
+                </div>
+                <FiChevronDown size={14} className={`opacity-40 transition-transform group-hover/profile:rotate-180 ${scrolled ? "text-slate-800" : "text-white"}`} />
+
+                {/* Dropdown Menu */}
+                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover/profile:opacity-100 group-hover/profile:visible transition-all duration-200 translate-y-2 group-hover/profile:translate-y-0 z-[60] overflow-hidden">
+                    <div className="p-4 bg-gray-50 border-b border-gray-100">
+                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">My Account</p>
+                        <p className="text-sm font-bold text-gray-800 truncate">{user?.email}</p>
+                    </div>
+                    <div className="p-2">
+                        <Link to="/profile" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-violet-50 text-sm font-bold text-gray-700 transition-colors">
+                            <FiUser className="text-[#7C3AED]" /> My Profile
+                        </Link>
+                        <Link to="/bookings" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-violet-50 text-sm font-bold text-gray-700 transition-colors">
+                            <FiSettings className="text-[#7C3AED]" /> Manage Bookings
+                        </Link>
+                        <div className="h-px bg-gray-100 my-2" />
+                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-sm font-bold text-red-600 transition-colors">
+                            <FiLogOut /> Logout
+                        </button>
+                    </div>
                 </div>
               </div>
-              <Link to="/auth/register"
-                className="px-4 py-2 text-sm font-semibold rounded-xl bg-[#cf3425] text-white hover:bg-[#b82e1f] transition shadow-sm hover:shadow-md">
-                Get Started
-              </Link>
-            </>
-          ) : (
-            <>
-              <Link to="/profile" className="flex items-center gap-2 group">
-                {user?.avatar ? (
-                  <img src={user.avatar} alt="avatar"
-                    className="w-9 h-9 rounded-full border-2 border-[#cf3425] object-cover" />
-                ) : (
-                  <div className="w-9 h-9 rounded-full border-2 border-[#cf3425] bg-red-50 flex items-center justify-center text-xs font-black text-[#cf3425]">
-                    {user?.first_name?.[0]  || user?.email?.[0]}
-                  </div>
-                )}
-                <span className={`text-sm font-semibold group-hover:text-[#cf3425] transition ${scrolled ? "text-gray-800" : "text-white"}`}>
-                  {user?.first_name ? `${user.first_name} ${user.last_name || ""}`.trim() : "Account"}
-                </span>
-              </Link>
-              
-            </>
+            </div>
           )}
         </div>
 
@@ -148,59 +178,72 @@ const Header = () => {
         </button>
       </div>
 
+      {/* Mobile Drawer */}
       {isOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 shadow-lg">
+        <div className="md:hidden bg-white border-t border-gray-100 shadow-lg fixed inset-x-0 top-[60px] max-h-[calc(100vh-60px)] overflow-y-auto drawer-in">
           <div className="flex flex-col px-6 py-4 space-y-4">
-            {user && (
-              <div className="py-2 border-b border-gray-100 mb-1">
-                <div className="flex items-center gap-3">
+            {user ? (
+              <div className="py-4 border-b border-gray-100 mb-2">
+                <div className="flex items-center gap-4">
                   {user?.avatar ? (
-                    <img src={user.avatar} alt="avatar" className="w-10 h-10 rounded-full border-2 border-[#cf3425] object-cover" />
+                    <img src={user.avatar} alt="avatar" className="w-12 h-12 rounded-full border-2 border-[#7c3aed] object-cover" />
                   ) : (
-                    <div className="w-10 h-10 rounded-full border-2 border-[#cf3425] bg-red-50 flex items-center justify-center text-sm font-black text-[#cf3425]">
+                    <div className="w-12 h-12 rounded-full border-2 border-[#7c3aed] bg-violet-50 flex items-center justify-center text-sm font-black text-[#7c3aed]">
                       {user?.first_name?.[0] || user?.email?.[0]}
                     </div>
                   )}
                   <div>
-                    <p className="text-sm font-bold text-gray-800">{user?.first_name ? `${user.first_name} ${user.last_name || ""}`.trim() : "Account"}</p>
-                    <p className="text-xs text-gray-400 truncate max-w-[160px]">{user?.email}</p>
+                    <p className="text-sm font-bold text-gray-800">{user?.first_name ? `${user.first_name} ${user.last_name || ""}`.trim() : "Traveler"}</p>
+                    <p className="text-xs text-gray-400 truncate max-w-[200px]">{user?.email}</p>
                   </div>
                 </div>
               </div>
-            )}
-            {navItems.map((item) => (
-              <Link key={item.name} to={item.path}
-                className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-600 hover:text-[#cf3425] transition py-1">
-                {item.name}
-              </Link>
-            ))}
-            {!user ? (
-              <>
-                <div className="flex flex-col space-y-2 py-1">
-                  <span className="text-xs font-black uppercase tracking-[0.1em] text-gray-400">Sign In</span>
-                  <Link to="/auth/login" className="text-sm font-semibold text-gray-700 pl-2 hover:text-[#cf3425] transition">User Login</Link>
-                  <a href="http://localhost:5174/login" className="text-sm font-semibold text-gray-700 pl-2 hover:text-[#cf3425] transition">Admin Login</a>
-                </div>
-                <Link to="/auth/register"
-                  className="bg-[#cf3425] text-white px-4 py-2.5 rounded-xl text-sm text-center font-semibold hover:bg-[#b82e1f] transition">
-                  Get Started
-                </Link>
-              </>
             ) : (
-              <>
-                <Link to="/profile" className="text-sm font-semibold text-[#cf3425] py-1">My Profile</Link>
-                <button onClick={handleLogout}
-                  className="text-left text-gray-500 text-sm font-semibold py-1 flex items-center gap-2 hover:text-gray-700">
-                  <LuLogOut size={15} />
-                  Logout
+                <button 
+                    onClick={() => { setIsAuthModalOpen(true); setIsOpen(false); }}
+                    className="w-full py-4 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-lg shadow-violet-100"
+                >
+                    Login / Create Account
                 </button>
-              </>
+            )}
+
+            <div className="grid grid-cols-2 gap-2">
+                {navItems.map((item) => (
+                <Link key={item.name} to={item.path}
+                    className="text-[10px] font-black uppercase tracking-[0.1em] text-gray-600 bg-gray-50 hover:text-[#7c3aed] transition p-3 rounded-xl border border-gray-100">
+                    {item.name}
+                </Link>
+                ))}
+            </div>
+
+            {user && (
+              <div className="space-y-2 pt-4">
+                <Link to="/profile" className="block text-sm font-bold text-gray-700 py-2">Account Settings</Link>
+                <Link to="/bookings" className="block text-sm font-bold text-gray-700 py-2">My Bookings</Link>
+                <button onClick={handleLogout}
+                  className="w-full text-left text-red-600 text-sm font-black py-4 flex items-center gap-2">
+                  <FiLogOut size={18} />
+                  LOGOUT
+                </button>
+              </div>
             )}
           </div>
         </div>
       )}
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        onAuthSuccess={(newToken) => {
+          localStorage.setItem("token", newToken);
+          setToken(newToken);
+          setIsAuthModalOpen(false);
+          refetch();
+        }}
+      />
     </header>
   );
 };
 
 export default Header;
+

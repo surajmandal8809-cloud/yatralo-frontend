@@ -1,6 +1,5 @@
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import Logo from "../components/common/Logo";
 
 const AuthLayout = () => {
   const navigate = useNavigate();
@@ -16,14 +15,14 @@ const AuthLayout = () => {
           {/* Back Button (Mobile Only) */}
           <button
             onClick={() => navigate(-1)}
-            className="sm:hidden flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-600 hover:bg-orange-500 hover:text-white transition"
+            className="sm:hidden flex items-center justify-center w-9 h-9 rounded-full border border-gray-200 bg-white text-gray-600 hover:bg-[#008cff] hover:text-white transition"
           >
             <ArrowLeft size={18} />
           </button>
 
-          {/* Logo */}
-          <Link to="/">
-            <Logo showText={true} variant="dark" className="scale-90" />
+          {/* Logo Replacement */}
+          <Link to="/" className="text-2xl font-black tracking-tighter text-slate-900">
+            Yatra<span className="text-[#f97316]">lo</span>
           </Link>
         </div>
       </header>
@@ -47,7 +46,7 @@ const AuthLayout = () => {
 
         <div className="bg-white text-center text-sm text-gray-600 py-4 border-t">
           © {new Date().getFullYear()}{" "}
-          <span className="font-semibold text-[#cf3425]">
+          <span className="font-semibold text-[#7c3aed]">
             Yatralo
           </span>. All Rights Reserved.
         </div>

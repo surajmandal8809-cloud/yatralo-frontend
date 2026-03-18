@@ -18,12 +18,12 @@ const HeroSection = () => {
 >
   <source src="/assets/Banner.mp4" type="video/mp4" />
 </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/90"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1e1b4b] via-[#7c3aed]/30 to-slate-50"></div>
       </div>
 
       {/* Ambient Luxury Glows */}
-      <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-[#cf3425]/20 blur-[160px] rounded-full animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-yellow-400/10 blur-[160px] rounded-full animate-pulse delay-1000" />
+      <div className="absolute top-1/3 left-1/4 w-96 h-96 bg-[#7c3aed]/20 blur-[160px] rounded-full animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-orange-400/10 blur-[160px] rounded-full animate-pulse delay-700" />
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-6 py-20 text-center">
@@ -35,10 +35,10 @@ const HeroSection = () => {
           className="max-w-5xl mx-auto"
         >
           {/* Heading */}
-          <h1 className="text-white text-4xl md:text-6xl font-black mb-8 tracking-tight leading-[0.95]">
-            Curated Journeys for the <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#cf3425] to-yellow-400">
-              Global Elite
+          <h1 className="text-white text-4xl md:text-7xl font-black mb-8 tracking-tighter leading-[0.9]">
+            Where your <br />
+            <span className="text-white">
+              Journey Begins
             </span>
           </h1>
 

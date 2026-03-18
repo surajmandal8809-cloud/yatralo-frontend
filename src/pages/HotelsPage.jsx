@@ -71,9 +71,9 @@ const CityBox = ({ label, value, onChange }) => {
                     setOpen(!open);
                     setQ("");
                 }}
-                className="w-full flex items-center gap-3 px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-left transition-all hover:border-[#CF3425]/40"
+                className="w-full flex items-center gap-3 px-4 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-left transition-all hover:border-[#f97316]/40"
             >
-                <MapPin size={18} className="text-[#CF3425] flex-shrink-0" />
+                <MapPin size={18} className="text-[#f97316] flex-shrink-0" />
                 {value ? (
                     <div>
                         <p className="text-lg font-black text-slate-900 leading-none">{value}</p>
@@ -91,11 +91,11 @@ const CityBox = ({ label, value, onChange }) => {
                             value={q}
                             onChange={(e) => setQ(e.target.value)}
                             placeholder="Enter city name..."
-                            className="w-full text-sm font-bold px-4 py-3 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-[#CF3425]/10 border border-transparent focus:border-[#CF3425]/40"
+                            className="w-full text-sm font-bold px-4 py-3 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-[#f97316]/10 border border-transparent focus:border-[#f97316]/40"
                         />
                     </div>
                     <div className="max-h-60 overflow-y-auto">
-                        {loading && <div className="p-6 text-center"><RefreshCw className="animate-spin mx-auto text-[#CF3425]" size={24} /></div>}
+                        {loading && <div className="p-6 text-center"><RefreshCw className="animate-spin mx-auto text-[#f97316]" size={24} /></div>}
                         {list.map((c) => (
                             <button
                                 key={c.code}
@@ -106,7 +106,7 @@ const CityBox = ({ label, value, onChange }) => {
                                 }}
                                 className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-slate-50 text-left transition-colors"
                             >
-                                <span className="text-xs font-black bg-rose-50 text-[#CF3425] px-2 py-1 rounded min-w-[40px] text-center">{c.code}</span>
+                                <span className="text-xs font-black bg-rose-50 text-[#f97316] px-2 py-1 rounded min-w-[40px] text-center">{c.code}</span>
                                 <p className="text-sm font-black text-slate-800">{c.name}</p>
                             </button>
                         ))}
@@ -123,7 +123,7 @@ function HotelCard({ hotel, index, onBook }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
-            className="bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden hover:border-[#CF3425]/40 transition-all group"
+            className="bg-white rounded-[2rem] border border-slate-100 shadow-xl overflow-hidden hover:border-[#f97316]/40 transition-all group"
         >
             <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/3 relative overflow-hidden">
@@ -146,13 +146,13 @@ function HotelCard({ hotel, index, onBook }) {
                         <div>
                             <h3 className="text-xl md:text-2xl font-black text-slate-900 leading-tight mb-1">{hotel.name}</h3>
                             <p className="flex items-center gap-1.5 text-xs font-bold text-slate-400">
-                                <MapPin size={13} className="text-[#CF3425]" />
+                                <MapPin size={13} className="text-[#f97316]" />
                                 {hotel.address}, {hotel.city}
                             </p>
                         </div>
                         <div className="text-right">
                             <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">Starting from</p>
-                            <p className="text-3xl font-black text-[#CF3425]">₹{hotel.price ? hotel.price.toLocaleString() : "N/A"}</p>
+                            <p className="text-3xl font-black text-[#f97316]">₹{hotel.price ? hotel.price.toLocaleString() : "N/A"}</p>
                             <p className="text-[10px] font-bold text-slate-500">Per Night + Taxes</p>
                         </div>
                     </div>
@@ -177,11 +177,11 @@ function HotelCard({ hotel, index, onBook }) {
                             {[1, 2, 3].map(i => (
                                 <div key={i} className="w-8 h-8 rounded-full border-2 border-white bg-slate-200" />
                             ))}
-                            <div className="w-8 h-8 rounded-full border-2 border-white bg-rose-50 text-[#CF3425] text-[10px] font-black flex items-center justify-center">+12k booked</div>
+                            <div className="w-8 h-8 rounded-full border-2 border-white bg-rose-50 text-[#f97316] text-[10px] font-black flex items-center justify-center">+12k booked</div>
                         </div>
                         <button
                             onClick={() => onBook(hotel)}
-                            className="bg-[#cf3425] hover:bg-[#b82e1f] text-white px-8 py-3 rounded-xl text-sm font-semibold transition-all shadow-lg flex items-center gap-2"
+                            className="bg-[#7c3aed] hover:bg-[#b82e1f] text-white px-8 py-3 rounded-xl text-sm font-semibold transition-all shadow-lg flex items-center gap-2"
                         >
                             View Details <ChevronRight size={16} />
                         </button>
@@ -290,7 +290,7 @@ export default function HotelsPage() {
     <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className="px-8 py-4 bg-[#cf3425] hover:bg-[#b82e1f] text-white font-semibold rounded-xl shadow-xl"
+      className="px-8 py-4 bg-[#7c3aed] hover:bg-[#b82e1f] text-white font-semibold rounded-xl shadow-xl"
     >
       Explore Hotels
     </motion.button>
@@ -310,7 +310,7 @@ export default function HotelsPage() {
                         <div>
                             <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Check In</p>
                             <div className="relative">
-                                <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#CF3425]" />
+                                <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#f97316]" />
                                 <input
                                     type="date"
                                     value={checkIn}
@@ -323,7 +323,7 @@ export default function HotelsPage() {
                         <div>
                             <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2 ml-1">Check Out</p>
                             <div className="relative">
-                                <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#CF3425]" />
+                                <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#f97316]" />
                                 <input
                                     type="date"
                                     value={checkOut}
@@ -338,7 +338,7 @@ export default function HotelsPage() {
                     <button
                         onClick={handleSearch}
                         disabled={loading}
-                        className="w-full md:w-auto px-10 py-4 bg-[#cf3425] hover:bg-[#b82e1f] text-white font-semibold rounded-xl shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                        className="w-full md:w-auto px-10 py-4 bg-[#7c3aed] hover:bg-[#b82e1f] text-white font-semibold rounded-xl shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                     >
                         {loading ? <RefreshCw className="animate-spin" size={20} /> : <Search size={20} />}
                         Search
@@ -366,7 +366,7 @@ export default function HotelsPage() {
                             <button 
                                 onClick={() => setShowFilter(!showFilter)}
                                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold uppercase transition-all ${
-                                    showFilter ? "bg-[#cf3425] text-white border-[#cf3425]" : "bg-white border border-slate-200 text-slate-600 hover:bg-[#cf3425] hover:text-white hover:border-[#cf3425]"
+                                    showFilter ? "bg-[#7c3aed] text-white border-[#7c3aed]" : "bg-white border border-slate-200 text-slate-600 hover:bg-[#7c3aed] hover:text-white hover:border-[#7c3aed]"
                                 }`}
                             >
                                 <Filter size={14} /> {showFilter ? "Hide Filter" : "Filter"}
@@ -383,7 +383,7 @@ export default function HotelsPage() {
                                 >
                                     <div className="bg-white rounded-3xl border border-slate-100 p-8 shadow-sm">
                                         <div className="max-w-md">
-                                            <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Max Price Per Night: <span className="text-[#CF3425]">₹{priceRange.toLocaleString()}</span></p>
+                                            <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-4">Max Price Per Night: <span className="text-[#f97316]">₹{priceRange.toLocaleString()}</span></p>
                                             <input
                                                 type="range"
                                                 min="1000"
@@ -391,7 +391,7 @@ export default function HotelsPage() {
                                                 step="1000"
                                                 value={priceRange}
                                                 onChange={(e) => setPriceRange(Number(e.target.value))}
-                                                className="w-full accent-[#cf3425]"
+                                                className="w-full accent-[#7c3aed]"
                                             />
                                             <div className="flex justify-between mt-2 text-[10px] font-bold text-slate-400">
                                                 <span>₹1,000</span>
@@ -453,7 +453,7 @@ export default function HotelsPage() {
 
                 {!searched && !loading && (
                     <div className="text-center py-20">
-                        <div className="w-24 h-24 bg-rose-50 rounded-3xl flex items-center justify-center mx-auto mb-8 text-[#CF3425]">
+                        <div className="w-24 h-24 bg-rose-50 rounded-3xl flex items-center justify-center mx-auto mb-8 text-[#f97316]">
                             <Sparkles size={40} />
                         </div>
                         <h2 className="text-3xl font-black text-slate-800">Ready for your next adventure?</h2>

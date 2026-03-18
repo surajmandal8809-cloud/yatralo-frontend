@@ -82,7 +82,7 @@ const DealCard = ({ deal }) => {
           loading="lazy"
           className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
         />
-        <div className="absolute top-4 right-4 bg-orange-600 text-white px-3 py-1 text-xs font-bold rounded-lg">
+        <div className="absolute top-4 right-4 bg-[#f97316] text-white px-3 py-1 text-xs font-bold rounded-lg">
           {deal.discount}
         </div>
         {deal.badge && (
@@ -93,7 +93,7 @@ const DealCard = ({ deal }) => {
       </div>
 
       <div className="p-5">
-        <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full">
+        <span className="text-xs font-semibold text-[#7c3aed] bg-violet-50 px-3 py-1 rounded-full">
           {deal.category}
         </span>
 
@@ -118,7 +118,7 @@ const DealCard = ({ deal }) => {
           </div>
           <button
             onClick={handleBooking}
-            className="px-5 py-2 bg-[#cf3425] hover:bg-[#b82e1f] text-white text-sm rounded-xl font-semibold transition shadow-md"
+            className="px-5 py-2 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-sm rounded-xl font-semibold transition shadow-md"
           >
             Book Now
           </button>
@@ -433,7 +433,13 @@ const DealsPage = () => {
     <div className="min-h-screen bg-gray-100 py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold">🔥 Travel Deals</h1>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4">
+            Travel{" "}
+            <span className="bg-gradient-to-r from-[#7c3aed] to-[#f97316] bg-clip-text text-transparent">
+              Deals
+            </span>
+            
+          </h2>
           <p className="text-gray-600 mt-2">
             Amazing discounts on flights, hotels, buses & holiday packages
           </p>
@@ -447,8 +453,8 @@ const DealsPage = () => {
                 onClick={() => setActiveCategory(cat)}
                 className={`px-5 py-2 rounded-xl text-sm font-semibold transition ${
                   activeCategory === cat
-                    ? "bg-[#cf3425] text-white"
-                    : "bg-white border border-slate-200 hover:bg-slate-50 text-slate-600"
+                    ? "bg-[#7c3aed] text-white"
+                    : "bg-white border border-slate-200 hover:bg-violet-50 text-slate-600"
                 }`}
               >
                 {cat === "holiday-packages" ? "Holidays" : 

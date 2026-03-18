@@ -26,9 +26,9 @@ import {
 
 
 const TRAIN_TYPES = [
-  { name: "Vande Bharat", code: "VB", bg: "#b82e1f" },
-  { name: "Rajdhani Express", code: "RJ", bg: "#b91c1c" },
-  { name: "Shatabdi Express", code: "SH", bg: "#0f766e" },
+  { name: "Vande Bharat", code: "VB", bg: "#7c3aed" },
+  { name: "Rajdhani Express", code: "RJ", bg: "#f97316" },
+  { name: "Shatabdi Express", code: "SH", bg: "#6d28d9" },
   { name: "Duronto Express", code: "DR", bg: "#ea580c" },
   { name: "Garib Rath", code: "GR", bg: "#4f46e5" },
 ];
@@ -134,7 +134,7 @@ function CityBox({ value, onChange, label }) {
           setOpen(!open);
           setQ("");
         }}
-        className="w-full flex items-center gap-2 px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-left transition-all hover:border-[#CF3425]/40"
+        className="w-full flex items-center gap-2 px-3 py-3 bg-slate-50 border border-slate-200 rounded-xl text-left transition-all hover:border-[#f97316]/40"
       >
         <MapPin size={14} className="text-slate-400 flex-shrink-0" />
         {value ? (
@@ -154,11 +154,11 @@ function CityBox({ value, onChange, label }) {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search city or station..."
-              className="w-full text-sm px-3 py-2 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-[#CF3425]/10 border border-transparent focus:border-[#CF3425]/40"
+              className="w-full text-sm px-3 py-2 rounded-xl bg-slate-50 outline-none focus:ring-2 focus:ring-[#f97316]/10 border border-transparent focus:border-[#f97316]/40"
             />
           </div>
           <div className="max-h-52 overflow-y-auto">
-            {loading && <div className="p-4 text-center"><RefreshCw className="animate-spin mx-auto text-[#CF3425]" size={16} /></div>}
+            {loading && <div className="p-4 text-center"><RefreshCw className="animate-spin mx-auto text-[#f97316]" size={16} /></div>}
             {list.map((c) => (
               <button
                 key={c.code}
@@ -169,7 +169,7 @@ function CityBox({ value, onChange, label }) {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 text-left transition-colors"
               >
-                <span className="text-xs font-black bg-rose-50 text-[#CF3425] px-1.5 py-0.5 rounded min-w-[36px] text-center">{c.code}</span>
+                <span className="text-xs font-black bg-violet-50 text-[#f97316] px-1.5 py-0.5 rounded min-w-[36px] text-center">{c.code}</span>
                 <div>
                   <p className="text-sm font-semibold text-slate-800">{c.name}</p>
                   <p className="text-xs text-slate-400">{c.station}</p>
@@ -190,7 +190,7 @@ function TrainCard({ t, index, onBook }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: index * 0.04 }}
-      className="bg-white rounded-[1.75rem] border border-slate-100 shadow-lg shadow-slate-200/60 hover:border-[#CF3425]/40 transition-all overflow-hidden"
+      className="bg-white rounded-[1.75rem] border border-slate-100 shadow-lg shadow-slate-200/60 hover:border-[#f97316]/40 transition-all overflow-hidden"
     >
       <div className="p-5">
         <div className="flex flex-wrap items-center gap-4">
@@ -210,7 +210,7 @@ function TrainCard({ t, index, onBook }) {
               <p className="text-xs text-slate-400 font-semibold mb-1">{durLabel(t.duration)}</p>
               <div className="w-full flex items-center gap-1.5">
                 <div className="flex-1 h-px bg-slate-200" />
-                <Train size={13} className="text-[#CF3425]" />
+                <Train size={13} className="text-[#f97316]" />
                 <div className="flex-1 h-px bg-slate-200" />
               </div>
               <p className={`text-xs font-bold mt-1 ${t.stops === 0 ? "text-emerald-600" : "text-amber-600"}`}>
@@ -221,7 +221,7 @@ function TrainCard({ t, index, onBook }) {
           </div>
 
           <div className="text-right min-w-[110px]">
-            <p className="text-2xl font-black text-[#CF3425]">{formatInr(t.price)}</p>
+            <p className="text-2xl font-black text-[#f97316]">{formatInr(t.price)}</p>
             <p className="text-xs text-slate-400">{formatInr(t.perPax)} / person</p>
             <div className="flex items-center justify-end gap-0.5 mt-1">
               <Star size={10} className="fill-amber-400 text-amber-400" />
@@ -232,11 +232,11 @@ function TrainCard({ t, index, onBook }) {
           <div className="flex flex-col items-end gap-1.5">
             <button
               onClick={() => onBook(t)}
-              className="px-5 py-2.5 bg-[#cf3425] hover:bg-[#b82e1f] text-white text-sm font-semibold rounded-xl transition-all shadow"
+              className="px-5 py-2.5 bg-[#7c3aed] hover:bg-[#b82e1f] text-white text-sm font-semibold rounded-xl transition-all shadow"
             >
               Book Now
             </button>
-            <button onClick={() => setOpen(!open)} className="text-xs text-slate-500 hover:text-[#CF3425] flex items-center gap-0.5 transition-colors">
+            <button onClick={() => setOpen(!open)} className="text-xs text-slate-500 hover:text-[#f97316] flex items-center gap-0.5 transition-colors">
               Details {open ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
             </button>
           </div>
@@ -254,7 +254,7 @@ function TrainCard({ t, index, onBook }) {
               <Coffee size={9} /> Pantry
             </span>
           )}
-          {t.ac && <span className="text-xs font-bold bg-rose-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">AC coach</span>}
+          {t.ac && <span className="text-xs font-bold bg-violet-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">AC coach</span>}
         </div>
       </div>
 
@@ -483,7 +483,7 @@ export default function TrainsPage() {
               <button
                 onClick={handleSearch}
                 disabled={loading || from === to}
-                className="self-end h-[48px] flex items-center justify-center gap-2 px-5 bg-[#cf3425] text-white text-sm font-semibold rounded-xl hover:bg-[#b82e1f] transition-all disabled:opacity-50"
+                className="self-end h-[48px] flex items-center justify-center gap-2 px-5 bg-[#7c3aed] text-white text-sm font-semibold rounded-xl hover:bg-[#b82e1f] transition-all disabled:opacity-50"
               >
                 {loading ? <RefreshCw size={17} className="animate-spin" /> : <Search size={17} />}
                 Search
@@ -513,7 +513,7 @@ export default function TrainsPage() {
             <motion.div layout className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-7">
               <div>
                 <h2 className="text-2xl font-black text-slate-900">
-                  {fromCity?.name} <ArrowRight size={16} className="inline text-[#CF3425]" /> {toCity?.name}
+                  {fromCity?.name} <ArrowRight size={16} className="inline text-[#f97316]" /> {toCity?.name}
                 </h2>
                 <p className="text-slate-400 text-sm mt-1">
                   {new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
@@ -539,7 +539,7 @@ export default function TrainsPage() {
                 </div>
                 <button
                   onClick={() => setShowFilter(!showFilter)}
-                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-all shadow-sm ${showFilter ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-200 text-slate-700 hover:border-[#CF3425]/40"
+                  className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold transition-all shadow-sm ${showFilter ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-200 text-slate-700 hover:border-[#f97316]/40"
                     }`}
                 >
                   <Filter size={13} /> Filters
@@ -557,7 +557,7 @@ export default function TrainsPage() {
                 >
                   <div className="flex justify-between">
                     <p className="font-black text-slate-800">Filters</p>
-                    <button onClick={() => { setMaxPrice(12000); setDirectOnly(false); }} className="text-xs text-[#CF3425] font-semibold hover:underline">
+                    <button onClick={() => { setMaxPrice(12000); setDirectOnly(false); }} className="text-xs text-[#f97316] font-semibold hover:underline">
                       Reset
                     </button>
                   </div>
@@ -572,7 +572,7 @@ export default function TrainsPage() {
                       step={250}
                       value={maxPrice}
                       onChange={(e) => setMaxPrice(Number(e.target.value))}
-                      className="w-full accent-[#CF3425]"
+                      className="w-full accent-[#f97316]"
                     />
                     <div className="flex justify-between text-xs text-slate-400 mt-1">
                       <span>Rs 500</span>
@@ -580,7 +580,7 @@ export default function TrainsPage() {
                     </div>
                   </div>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={directOnly} onChange={(e) => setDirectOnly(e.target.checked)} className="accent-[#CF3425] w-4 h-4" />
+                    <input type="checkbox" checked={directOnly} onChange={(e) => setDirectOnly(e.target.checked)} className="accent-[#f97316] w-4 h-4" />
                     <span className="text-sm font-semibold text-slate-700">Direct routes only</span>
                   </label>
                 </motion.div>
@@ -602,8 +602,8 @@ export default function TrainsPage() {
 
         {!searched && !loading && (
           <div className="text-center py-24">
-            <div className="w-20 h-20 rounded-2xl bg-rose-50 flex items-center justify-center mx-auto mb-5">
-              <Train size={36} className="text-[#CF3425]" />
+            <div className="w-20 h-20 rounded-2xl bg-violet-50 flex items-center justify-center mx-auto mb-5">
+              <Train size={36} className="text-[#f97316]" />
             </div>
             <p className="text-lg font-black text-slate-700">Search for available trains</p>
             <p className="text-sm text-slate-400 mt-1">Select source, destination and date above</p>

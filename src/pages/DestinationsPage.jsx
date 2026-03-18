@@ -308,7 +308,7 @@ const DestinationsPage = () => {
                             placeholder="Search destination..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition"
+                            className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-violet-400 transition"
                         />
                     </div>
 
@@ -367,7 +367,7 @@ const DestinationsPage = () => {
                             <p className="text-slate-300 text-sm mt-1">Try a different search or category</p>
                             <button
                                 onClick={() => { setSearchTerm(""); setActiveCategory("all"); }}
-                                className="mt-6 px-6 py-3 bg-[#cf3425] hover:bg-[#b82e1f] text-white rounded-xl font-semibold text-sm transition"
+                                className="mt-6 px-6 py-3 bg-[#7c3aed] hover:bg-[#6d28d9] text-white rounded-xl font-semibold text-sm transition"
                             >
                                 Clear Filters
                             </button>
@@ -410,7 +410,7 @@ const DestinationsPage = () => {
                     </p>
                     <button
                         onClick={() => navigate("/")}
-                        className="inline-flex items-center gap-3 bg-[#cf3425] hover:bg-[#b82e1f] text-white font-semibold px-10 py-5 rounded-xl text-sm uppercase tracking-widest transition-all shadow-2xl shadow-red-500/20 group"
+                        className="inline-flex items-center gap-3 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white font-semibold px-10 py-5 rounded-xl text-sm uppercase tracking-widest transition-all shadow-2xl shadow-violet-500/20 group"
                     >
                         Start Planning
                         <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
@@ -454,7 +454,7 @@ const DestinationCard = ({ dest, index, liked, onLike, onClick }) => (
             >
                 <Heart
                     size={15}
-                    className={liked ? "fill-blue-500 text-[#CF3425]" : "text-slate-400"}
+                    className={liked ? "fill-[#7c3aed] text-[#7c3aed]" : "text-slate-400"}
                 />
             </button>
 
@@ -488,7 +488,7 @@ const DestinationCard = ({ dest, index, liked, onLike, onClick }) => (
                     </div>
                 </div>
                 <div className="text-right">
-                    <p className="text-lg font-black text-indigo-600">{dest.price}</p>
+                    <p className="text-lg font-black text-[#7c3aed]">{dest.price}</p>
                     <p className="text-[10px] text-slate-400 font-semibold">per person</p>
                 </div>
             </div>
@@ -496,7 +496,7 @@ const DestinationCard = ({ dest, index, liked, onLike, onClick }) => (
             {/* Stats row */}
             <div className="flex items-center gap-4 border-t border-slate-100 pt-3">
                 <div className="flex items-center gap-1">
-                    <Plane size={11} className="text-indigo-400" />
+                    <Plane size={11} className="text-[#f97316]" />
                     <span className="text-xs font-bold text-slate-500">
                         {dest.flights} Flights
                     </span>
@@ -515,7 +515,7 @@ const DestinationCard = ({ dest, index, liked, onLike, onClick }) => (
             </div>
 
             {/* Explore button */}
-            <button className="mt-4 w-full py-3 bg-[#cf3425] hover:bg-[#b82e1f] text-white rounded-2xl text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors duration-300">
+            <button className="mt-4 w-full py-3 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl text-xs font-semibold uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 hover:opacity-90">
                 Explore
                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
             </button>

@@ -17,8 +17,8 @@ const Logo = ({ className = "", showText = true, variant = "dark" }) => {
           <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-xl">
             <defs>
               <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#cf3425" />
-                <stop offset="100%" stopColor="#8b1e16" />
+                <stop offset="0%" stopColor="#7c3aed" />
+                <stop offset="100%" stopColor="#f97316" />
               </linearGradient>
             </defs>
 
@@ -53,7 +53,7 @@ const Logo = ({ className = "", showText = true, variant = "dark" }) => {
             </motion.g>
           </svg>
 
-          <div className="absolute inset-0 bg-[#cf3425]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute inset-0 bg-[#7c3aed]/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
         </motion.div>
       </div>
 
@@ -61,11 +61,11 @@ const Logo = ({ className = "", showText = true, variant = "dark" }) => {
         <div className="flex flex-col">
           <span
             className={`text-2xl md:text-3xl font-black tracking-tight ${
-              isLight ? "text-white" : "text-slate-900"
+              isLight ? "text-white" : "text-violet-600"
             }`}
           >
             Yatra
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#cf3425] to-[#8b1e16]">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] to-[#f97316]">
               lo
             </span>
           </span>

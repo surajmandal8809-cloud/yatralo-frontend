@@ -97,15 +97,15 @@ const Benefits = () => {
         {/* Header */}
         <div className="text-center mb-14">
           <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full mb-5 shadow-sm">
-            <Sparkles size={14} className="text-[#cf3425]" />
-            <span className="text-[10px] font-bold tracking-widest uppercase text-[#cf3425]">
+            <Sparkles size={14} className="text-[#7c3aed]" />
+            <span className="text-[10px] font-bold tracking-widest uppercase text-[#7c3aed]">
               Elite Standard
             </span>
           </div>
 
           <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4">
             The{" "}
-            <span className="text-[#cf3425]">
+            <span className="bg-gradient-to-r from-[#7c3aed] to-[#f97316] bg-clip-text text-transparent">
               Yatralo
             </span>{" "}
             Advantage
@@ -124,8 +124,8 @@ const Benefits = () => {
               whileHover={{ y: -6 }}
               className="bg-white rounded-3xl shadow-lg p-8 transition-all"
             >
-              <div className="w-12 h-12 rounded-2xl bg-[#cf3425]/10 flex items-center justify-center mb-6">
-                <benefit.icon size={22} className="text-[#cf3425]" />
+              <div className="w-12 h-12 rounded-2xl bg-[#7c3aed]/10 flex items-center justify-center mb-6">
+                <benefit.icon size={22} className="text-[#7c3aed]" />
               </div>
 
               <h3 className="text-lg font-bold text-slate-800 mb-2">
@@ -149,7 +149,7 @@ const Benefits = () => {
               key={stat.id}
               className="bg-white p-8 rounded-3xl shadow-lg text-center"
             >
-              <div className="text-3xl md:text-4xl font-bold text-[#cf3425] mb-2">
+              <div className="text-3xl md:text-4xl font-bold text-[#7c3aed] mb-2">
                 {formatNumber(counts[index], stat.suffix)}
               </div>
 
@@ -164,7 +164,7 @@ const Benefits = () => {
         <div className="text-center mt-16">
           <button
             onClick={() => navigate("/benefits")}
-            className="px-8 py-4 bg-[#cf3425] text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg hover:bg-[#b82e1f] transition-all"
+            className="px-8 py-4 bg-[#7c3aed] text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg hover:bg-[#b82e1f] transition-all"
           >
             Explore Exclusive Benefits
             <ArrowRight size={16} className="inline ml-2" />

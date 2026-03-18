@@ -28,10 +28,10 @@ import { getBookings, cancelBooking, formatInr } from "../../utils/bookingUtils"
 
 
 const DEFAULT_AVATAR =
-  "https://ui-avatars.com/api/?background=cf3425&color=fff&name=Traveller&size=240";
+  "https://ui-avatars.com/api/?background=7c3aed&color=fff&name=Traveller&size=240";
 
 const COVER_GRADIENT =
-  "linear-gradient(135deg, #1f2937 0%, #cf3425 55%, #f97316 100%)";
+  "linear-gradient(135deg, #4c1d95 0%, #7c3aed 55%, #f97316 100%)";
 
 const formatDate = (date) =>
   new Date(`${date}T00:00:00`).toLocaleDateString("en-IN", {
@@ -201,13 +201,9 @@ export default function ProfilePage() {
     if (status === "cancelled") return;
     const ok = window.confirm("Cancel this booking?");
     if (!ok) return;
-    const updated = cancelBooking(id);
-    if (updated) {
-      toast.success("Booking cancelled");
-      setBookings(getBookings());
-    } else {
-      toast.error("Unable to cancel booking");
-    }
+    cancelBooking(id);
+    setBookings(getBookings());
+    toast.success("Booking cancelled");
   };
 
   /* ---------------- LOGOUT ---------------- */
@@ -223,7 +219,7 @@ export default function ProfilePage() {
   if (token && isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-red-200 border-t-red-600 rounded-full animate-spin" />
+        <div className="w-10 h-10 border-4 border-violet-100 border-t-[#7c3aed] rounded-full animate-spin" />
       </div>
     );
   }
@@ -231,7 +227,7 @@ export default function ProfilePage() {
   if (token && isError && error?.status !== 401) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <button onClick={refetch} className="text-[#CF3425] font-bold">
+        <button onClick={refetch} className="text-[#7c3aed] font-bold">
           Retry Loading Profile
         </button>
       </div>
@@ -276,7 +272,7 @@ export default function ProfilePage() {
 
                 <button
                   onClick={() => fileInputRef.current.click()}
-                  className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#cf3425] hover:bg-[#b82e1f] text-white rounded-xl flex items-center justify-center shadow-md transition-all"
+                  className="absolute -bottom-2 -right-2 w-10 h-10 bg-[#7c3aed] hover:bg-[#6d28d9] text-white rounded-xl flex items-center justify-center shadow-md transition-all"
                 >
                   <Camera size={16} />
                 </button>
@@ -302,11 +298,11 @@ export default function ProfilePage() {
                     {stats.total} Bookings
                   </span>
 
-                  <span className="bg-rose-50 text-blue-700 border border-blue-200 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider">
+                  <span className="bg-violet-50 text-[#7c3aed] border border-violet-100 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider">
                     {stats.flights} Flights
                   </span>
 
-                  <span className="bg-green-50 text-green-700 border border-green-200 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider">
+                  <span className="bg-orange-50 text-[#f97316] border border-orange-200 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider">
                     {stats.trains} Trains
                   </span>
 
@@ -329,7 +325,7 @@ export default function ProfilePage() {
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 border border-slate-200 text-[#cf3425] border-[#cf3425]/20 bg-red-50/30 rounded-xl flex items-center gap-2 text-[11px] font-black uppercase tracking-wider hover:bg-red-50 transition-all"
+                className="px-4 py-2 border border-slate-200 text-[#7c3aed] border-[#7c3aed]/20 bg-violet-50/30 rounded-xl flex items-center gap-2 text-[11px] font-black uppercase tracking-wider hover:bg-violet-50 transition-all"
               >
                 <LogOut size={16} />
                 Logout
@@ -345,12 +341,12 @@ export default function ProfilePage() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-4 text-[11px] font-black uppercase tracking-widest transition-all relative ${
-                  activeTab === tab ? "text-[#cf3425]" : "text-slate-400 hover:text-slate-600"
+                  activeTab === tab ? "text-[#7c3aed]" : "text-slate-400 hover:text-slate-600"
                 }`}
               >
                 {tab}
                 {activeTab === tab && (
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#cf3425] rounded-full" />
+                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-[#7c3aed] rounded-full" />
                 )}
               </button>
             ))}
@@ -376,22 +372,22 @@ export default function ProfilePage() {
                   <InfoItem icon={<Calendar size={16}/>} label="Birthday" value="Jan 15, 1995" />
                 </div>
               </div>
-              <div className="bg-[#1e293b] rounded-3xl p-6 text-white relative overflow-hidden shadow-xl">
+               <div className="bg-[#1e1b4b] rounded-3xl p-6 text-white relative overflow-hidden shadow-xl">
                  <div className="relative z-10">
                    <h3 className="text-sm font-black uppercase tracking-widest mb-6 opacity-60 text-white">Travel Status</h3>
                    <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center mb-4">
-                      <Plane size={32} className="text-blue-400" />
+                      <Plane size={32} className="text-[#f97316]" />
                    </div>
                    <p className="text-2xl font-black mb-1">Explorer</p>
                    <p className="text-xs font-bold text-white/50 uppercase tracking-widest mb-8">Level 4 Member</p>
                    <div className="space-y-4">
                       <div>
                         <div className="flex justify-between text-[10px] font-black uppercase tracking-widest mb-2">
-                          <span>Progress to Gold</span>
-                          <span>75%</span>
+                           <span>Progress to Gold</span>
+                           <span>75%</span>
                         </div>
                         <div className="h-1.5 w-full bg-white/10 rounded-full">
-                          <div className="h-full bg-blue-500 rounded-full" style={{ width: '75%' }} />
+                           <div className="h-full bg-gradient-to-r from-[#7c3aed] to-[#f97316] rounded-full" style={{ width: '75%' }} />
                         </div>
                       </div>
                       <p className="text-[10px] font-bold text-white/40 leading-relaxed">
@@ -399,7 +395,7 @@ export default function ProfilePage() {
                       </p>
                    </div>
                  </div>
-                 <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-blue-500/20 blur-3xl rounded-full" />
+                 <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#7c3aed]/20 blur-3xl rounded-full" />
               </div>
             </div>
           </div>
@@ -420,7 +416,7 @@ export default function ProfilePage() {
                 <button
                   onClick={handleSave}
                   disabled={isSaving}
-                  className="bg-[#cf3425] text-white px-8 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-red-500/20 hover:bg-[#b82e1f] transition-all flex items-center gap-2"
+                  className="w-full bg-[#7c3aed] text-white py-4 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-violet-100 hover:opacity-90 transition-all flex items-center justify-center gap-2"
                 >
                   {isSaving ? <RefreshCw className="animate-spin" size={14} /> : <Save size={14} />}
                   Save Changes
@@ -435,7 +431,7 @@ export default function ProfilePage() {
                   name="first_name"
                   value={formData.first_name}
                   onChange={handleChange}
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#cf3425]/30 outline-none transition-all"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#7c3aed]/30 outline-none transition-all"
                 />
               </div>
               <div className="space-y-1.5">
@@ -444,7 +440,7 @@ export default function ProfilePage() {
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleChange}
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#cf3425]/30 outline-none transition-all"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#7c3aed]/30 outline-none transition-all"
                 />
               </div>
               <div className="space-y-1.5">
@@ -463,7 +459,7 @@ export default function ProfilePage() {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="+91 00000 00000"
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#cf3425]/30 outline-none transition-all"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#7c3aed]/30 outline-none transition-all"
                 />
               </div>
               <div className="md:col-span-2 space-y-1.5">
@@ -474,7 +470,7 @@ export default function ProfilePage() {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Tell us about yourself..."
-                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#cf3425]/30 outline-none transition-all resize-none"
+                  className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-5 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:border-[#7c3aed]/30 outline-none transition-all resize-none"
                 />
               </div>
             </div>
@@ -489,7 +485,7 @@ export default function ProfilePage() {
               <h3 className="text-lg font-black text-slate-900">Recent Bookings</h3>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Manage your upcoming and past trips</p>
             </div>
-            <Ticket className="text-[#CF3425]" size={24} />
+            <Ticket className="text-[#f97316]" size={24} />
           </div>
           <div className="divide-y divide-slate-100">
             {recentBookings.length === 0 ? (
@@ -498,7 +494,7 @@ export default function ProfilePage() {
                   <Ticket size={32} />
                 </div>
                 <p className="text-sm text-slate-500 font-bold">No bookings found</p>
-                <Link to="/flights" className="text-[#CF3425] text-xs font-black uppercase tracking-widest mt-4 inline-block hover:underline">Book your first trip</Link>
+                <Link to="/flights" className="text-[#7c3aed] text-xs font-black uppercase tracking-widest mt-4 inline-block hover:underline">Book your first trip</Link>
               </div>
             ) : (
               recentBookings.map((b) => {
@@ -509,7 +505,7 @@ export default function ProfilePage() {
                 return (
                   <div key={b.id} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-slate-50 transition-colors">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isCancelled ? "bg-slate-100 text-slate-400" : "bg-red-50 text-[#CF3425]"}`}>
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${isCancelled ? "bg-slate-100 text-slate-400" : "bg-violet-50 text-[#7c3aed]"}`}>
                         <TypeIcon size={24} />
                       </div>
                       <div>
@@ -529,7 +525,7 @@ export default function ProfilePage() {
                           {b.providerName} • {b.departTime} - {b.arriveTime} • {new Date(b.travelDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </p>
                         {b.class && (
-                          <p className="text-[10px] font-black text-[#CF3425] uppercase tracking-tighter mt-1">
+                          <p className="text-[10px] font-black text-[#f97316] uppercase tracking-tighter mt-1">
                             {b.class} Class • {b.meal || "No Meal"}
                           </p>
                         )}
@@ -548,7 +544,7 @@ export default function ProfilePage() {
                           className={`px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                             isCancelled 
                               ? "bg-slate-100 text-slate-300 cursor-not-allowed" 
-                              : "bg-white border-2 border-slate-200 text-slate-700 hover:border-red-200 hover:text-[#CF3425]"
+                              : "bg-white border-2 border-slate-200 text-slate-700 hover:border-violet-200 hover:text-[#7c3aed]"
                           }`}
                         >
                           {isCancelled ? "Cancelled" : "Cancel trip"}
@@ -562,7 +558,7 @@ export default function ProfilePage() {
           </div>
           {recentBookings.length > 0 && (
             <div className="p-4 bg-slate-50 text-center border-t border-slate-100">
-              <Link to="/bookings" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-[#CF3425] transition-colors">View All Bookings</Link>
+              <Link to="/bookings" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-[#7c3aed] transition-colors">View All Bookings</Link>
             </div>
           )}
         </div>

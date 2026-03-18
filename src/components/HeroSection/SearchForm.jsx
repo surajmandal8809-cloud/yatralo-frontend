@@ -11,7 +11,8 @@ import {
   Hotel,
   Search,
   ChevronRight,
-  Navigation,
+  Bus,
+  Navigation
 } from "lucide-react";
 
 const SearchForm = () => {
@@ -34,22 +35,33 @@ const SearchForm = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    const query = formData.to || formData.from || "your destination";
-    const pax = Math.max(1, parseInt(formData.passengers, 10) || 1);
-
-    if (activeTab === "flight" || activeTab === "train") {
-      const params = new URLSearchParams({
-        from: formData.from.trim(),
-        to: formData.to.trim(),
-        date: formData.date,
-        pax: String(pax),
-        autoSearch: "1",
-      });
-      navigate(`/${activeTab === "flight" ? "flights" : "trains"}?${params.toString()}`);
+    const params = new URLSearchParams();
+    if (activeTab === "flight" || activeTab === "train" || activeTab === "bus") {
+      params.append("from", formData.from.trim());
+      params.append("to", formData.to.trim());
+      params.append("date", formData.date);
+      params.append("pax", activeTab === "bus" ? "1" : (formData.passengers?.split(" ")[0] || "1"));
+      params.append("autoSearch", "1");
+      
+      const route = activeTab === "flight" ? "flights/results" : 
+                    activeTab === "train" ? "trains/results" : "buses/results";
+      navigate(`/${route}?${params.toString()}`);
       return;
     }
 
-    toast.success(`Searching ${activeTab}s to ${query}`, {
+    if (activeTab === "hotel") {
+      params.append("location", formData.from.trim());
+      params.append("checkIn", formData.date);
+      params.append("checkOut", formData.dateEnd);
+      params.append("guests", formData.guests?.split(" ")[0] || "2");
+      params.append("autoSearch", "1");
+      navigate(`/hotels/results?${params.toString()}`);
+      return;
+    }
+       
+
+
+    toast.success(`Searching ${activeTab}s to ${formData.to || formData.from}`, {
       icon: "✈️",
       style: { borderRadius: "1rem", background: "#0f172a", color: "#fff" },
     });
@@ -59,6 +71,7 @@ const SearchForm = () => {
     { id: "flight", label: "Flights", icon: Plane },
     { id: "train", label: "Trains", icon: Train },
     { id: "hotel", label: "Hotels", icon: Hotel },
+    { id: "bus", label: "Buses", icon: Bus },
   ];
 
   return (
@@ -78,10 +91,10 @@ const SearchForm = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative flex-1 flex items-center justify-center gap-2 px-6 py-4 text-sm font-semibold transition-all ${
-                  isActive ? "text-[#cf3425]" : "text-slate-500 hover:text-slate-800"
+                  isActive ? "text-[#7c3aed]" : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                {isActive && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#cf3425]" />}
+                {isActive && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7c3aed]" />}
                 <Icon size={16} />
                 {tab.label}
               </button>
@@ -127,6 +140,19 @@ const SearchForm = () => {
                     <SearchButton text="Search Hotels" />
                   </>
                 )}
+
+                {activeTab === "bus" && (
+                  <>
+                    <Input name="from" label="From" icon={MapPin} value={formData.from} onChange={handleInputChange} placeholder="Mumbai" />
+                    <Input name="to" label="To" icon={Bus} value={formData.to} onChange={handleInputChange} placeholder="Pune" />
+                    <Input name="date" label="Date" type="date" icon={Calendar} value={formData.date} onChange={handleInputChange} />
+                    <Input name="passengers" label="Passengers" icon={Users} value={formData.passengers} onChange={handleInputChange} />
+                    <SearchButton text="Search Buses" />
+                  </>
+                )}
+                
+               
+
               </motion.div>
             </AnimatePresence>
           </form>
@@ -138,7 +164,7 @@ const SearchForm = () => {
                 key={dest}
                 type="button"
                 onClick={() => setFormData((p) => ({ ...p, to: dest }))}
-                className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full hover:border-[#cf3425] hover:text-[#cf3425] transition-colors font-medium"
+                className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full hover:border-[#7c3aed] hover:text-[#7c3aed] transition-colors font-medium"
               >
                 {dest}
               </button>
@@ -154,7 +180,7 @@ const Input = ({ icon: Icon, label, placeholder, type = "text", name, value, onC
   <div className="group relative">
     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
     <div className="relative">
-      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#cf3425] transition-colors">
+      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#7c3aed] transition-colors">
         <Icon size={16} />
       </div>
       <input
@@ -164,7 +190,7 @@ const Input = ({ icon: Icon, label, placeholder, type = "text", name, value, onC
         onChange={onChange}
         type={type}
         placeholder={placeholder}
-        className="w-full bg-slate-50 border border-slate-200 p-3 pl-10 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-[#cf3425]/20 focus:border-[#cf3425] outline-none transition-all h-12"
+        className="w-full bg-slate-50 border border-slate-100 p-3 pl-10 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-[#7c3aed]/20 focus:border-[#7c3aed] outline-none transition-all h-12"
       />
     </div>
   </div>
@@ -177,7 +203,7 @@ const SearchButton = ({ text }) => (
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
       type="submit"
-      className="h-12 bg-[#cf3425] hover:bg-[#b82e1f] text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg transition-all text-sm group"
+      className="h-12 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-violet-100 transition-all text-sm group"
     >
       <Search size={16} />
       {text}

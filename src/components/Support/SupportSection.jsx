@@ -33,7 +33,7 @@ const SupportSection = () => {
           transition={{ duration: 0.5 }}
           className="mb-8 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-6 py-2 shadow-sm"
         >
-          <Headphones size={14} className="text-orange-500" />
+          <Headphones size={14} className="text-[#f97316]" />
           <span className="text-xs font-bold uppercase tracking-[0.25em] text-slate-500">
             24/7 Premium Concierge
           </span>
@@ -42,7 +42,7 @@ const SupportSection = () => {
         {/* Heading */}
         <h2 className="mb-6 text-2xl font-black tracking-tight text-slate-900 md:text-4xl">
           Your Private{" "}
-          <span className="bg-[#cf3425] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#7c3aed] to-[#f97316] bg-clip-text text-transparent">
             Travel Desk
           </span>
         </h2>
@@ -62,7 +62,7 @@ const SupportSection = () => {
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300 }}
             onClick={() => navigate("/help")}
-            className="group rounded-xl bg-slate-900 px-10 py-5 text-xs font-semibold uppercase tracking-[0.25em] text-white shadow-xl shadow-slate-900/20 transition-all hover:bg-[#b82e1f]"
+            className="group rounded-xl bg-[#7c3aed] px-10 py-5 text-xs font-semibold uppercase tracking-[0.25em] text-white shadow-xl shadow-violet-900/20 transition-all hover:bg-[#6d28d9]"
           >
             Access Help Center
             <ArrowRight
@@ -77,7 +77,7 @@ const SupportSection = () => {
             transition={{ type: "spring", stiffness: 200 }}
             className="flex items-center gap-6 rounded-3xl border border-slate-200 bg-white px-8 py-5 shadow-lg transition-all hover:shadow-xl"
           >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-orange-500">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 text-[#f97316]">
               <MessageCircle size={20} />
             </div>
 
@@ -99,7 +99,7 @@ const SupportSection = () => {
               <div key={index} className="text-center">
                 <item.icon
                   size={22}
-                  className="mx-auto mb-4 text-orange-500"
+                  className="mx-auto mb-4 text-[#7c3aed]"
                 />
                 <h3 className="mb-2 text-xl font-black text-slate-900">
                   {item.value}

@@ -19,7 +19,9 @@ const Footer = () => {
 
         {/* Logo & About */}
         <div>
-          <Logo />
+          <h3 className="text-xl font-black tracking-tighter text-slate-900 mb-2">
+            Yatra<span className="text-[#f97316]">lo</span>
+          </h3>
           <p className="text-sm text-gray-600 mt-3">
             Yatralo helps you book flights, hotels, buses and trains easily
             with the best travel deals.
@@ -54,7 +56,7 @@ const Footer = () => {
 
       {/* Bottom */}
       <div className="border-t text-center py-4 text-sm text-gray-500">
-        © {year} Yatralo. All rights reserved.
+        © {year} <span className="text-[#7c3aed] font-bold">Yatralo</span>. All rights reserved.
       </div>
     </footer>
   );

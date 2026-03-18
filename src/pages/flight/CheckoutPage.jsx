@@ -17,11 +17,22 @@ import {
     MapPin,
     ArrowRight,
     Hotel,
-    Utensils
+    Utensils,
+    ShieldCheck,
+    AlertCircle,
+    Zap,
+    Shield,
+    Heart,
+    Tag,
+    ChevronDown,
+    X
 } from "lucide-react";
+
+
 import toast from "react-hot-toast";
-import { useGetUserQuery } from "../services/userService";
-import { addBooking, formatInr, isInternational } from "../utils/bookingUtils";
+import { useGetUserQuery } from "../../services/userService";
+import { useGetCouponsQuery } from "../../services/couponService";
+import { addBooking, formatInr, isInternational } from "../../utils/bookingUtils";
 
 const STEPS = ["Review", "Payment", "Success"];
 
@@ -38,16 +49,25 @@ export default function CheckoutPage() {
     );
     const [loading, setLoading] = useState(false);
     const [bookingResult, setBookingResult] = useState(null);
+    const [isSecureTrip, setIsSecureTrip] = useState(false);
+    const [appliedCoupon, setAppliedCoupon] = useState(null);
+    const [promoCode, setPromoCode] = useState("");
 
-    // Pre-fill first passenger if user is logged in
+    const { data: couponsData } = useGetCouponsQuery(type);
+
+    // Pre-fill first passenger if user is logged in (only runs when userData changes)
     useEffect(() => {
-        if (userData?.user && passengers[0].name === "") {
-            const newP = [...passengers];
-            newP[0].name = userData.user.name || "";
-            // Optionally fill age if available in userData
-            setPassengers(newP);
+        if (userData?.data && passengers[0].name === "") {
+            setPassengers(prev => {
+                const newP = [...prev];
+                newP[0].name = userData.data.first_name
+                    ? `${userData.data.first_name} ${userData.data.last_name || ""}`.trim()
+                    : (userData.data.name || "");
+                return newP;
+            });
         }
-    }, [userData, passengers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userData]);
 
     // If no state or no token is present, redirect back
     useEffect(() => {
@@ -73,6 +93,19 @@ export default function CheckoutPage() {
     const item = flight || train || hotel;
     const Icon = isFlight ? Plane : (isTrain ? Train : Hotel);
 
+    const calculateTotal = () => {
+        let total = item.price || 0;
+        if (isSecureTrip) total += (199 * pax);
+        if (appliedCoupon) {
+            if (appliedCoupon.discountType === "percentage") {
+                total -= (total * appliedCoupon.discountValue / 100);
+            } else {
+                total -= appliedCoupon.discountValue;
+            }
+        }
+        return Math.max(total, 0);
+    };
+
     const handleNext = () => {
         if (currentStep === 0) {
             // Validate passengers
@@ -85,6 +118,7 @@ export default function CheckoutPage() {
         } else if (currentStep === 1) {
             // Simulate Payment
             setLoading(true);
+            const totalToPay = calculateTotal();
             setTimeout(() => {
                 const result = {
                     id: `BK-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
@@ -99,9 +133,11 @@ export default function CheckoutPage() {
                     arriveTime: item.arr,
                     passengers: pax,
                     passengerDetails: passengers,
-                    totalPrice: item.price,
+                    totalPrice: totalToPay,
                     meal: item.meal,
                     class: item.class,
+                    isSecureTrip,
+                    coupon: appliedCoupon?.code,
                     providerName: isFlight ? item.airline : item.name,
                     providerCode: isFlight ? item.flightNo : item.trainNo,
                     status: "confirmed",
@@ -131,7 +167,7 @@ export default function CheckoutPage() {
                         <React.Fragment key={step}>
                             <div className="flex flex-col items-center">
                                 <div
-                                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= index ? "bg-[#CF3425] text-white shadow-lg shadow-[#CF3425]/20" : "bg-white text-slate-400 border border-slate-200"
+                                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= index ? "bg-gradient-to-br from-[#7c3aed] to-[#6d28d9] text-white shadow-lg shadow-violet-200" : "bg-white text-slate-400 border border-slate-200"
                                         }`}
                                 >
                                     {renderStepIcon(index)}
@@ -141,7 +177,7 @@ export default function CheckoutPage() {
                                 </span>
                             </div>
                             {index < STEPS.length - 1 && (
-                                <div className={`w-16 md:w-32 h-[2px] mx-2 -mt-6 transition-all duration-300 ${currentStep > index ? "bg-[#CF3425]" : "bg-slate-200"}`} />
+                                <div className={`w-16 md:w-32 h-[2px] mx-2 -mt-6 transition-all duration-300 ${currentStep > index ? "bg-[#7c3aed]" : "bg-slate-200"}`} />
                             )}
                         </React.Fragment>
                     ))}
@@ -160,17 +196,23 @@ export default function CheckoutPage() {
                                             <Icon size={20} />
                                         </div>
                                         <div>
-                                            <h2 className="text-xl font-black">Review Your Trip</h2>
-                                            <p className="text-blue-100 text-sm font-medium">Please verify your journey details</p>
+                                            <div className="flex items-center gap-2">
+                                                <h2 className="text-xl font-black">Review Your Trip</h2>
+                                                {item.fareType && (
+                                                    <span className="px-2 py-0.5 bg-[#f97316] text-[9px] font-black uppercase tracking-widest rounded-md border border-white/20">
+                                                        {item.fareType}
+                                                    </span>
+                                                )}
+                                            </div>
+                                             <p className="text-violet-100 text-[11px] font-medium">Please verify your journey details before payment</p>
                                         </div>
                                     </div>
                                 </div>
-
                                 <div className="p-6">
                                     <div className="flex flex-col md:flex-row items-center justify-between gap-8 py-2">
                                         <div className="text-center md:text-left flex-1">
                                             <p className="text-3xl font-black text-slate-900 leading-none">{item.dep}</p>
-                                            <p className="text-sm font-bold text-[#CF3425] mt-1.5 uppercase tracking-wider">{from}</p>
+                                            <p className="text-sm font-bold text-[#f97316] mt-1.5 uppercase tracking-wider">{from}</p>
                                             <p className="text-xs text-slate-500 font-medium mt-1">{fromName}</p>
                                         </div>
 
@@ -178,7 +220,7 @@ export default function CheckoutPage() {
                                             <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Non-Stop</p>
                                             <div className="w-full flex items-center gap-2">
                                                 <div className="flex-1 h-px bg-slate-200 border-t border-dashed" />
-                                                <Icon size={18} className="text-[#CF3425] rotate-90 md:rotate-0" />
+                                                <Icon size={18} className="text-[#f97316] rotate-90 md:rotate-0" />
                                                 <div className="flex-1 h-px bg-slate-200 border-t border-dashed" />
                                             </div>
                                             <p className="text-xs font-bold text-slate-900 mt-2">{item.duration}m</p>
@@ -186,15 +228,15 @@ export default function CheckoutPage() {
 
                                         <div className="text-center md:text-right flex-1">
                                             <p className="text-3xl font-black text-slate-900 leading-none">{item.arr}</p>
-                                            <p className="text-sm font-bold text-[#CF3425] mt-1.5 uppercase tracking-wider">{to}</p>
+                                            <p className="text-sm font-bold text-[#f97316] mt-1.5 uppercase tracking-wider">{to}</p>
                                             <p className="text-xs text-slate-500 font-medium mt-1">{toName}</p>
                                         </div>
                                     </div>
 
                                     <div className="mt-8 pt-6 border-t border-slate-100 grid grid-cols-2 md:grid-cols-4 gap-4">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-lg bg-rose-50 flex items-center justify-center text-[#CF3425]">
-                                                <Calendar size={16} />
+                                            <div className="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center">
+                                                <Plane className="text-[#f97316]" size={24} />
                                             </div>
                                             <div>
                                                 <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">Date</p>
@@ -207,7 +249,9 @@ export default function CheckoutPage() {
                                             </div>
                                             <div>
                                                 <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">Type</p>
-                                                <p className="text-sm font-bold text-slate-800 capitalize">{type}</p>
+                                                <p className="text-sm font-bold text-slate-800 capitalize">
+                                                    {type === 'flight' && item.fareType ? item.fareType : type}
+                                                </p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
@@ -228,48 +272,143 @@ export default function CheckoutPage() {
                                                 <p className="text-sm font-bold text-slate-800">{isFlight ? "Included" : "Available"}</p>
                                             </div>
                                         </div>
-
-                                        {item.seats && (
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
-                                                    <div className="text-[10px] font-black">{isFlight ? "Seat" : "Berth"}</div>
-                                                </div>
-                                                <div>
-                                                    <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">{isFlight ? "Seat" : "Berth"}</p>
-                                                    <p className="text-sm font-bold text-slate-800 truncate max-w-[80px]">{item.seats}</p>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {item.class && (
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-[#CF3425]">
-                                                    <div className="text-[10px] font-black">CLS</div>
-                                                </div>
-                                                <div>
-                                                    <p className="text-[10px] uppercase font-black text-slate-400 tracking-widest">Class / Type</p>
-                                                    <p className="text-sm font-bold text-slate-800">{item.class}</p>
-                                                </div>
-                                            </div>
-                                        )}
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Cancellation Policy */}
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                                <div className="p-5 border-b border-slate-100 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <Clock size={16} className="text-[#f97316]" />
+                                        <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Cancellation & Date Change Policy</h3>
+                                    </div>
+                                    <button className="text-[10px] font-black text-[#f97316] uppercase tracking-widest hover:underline">View Policy</button>
+                                </div>
+                                <div className="p-6">
+                                    <div className="flex items-center justify-between gap-10">
+                                        <div className="flex-1">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Cancellation Penalty</p>
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-center">
+                                                    <p className="text-sm font-black text-slate-900">₹2,500</p>
+                                                    <p className="text-[9px] font-bold text-slate-400">Before 24h</p>
+                                                </div>
+                                                <div className="h-8 w-px bg-slate-100" />
+                                                <div className="text-center">
+                                                    <p className="text-sm font-black text-slate-900">₹4,500</p>
+                                                    <p className="text-[9px] font-bold text-slate-400">Within 24h</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex-1">
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Date Change Penalty</p>
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-center">
+                                                    <p className="text-sm font-black text-slate-900">₹1,500</p>
+                                                    <p className="text-[9px] font-bold text-slate-400">Before 24h</p>
+                                                </div>
+                                                <div className="h-8 w-px bg-slate-100" />
+                                                <div className="text-center">
+                                                    <p className="text-sm font-black text-slate-900">₹3,000</p>
+                                                    <p className="text-[9px] font-bold text-slate-400">Within 24h</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Trip Secure */}
+                            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden relative">
+                                <div className="absolute top-0 right-0 p-4">
+                                    <Shield size={40} className="text-emerald-50 opacity-20" />
+                                </div>
+                                <div className="p-6 bg-emerald-50/30 border-b border-emerald-100 flex items-center gap-3">
+                                    <ShieldCheck className="text-emerald-600" size={20} />
+                                    <div>
+                                        <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Trip Secure</h3>
+                                        <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-tight">Highly Recommended for your travel</p>
+                                    </div>
+                                </div>
+                                <div className="p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                                    <div className="flex-1 space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <Check size={14} className="text-emerald-500" />
+                                            <p className="text-xs font-bold text-slate-700">Medical expenses covered up to ₹50,000</p>
+                                        </div>
+                                        <div className="flex items-center gap-3">
+                                            <Check size={14} className="text-emerald-500" />
+                                            <p className="text-xs font-bold text-slate-700">Flight delay or cancellation coverage</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-4 bg-white border border-emerald-100 p-4 rounded-2xl">
+                                        <div className="text-right">
+                                            <p className="text-xs font-black text-slate-900">₹199 / traveler</p>
+                                            <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Secure entire trip</p>
+                                        </div>
+                                        <button 
+                                            onClick={() => setIsSecureTrip(!isSecureTrip)}
+                                            className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all ${isSecureTrip ? "bg-slate-900 text-white shadow-slate-200" : "bg-emerald-600 text-white shadow-emerald-200"}`}
+                                        >
+                                            {isSecureTrip ? "Remove" : "Add"}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Important Information */}
+                            <div className="bg-amber-50/30 border border-amber-100 rounded-2xl p-6">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <AlertCircle className="text-amber-500" size={18} />
+                                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Important Information</h3>
+                                </div>
+                                <ul className="space-y-3">
+                                    <li className="flex items-start gap-3 text-xs font-bold text-slate-600 leading-relaxed">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                                        Please check travel guidelines and baggage information before you fly.
+                                    </li>
+                                    <li className="flex items-start gap-3 text-xs font-bold text-slate-600 leading-relaxed">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0" />
+                                        Availability of Boarding Pass: Once web check-in is completed, your boarding pass will be available.
+                                    </li>
+                                </ul>
+                            </div>
+
 
                             {/* Passenger Details */}
                             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                                 <div className="p-6 border-b border-slate-100 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <User className="text-[#CF3425]" size={20} />
+                                        <User className="text-[#f97316]" size={20} />
                                         <h3 className="text-lg font-black text-slate-900">Passenger Details</h3>
                                     </div>
                                     <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{pax} Traveller{pax > 1 ? 's' : ''}</span>
                                 </div>
 
                                 <div className="p-6 space-y-6">
+                                    {!userData && (
+                                         <div className="bg-violet-50/50 border border-violet-100 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+                                             <div className="flex items-center gap-4">
+                                                 <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-[#7c3aed] shadow-sm border border-violet-50">
+                                                     <User size={24} />
+                                                 </div>
+                                                 <div>
+                                                     <p className="text-sm font-black text-slate-900">Log in to view your saved traveler list</p>
+                                                     <p className="text-[10px] font-bold text-[#7c3aed] uppercase tracking-widest">Unlock amazing deals & faster checkout</p>
+                                                 </div>
+                                             </div>
+                                             <button className="px-8 py-3 bg-white text-[#7c3aed] border border-violet-100 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-violet-50 transition-all">Login Now</button>
+                                         </div>
+                                    )}
+
                                     {passengers.map((p, i) => (
-                                        <div key={i} className="p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                                            <p className="text-[11px] font-black text-[#CF3425] uppercase tracking-[0.2em] mb-4">Adult {i + 1}</p>
+                                        <div key={i} className="p-5 bg-white rounded-2xl border border-slate-100 shadow-sm hover:border-[#f97316]/20 transition-all">
+                                            <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-[#f97316]" />
+                                                ADULT {i + 1}
+                                            </p>
+
                                             <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                                                 <div className="md:col-span-3">
                                                     <label className="text-[11px] font-black text-slate-500 uppercase mb-1.5 block">Full Name</label>
@@ -282,7 +421,7 @@ export default function CheckoutPage() {
                                                             newP[i].name = e.target.value;
                                                             setPassengers(newP);
                                                         }}
-                                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:bg-white focus:border-blue-400 outline-none text-sm font-bold transition-all"
+                                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:bg-white focus:border-violet-400 outline-none text-sm font-bold transition-all"
                                                     />
                                                 </div>
                                                 <div className="md:col-span-1">
@@ -296,7 +435,7 @@ export default function CheckoutPage() {
                                                             newP[i].age = e.target.value;
                                                             setPassengers(newP);
                                                         }}
-                                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:bg-white focus:border-blue-400 outline-none text-sm font-bold transition-all"
+                                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:bg-white focus:border-violet-400 outline-none text-sm font-bold transition-all"
                                                     />
                                                 </div>
                                                 <div className="md:col-span-2">
@@ -308,7 +447,7 @@ export default function CheckoutPage() {
                                                             newP[i].gender = e.target.value;
                                                             setPassengers(newP);
                                                         }}
-                                                        className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:bg-white focus:border-blue-400 outline-none text-sm font-bold transition-all appearance-none bg-no-repeat bg-[right_1rem_center]"
+                                                         className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:bg-white focus:border-violet-400 outline-none text-sm font-bold transition-all appearance-none bg-no-repeat bg-[right_1rem_center]"
                                                     >
                                                         <option>Male</option>
                                                         <option>Female</option>
@@ -326,7 +465,7 @@ export default function CheckoutPage() {
                                                                 newP[i].passport = e.target.value;
                                                                 setPassengers(newP);
                                                             }}
-                                                            className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:bg-white focus:border-blue-400 outline-none text-sm font-bold transition-all"
+                                                             className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:bg-white focus:border-violet-400 outline-none text-sm font-bold transition-all"
                                                         />
                                                     </div>
                                                 )}
@@ -344,42 +483,107 @@ export default function CheckoutPage() {
                                     <h3 className="text-lg font-black text-slate-900 leading-none">Fare Summary</h3>
                                 </div>
                                 <div className="p-6 space-y-4">
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-slate-500 font-bold">Base Fare ({pax} Traveller{pax > 1 ? 's' : ''})</span>
-                                        <span className="text-slate-900 font-black">{formatInr(item.price * 0.85)}</span>
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-slate-500 font-bold">Base Fare ({pax} Traveller{pax > 1 ? 's' : ''})</span>
+                                            <span className="text-slate-900 font-black">{formatInr(item.price * 0.85)}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-slate-500 font-bold">Taxes & Surcharges</span>
+                                            <span className="text-slate-900 font-black">{formatInr(item.price * 0.15)}</span>
+                                        </div>
+                                        {isSecureTrip && (
+                                            <div className="flex justify-between items-center text-sm text-emerald-600">
+                                                <span className="font-bold">Trip Secure Fee</span>
+                                                <span className="font-black">+{formatInr(199 * pax)}</span>
+                                            </div>
+                                        )}
+                                        {appliedCoupon && (
+                                            <div className="flex justify-between items-center text-sm text-emerald-600">
+                                                <span className="font-bold">Coupon ({appliedCoupon.code})</span>
+                                                <span className="font-black">-{formatInr(item.price - (item.price * (appliedCoupon.discountType === 'percentage' ? (1 - appliedCoupon.discountValue / 100) : (item.price - appliedCoupon.discountValue) / item.price)))}</span>
+                                            </div>
+                                        )}
+                                        <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+                                            <span className="text-sm font-bold text-slate-900">Total Amount</span>
+                                            <span className="text-xl font-black text-slate-900">{formatInr(calculateTotal())}</span>
+                                        </div>
+
+                                        {/* Offers Section */}
+                                        <div className="mt-8 pt-8 border-t border-slate-100">
+                                            <div className="flex items-center gap-2 mb-6 text-[#f97316]">
+                                                <Tag size={16} fill="currentColor" className="opacity-20" />
+                                                <h3 className="text-sm font-black uppercase tracking-widest">OFFERS & PROMOS</h3>
+                                            </div>
+                                            
+                                            <div className="relative mb-6">
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Enter Promo Code"
+                                                    value={promoCode}
+                                                    onChange={(e) => setPromoCode(e.target.value)}
+                                                    className="w-full pl-4 pr-20 py-3 rounded-xl border border-dashed border-slate-300 bg-slate-50 outline-none text-xs font-black uppercase tracking-widest focus:bg-white focus:border-[#f97316] transition-all"
+                                                />
+                                                <button 
+                                                    onClick={() => {
+                                                        const coupon = couponsData?.data?.find(c => c.code === promoCode.toUpperCase());
+                                                        if (coupon) {
+                                                            setAppliedCoupon(coupon);
+                                                            toast.success("Coupon Applied!");
+                                                        } else {
+                                                            toast.error("Invalid coupon code");
+                                                        }
+                                                    }}
+                                                    className="absolute right-2 top-1.5 bottom-1.5 px-4 bg-slate-900 text-white rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-[#f97316] transition-colors"
+                                                >
+                                                    Apply
+                                                </button>
+                                            </div>
+
+                                            <div className="space-y-3">
+                                                {couponsData?.data?.map((coupon) => (
+                                                    <div 
+                                                        key={coupon._id}
+                                                        onClick={() => {
+                                                            setAppliedCoupon(appliedCoupon?.code === coupon.code ? null : coupon);
+                                                            if (appliedCoupon?.code !== coupon.code) toast.success(`${coupon.code} Applied!`);
+                                                        }}
+                                                        className={`p-4 border rounded-2xl relative group cursor-pointer transition-all ${appliedCoupon?.code === coupon.code ? "border-emerald-300 bg-emerald-50/20" : "border-slate-100 bg-slate-50/50 hover:border-[#f97316]/30"}`}
+                                                    >
+                                                        <div className="flex justify-between items-center mb-1">
+                                                            <p className={`text-xs font-black ${appliedCoupon?.code === coupon.code ? "text-emerald-600" : "text-slate-900"}`}>{coupon.code}</p>
+                                                            {appliedCoupon?.code === coupon.code ? <Check size={14} className="text-emerald-500" /> : <button className="text-[10px] font-black text-[#f97316] uppercase tracking-widest">Apply</button>}
+                                                        </div>
+                                                        <p className="text-[10px] font-bold text-slate-500">{coupon.description}</p>
+                                                        {appliedCoupon?.code === coupon.code && <div className="absolute inset-y-0 right-0 w-1 bg-emerald-500 rounded-r-lg" />}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="flex justify-between items-center text-sm">
-                                        <span className="text-slate-500 font-bold">Taxes & Surcharges</span>
-                                        <span className="text-slate-900 font-black">{formatInr(item.price * 0.15)}</span>
+
+                                    <div className="pt-8">
+                                        <button
+                                            onClick={handleNext}
+                                            className="w-full bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:opacity-90 text-white font-black py-4 rounded-2xl shadow-xl shadow-violet-100 transition-all flex flex-col items-center justify-center gap-0.5 group uppercase tracking-widest"
+                                        >
+                                            <span>Continue</span>
+                                            <span className="text-[9px] opacity-60">to Payment</span>
+                                        </button>
                                     </div>
-                                    <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
-                                        <span className="text-lg font-black text-slate-900">Total Amount</span>
-                                        <span className="text-2xl font-black text-[#CF3425]">{formatInr(item.price)}</span>
-                                    </div>
-                                    <div className="bg-rose-50 p-4 rounded-xl flex gap-3">
-                                        <Info size={16} className="text-[#CF3425] flex-shrink-0 mt-0.5" />
-                                        <p className="text-[11px] text-slate-500 font-bold leading-relaxed">
-                                            By clicking continue, you agree to our booking policy and terms of service.
-                                        </p>
-                                    </div>
-                                    <button
-                                        onClick={handleNext}
-                                        className="w-full bg-[#cf3425] hover:bg-[#b82e1f] text-white font-semibold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 group"
-                                    >
-                                        Continue to Payment
-                                        <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
 
+
+
                 {currentStep === 1 && (
                     <div className="max-w-2xl mx-auto">
                         <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
                             <div className="p-8 border-b border-slate-100 text-center">
-                                <div className="w-16 h-16 bg-rose-50 text-[#CF3425] rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <div className="w-16 h-16 bg-orange-50 text-[#f97316] rounded-2xl flex items-center justify-center mx-auto mb-4">
                                     <CreditCard size={32} />
                                 </div>
                                 <h2 className="text-2xl font-black text-slate-900">Payment Selection</h2>
@@ -392,9 +596,9 @@ export default function CheckoutPage() {
 
                             <div className="p-8 space-y-4">
                                 <div className="space-y-3">
-                                    <div className="p-5 border-2 border-[#CF3425] bg-rose-50/50 rounded-2xl flex items-center justify-between cursor-pointer">
+                                    <div className="p-5 border-2 border-[#f97316] bg-orange-50/50 rounded-2xl flex items-center justify-between cursor-pointer">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-8 h-8 rounded-full border-4 border-[#CF3425] bg-white" />
+                                            <div className="w-8 h-8 rounded-full border-4 border-[#f97316] bg-white" />
                                             <div>
                                                 <p className="text-sm font-black text-slate-900">Credit / Debit Card</p>
                                                 <p className="text-xs text-slate-500 font-bold">Visa, Mastercard, RuPay, Amex</p>
@@ -452,7 +656,7 @@ export default function CheckoutPage() {
                                         </div>
                                         <button
                                             onClick={() => setCurrentStep(0)}
-                                            className="text-xs font-black text-[#CF3425] hover:underline"
+                                            className="text-xs font-black text-[#f97316] hover:underline"
                                         >
                                             Back to Review
                                         </button>
@@ -461,7 +665,7 @@ export default function CheckoutPage() {
                                     <button
                                         onClick={handleNext}
                                         disabled={loading}
-                                        className="w-full bg-[#cf3425] hover:bg-[#b82e1f] text-white font-semibold py-4 rounded-xl shadow-xl transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+                                         className="w-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold py-4 rounded-xl shadow-xl shadow-violet-100 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
                                     >
                                         {loading ? (
                                             <>
@@ -511,7 +715,7 @@ export default function CheckoutPage() {
                                     {/* Ticket Header */}
                                     <div className="bg-slate-900 p-6 flex items-center justify-between text-white">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 bg-[#CF3425] rounded-xl flex items-center justify-center shadow-lg">
+                                            <div className="w-10 h-10 bg-[#f97316] rounded-xl flex items-center justify-center shadow-lg">
                                                 <Icon size={20} />
                                             </div>
                                             <div>
@@ -531,7 +735,7 @@ export default function CheckoutPage() {
                                             <div>
                                                 <p className="text-3xl font-black text-slate-900 leading-none">{bookingResult.fromCode}</p>
                                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1.5">{fromName}</p>
-                                                <p className="text-lg font-black text-[#CF3425] mt-2">{bookingResult.departTime}</p>
+                                                <p className="text-lg font-black text-[#f97316] mt-2">{bookingResult.departTime}</p>
                                             </div>
 
                                             <div className="flex flex-col items-center flex-1 mx-4">
@@ -550,7 +754,7 @@ export default function CheckoutPage() {
                                             <div className="text-right">
                                                 <p className="text-3xl font-black text-slate-900 leading-none">{bookingResult.toCode}</p>
                                                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1.5">{toName}</p>
-                                                <p className="text-lg font-black text-[#CF3425] mt-2">{bookingResult.arriveTime}</p>
+                                                <p className="text-lg font-black text-[#f97316] mt-2">{bookingResult.arriveTime}</p>
                                             </div>
                                         </div>
 
@@ -558,14 +762,14 @@ export default function CheckoutPage() {
                                             <div>
                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Date</p>
                                                 <p className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                                                    <Calendar size={14} className="text-[#CF3425]" />
+                                                    <Calendar size={14} className="text-[#f97316]" />
                                                     {new Date(bookingResult.travelDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' })}
                                                 </p>
                                             </div>
                                             <div>
                                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5">Meal / Service</p>
                                                 <p className="text-sm font-bold text-slate-800 flex items-center gap-2">
-                                                    <Utensils size={14} className="text-[#CF3425]" />
+                                                    <Utensils size={14} className="text-[#f97316]" />
                                                     {bookingResult.meal || "Standard Meal"}
                                                 </p>
                                             </div>
@@ -576,7 +780,7 @@ export default function CheckoutPage() {
                                             {passengers.map((p, i) => (
                                                 <div key={i} className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-100">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 bg-rose-50 text-[#CF3425] rounded-full flex items-center justify-center font-bold text-xs">
+                                                        <div className="w-8 h-8 bg-orange-50 text-[#f97316] rounded-full flex items-center justify-center font-bold text-xs">
                                                             {i + 1}
                                                         </div>
                                                         <div>
@@ -616,25 +820,25 @@ export default function CheckoutPage() {
                                 </button>
                                 <button
                                     onClick={() => navigate("/bookings")}
-                                    className="flex items-center gap-2 px-8 py-3 bg-[#cf3425] hover:bg-[#b82e1f] text-white rounded-xl text-sm font-semibold transition-all shadow-lg"
+                                     className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-[#7c3aed] to-[#6d28d9] hover:opacity-90 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-violet-100"
                                 >
                                     Go to My Bookings
                                 </button>
                             </div>
                         </div>
 
-                        <div className="bg-[#CF3425] rounded-3xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-blue-200">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white backdrop-blur-md">
-                                    <Coffee size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-black">Join our loyalty program</h3>
-                                    <p className="text-rose-100 text-sm font-medium">Earn points on every trip and get exclusive discounts.</p>
-                                </div>
-                            </div>
-                            <button className="px-8 py-3 bg-white text-[#CF3425] rounded-xl text-sm font-black shadow-lg">Learn More</button>
-                        </div>
+                        <div className="bg-[#f97316] rounded-3xl p-8 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl shadow-orange-100">
+                             <div className="flex items-center gap-4">
+                                 <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-white backdrop-blur-md">
+                                     <Coffee size={24} />
+                                 </div>
+                                 <div>
+                                     <h3 className="text-xl font-black">Join our loyalty program</h3>
+                                     <p className="text-orange-100 text-sm font-medium">Earn points on every trip and get exclusive discounts.</p>
+                                 </div>
+                             </div>
+                             <button className="px-8 py-3 bg-white text-[#f97316] rounded-xl text-sm font-black shadow-lg hover:bg-orange-50 transition-all">Learn More</button>
+                         </div>
                     </div>
                 )}
             </div>

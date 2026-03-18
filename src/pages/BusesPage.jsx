@@ -46,10 +46,10 @@ const BusesPage = () => {
     ];
 
     const popularRoutes = [
-        { from: "Delhi", to: "Jaipur", price: "₹499", img: "https://images.unsplash.com/photo-1599661046289-e31897846e41?q=80&w=800", count: "45+ Buses" },
-        { from: "Mumbai", to: "Pune", price: "₹350", img: "https://images.unsplash.com/photo-1567157577867-05ccb1388e6e?q=80&w=800", count: "120+ Buses" },
-        { from: "Bangalore", to: "Chennai", price: "₹650", img: "https://images.unsplash.com/photo-1582510003544-2d095665039b?q=80&w=800", count: "80+ Buses" },
-        { from: "Hyderabad", to: "Bangalore", price: "₹899", img: "https://images.unsplash.com/photo-1626139575235-9053ea5a05dd?q=80&w=800", count: "65+ Buses" }
+        { from: "Delhi", to: "Jaipur", price: "₹499", img: "/assets/img/img_bac88c7be6.jpg", count: "45+ Buses" },
+        { from: "Mumbai", to: "Pune", price: "₹350", img: "/assets/img/img_b4622915e8.jpg", count: "120+ Buses" },
+        { from: "Bangalore", to: "Chennai", price: "₹650", img: "/assets/img/img_52f6d35149.jpg", count: "80+ Buses" },
+        { from: "Hyderabad", to: "Bangalore", price: "₹899", img: "/assets/img/img_c68557364b.jpg", count: "65+ Buses" }
     ];
 
     return (
@@ -58,7 +58,7 @@ const BusesPage = () => {
             <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden py-24">
                 <div className="absolute inset-0 z-0">
                     <img 
-                        src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=2000" 
+                        src="/assets/img/img_348ef02314.jpg" 
                         alt="Bus Hero" 
                         className="w-full h-full object-cover opacity-80"
                     />

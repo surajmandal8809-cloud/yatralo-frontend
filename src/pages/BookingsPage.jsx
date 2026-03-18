@@ -1,7 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Calendar, CircleDot, Plane, Search, Ticket, Train, XCircle, Hotel } from "lucide-react";
-import { getBookings, cancelBooking, formatInr } from "../utils/bookingUtils";
+import { getBookings, cancelBooking as localCancelBooking, formatInr } from "../utils/bookingUtils";
+import { useGetMyBookingsQuery, useCancelBookingMutation } from "../services/bookingService";
 
 import toast from "react-hot-toast";
 
@@ -34,19 +35,30 @@ const formatDate = (value) => {
 };
 
 export default function BookingsPage() {
-  const [bookings, setBookings] = useState(() => getBookings());
+  const { data: apiBookings, refetch } = useGetMyBookingsQuery();
+  const [cancelApiBooking] = useCancelBookingMutation();
+
+  const [bookings, setBookings] = useState([]);
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
 
   useEffect(() => {
-    const refresh = () => setBookings(getBookings());
+    if (apiBookings?.bookings) {
+      setBookings(apiBookings.bookings);
+    }
+  }, [apiBookings]);
+
+  useEffect(() => {
+    const refresh = () => {
+      refetch();
+    };
     window.addEventListener("bookings-updated", refresh);
     window.addEventListener("storage", refresh);
     return () => {
       window.removeEventListener("bookings-updated", refresh);
       window.removeEventListener("storage", refresh);
     };
-  }, []);
+  }, [refetch]);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -169,11 +181,18 @@ export default function BookingsPage() {
                       </div>
                       {booking.status !== "cancelled" && (
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             if (window.confirm("Are you sure you want to cancel this booking?")) {
-                              cancelBooking(booking.id);
-                              setBookings(getBookings());
-                              toast.success("Booking cancelled successfully");
+                              try {
+                                // 1. Cancel in DB
+                                await cancelApiBooking(booking._id).unwrap();
+                                // 2. Cancel in Local (compatibility)
+                                localCancelBooking(booking.id || booking._id);
+                                toast.success("Booking cancelled successfully");
+                                refetch();
+                              } catch (err) {
+                                toast.error("Failed to cancel booking");
+                              }
                             }
                           }}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-100 text-red-500 text-xs font-black hover:bg-red-50 transition-all"

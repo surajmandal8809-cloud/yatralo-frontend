@@ -46,10 +46,10 @@ const TrainLandingPage = () => {
     ];
 
     const popularRoutes = [
-        { from: "Delhi", to: "Mumbai", price: "₹1,250", img: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?q=80&w=800", count: "12+ Trains" },
-        { from: "Bangalore", to: "Chennai", price: "₹650", img: "https://images.unsplash.com/photo-1582510003544-2d095665039b?q=80&w=800", count: "25+ Trains" },
-        { from: "Kolkata", to: "Delhi", price: "₹1,450", img: "https://images.unsplash.com/photo-1558431382-bb7218352691?q=80&w=800", count: "8+ Trains" },
-        { from: "Mumbai", to: "Pune", price: "₹350", img: "https://images.unsplash.com/photo-1541410945396-a9b3d14b8222?q=80&w=800", count: "45+ Trains" }
+        { from: "Delhi", to: "Mumbai", price: "₹1,250", img: "/assets/img/img_e001c4dfa8.jpg", count: "12+ Trains" },
+        { from: "Bangalore", to: "Chennai", price: "₹650", img: "/assets/img/img_2fb2e54a39.jpg", count: "25+ Trains" },
+        { from: "Kolkata", to: "Delhi", price: "₹1,450", img: "/assets/img/img_3de209caad.jpg", count: "8+ Trains" },
+        { from: "Mumbai", to: "Pune", price: "₹350", img: "/assets/img/img_c68557364b.jpg", count: "45+ Trains" }
     ];
 
     return (
@@ -57,11 +57,15 @@ const TrainLandingPage = () => {
             {/* Hero Section */}
             <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden py-24">
                 <div className="absolute inset-0 z-0">
-                    <img 
-                        src="https://images.unsplash.com/photo-1474487022132-581338690e0c?q=80&w=2000" 
-                        alt="Train Hero" 
-                        className="w-full h-full object-cover opacity-80"
-                    />
+                    <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover"
+                    >
+                        <source src="/assets/video/Train.mp4" type="video/mp4" />
+                    </video>
                     <div className="absolute inset-0 bg-gradient-to-b from-[#1e1b4b]/80 via-[#7c3aed]/40 to-slate-50"></div>
                 </div>
 

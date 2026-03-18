@@ -46,10 +46,10 @@ const HotelLandingPage = () => {
     ];
 
     const popularProperties = [
-        { name: "The Taj Palace", location: "Mumbai", price: "₹18,500", img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800", rating: "4.9" },
-        { name: "Oceanic Resort", location: "Goa", price: "₹9,200", img: "https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=800", rating: "4.8" },
-        { name: "Mountain View", location: "Manali", price: "₹5,400", img: "https://images.unsplash.com/photo-1498503182468-3b51cbb6cb24?q=80&w=800", rating: "4.7" },
-        { name: "Royal Plaza", location: "Delhi", price: "₹7,800", img: "https://images.unsplash.com/photo-1551882547-ff43c69e5cf2?q=80&w=800", rating: "4.6" }
+        { name: "The Taj Palace", location: "Mumbai", price: "₹18,500", img: "/assets/img/img_11fb8a464f.jpg", rating: "4.9" },
+        { name: "Oceanic Resort", location: "Goa", price: "₹9,200", img: "/assets/img/img_55007fab14.jpg", rating: "4.8" },
+        { name: "Mountain View", location: "Manali", price: "₹5,400", img: "/assets/img/img_52f6d35149.jpg", rating: "4.7" },
+        { name: "Royal Plaza", location: "Delhi", price: "₹7,800", img: "/assets/img/img_2fb2e54a39.jpg", rating: "4.6" }
     ];
 
     return (
@@ -57,11 +57,15 @@ const HotelLandingPage = () => {
             {/* Hero Section */}
             <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden py-24">
                 <div className="absolute inset-0 z-0">
-                    <img 
-                        src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2000" 
-                        alt="Hotel Hero" 
-                        className="w-full h-full object-cover opacity-80"
-                    />
+                    <video
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        className="w-full h-full object-cover"
+                    >
+                        <source src="/assets/video/hotel.mp4" type="video/mp4" />
+                    </video>
                     <div className="absolute inset-0 bg-gradient-to-b from-[#1e1b4b]/80 via-[#7c3aed]/40 to-slate-50"></div>
                 </div>
 

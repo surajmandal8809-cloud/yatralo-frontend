@@ -17,7 +17,7 @@ const DestinationSection = () => {
     {
       id: 1,
       name: "Turkey",
-      img: "https://images.unsplash.com/photo-1527838832700-5059252407fa?auto=format&fit=crop&w=1200&q=80",
+      img: "/assets/img/img_ad1e529325.jpg",
       rating: 4.8,
       tag: "Cultural Hub",
       reviews: "452",
@@ -27,7 +27,7 @@ const DestinationSection = () => {
     {
       id: 2,
       name: "Thailand",
-      img: "https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?auto=format&fit=crop&w=1200&q=80",
+      img: "/assets/img/img_3de209caad.jpg",
       rating: 4.9,
       tag: "Exotic Escape",
       reviews: "400",
@@ -37,7 +37,7 @@ const DestinationSection = () => {
     {
       id: 3,
       name: "Australia",
-      img: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80",
+      img: "/assets/img/img_b4132c191b.jpg",
       rating: 4.7,
       tag: "Adventure Land",
       reviews: "410",
@@ -47,7 +47,7 @@ const DestinationSection = () => {
     {
       id: 4,
       name: "France",
-      img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=80",
+      img: "/assets/img/img_80d6404333.jpg",
       rating: 4.9,
       tag: "Romantic City",
       reviews: "520",
@@ -57,7 +57,7 @@ const DestinationSection = () => {
     {
       id: 5,
       name: "Japan",
-      img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80",
+      img: "/assets/img/img_2fb2e54a39.jpg",
       rating: 4.9,
       tag: "Land of Rising Sun",
       reviews: "612",
@@ -77,7 +77,7 @@ const DestinationSection = () => {
     {
       id: 7,
       name: "India",
-      img: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1200&q=80",
+      img: "/assets/img/img_92be5a31fd.jpg",
       rating: 4.9,
       tag: "Spiritual Saga",
       reviews: "723",
@@ -197,7 +197,7 @@ const DestinationCard = ({ img, name, rating, tag, flights, hotels }) => {
         className="w-full h-full object-cover group-hover:scale-110 transition duration-700 ease-out"
         onError={(e) => {
           e.target.src =
-            "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80";
+            "/assets/img/img_b4622915e8.jpg";
         }}
       />
       {/* Gradient */}

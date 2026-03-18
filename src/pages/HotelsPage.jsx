@@ -128,11 +128,11 @@ function HotelCard({ hotel, index, onBook }) {
             <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/3 relative overflow-hidden">
                     <img
-                        src={hotel.images && hotel.images.length > 0 ? hotel.images[0] : "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=60"}
+                        src={hotel.images && hotel.images.length > 0 ? hotel.images[0] : "/assets/img/img_2dc438666a.jpg"}
                         alt={hotel.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 aspect-[4/3] md:aspect-auto"
                         onError={(e) => {
-                            e.target.src = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=60";
+                            e.target.src = "/assets/img/img_2dc438666a.jpg";
                         }}
                     />
                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm">

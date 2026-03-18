@@ -45,25 +45,25 @@ const FlightLandingPage = () => {
     {
       name: "Dubai",
       price: "₹24,500",
-      img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=800",
+      img: "/assets/img/img_36383f6609.jpg",
       count: "124+ Flights"
     },
     {
       name: "Singapore",
       price: "₹18,900",
-      img: "https://images.unsplash.com/photo-1496939376851-89342e90adcd?q=80&w=800&auto=format&fit=crop",
+      img: "/assets/img/img_2c0ec1aac4.jpg",
       count: "86+ Flights"
     },
     {
       name: "London",
       price: "₹56,200",
-      img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?q=80&w=800",
+      img: "/assets/img/img_469a93f070.jpg",
       count: "42+ Flights"
     },
     {
       name: "Paris",
       price: "₹48,150",
-      img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=800",
+      img: "/assets/img/img_4cb6a307e4.jpg",
       count: "55+ Flights"
     }
   ];

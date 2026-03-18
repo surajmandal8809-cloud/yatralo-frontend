@@ -22,11 +22,13 @@ import {
   Timer,
   Users,
   Compass,
-  Sparkles
+  Sparkles,
+  Check
 } from "lucide-react";
 
 import FlightCard from "./FlightCard";
 import FareModal from "./FareModal";
+import AuthModal from "../../components/Auth/AuthModal";
 
 // --- Components ---
 
@@ -143,6 +145,7 @@ export default function FlightSearchResultsPage() {
 
   const [selectedFlightForFare, setSelectedFlightForFare] = useState(null);
   const [showFareModal, setShowFareModal] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const didAutoSearch = useRef(false);
 
@@ -225,6 +228,11 @@ export default function FlightSearchResultsPage() {
   }, [mappedFlights, sortBy, maxPrice, nonstop]);
 
   const handleViewPrices = (flight) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setIsAuthModalOpen(true);
+      return;
+    }
     setSelectedFlightForFare(flight);
     setShowFareModal(true);
   };
@@ -232,7 +240,7 @@ export default function FlightSearchResultsPage() {
   const handleBookWithFare = (flight, fareType) => {
     const token = localStorage.getItem("token");
     if (!token) {
-      toast.error("Please login to book");
+      setIsAuthModalOpen(true);
       return;
     }
 
@@ -256,6 +264,42 @@ export default function FlightSearchResultsPage() {
       },
     });
   };
+
+  const handleDateTabClick = (dStr) => {
+    setDate(dStr);
+    setSearchParamsState({ from, to, date: dStr });
+    setSearchParams({ from, to, date: dStr, pax });
+    setSearched(true);
+  };
+
+  const todayObj = new Date(today);
+  todayObj.setHours(0, 0, 0, 0);
+
+  const selectedDateObj = new Date(date);
+  selectedDateObj.setHours(0, 0, 0, 0);
+
+  let startDateObj = new Date(selectedDateObj);
+  startDateObj.setDate(selectedDateObj.getDate() - 2);
+  if (startDateObj < todayObj) {
+    startDateObj = new Date(todayObj);
+  }
+
+  const dateTabs = Array.from({ length: 5 }).map((_, i) => {
+    const d = new Date(startDateObj);
+    d.setDate(startDateObj.getDate() + i);
+    return d;
+  });
+
+  const formatDur = (mins) => {
+    if (!mins) return "--";
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return `${h}h ${m}m`;
+  };
+
+  const cheapestFlight = [...mappedFlights].sort((a,b) => a.price - b.price)[0] || {};
+  const fastestFlight = [...mappedFlights].filter(f => f.stops === 0).sort((a,b) => a.duration - b.duration)[0] || cheapestFlight;
+  const preferredFlight = [...mappedFlights].sort((a,b) => parseFloat(b.rating) - parseFloat(a.rating))[0] || cheapestFlight;
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans">
@@ -380,48 +424,86 @@ export default function FlightSearchResultsPage() {
           </div>
         ) : searched ? (
           <div className="flex flex-col lg:grid lg:grid-cols-[280px_1fr] gap-10">
-            <aside className="space-y-8">
-              <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm sticky top-24">
-                <Link to="/" className="flex items-center gap-2 group mb-8">
-                  <span className="text-2xl font-black tracking-tighter text-violet-600">
-                    Yatra<span className="text-[#f97316]">lo</span>
-                  </span>
-                </Link>
-                <div className="flex items-center justify-between mb-8">
-                   <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest">Applied Filters</h3>
-                   <button onClick={() => { setMaxPrice(60000); setNonstop(false); }} className="text-[10px] font-black text-[#7c3aed] uppercase hover:underline">Clear All</button>
+            <aside className="space-y-6">
+              <div className="bg-white rounded-[2.5rem] border border-slate-200 p-8 shadow-sm sticky top-24">
+                <div className="flex items-center justify-between mb-10">
+                   <h3 className="text-sm font-black text-slate-900 uppercase tracking-[0.2em]">Filters</h3>
+                   <button 
+                    onClick={() => { setMaxPrice(60000); setNonstop(false); }} 
+                    className="text-[10px] font-black text-[#7c3aed] uppercase tracking-widest hover:underline"
+                   >
+                    Clear All
+                   </button>
                 </div>
                 
-                {nonstop && (
-                    <div className="bg-slate-50 px-3 py-2 rounded-lg flex items-center justify-between group mb-8">
-                        <span className="text-[10px] font-black text-slate-600 uppercase">Non Stop</span>
-                        <X size={12} className="text-slate-400 cursor-pointer hover:text-slate-900" onClick={() => setNonstop(false)} />
-                    </div>
-                )}
-
-                <div className="space-y-10">
+                <div className="space-y-12">
+                  {/* Stops Section */}
                   <div>
-                    <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-900 mb-6">Popular Filters</h4>
+                    <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Stops</h4>
                     <div className="space-y-4">
-                        <label className="flex items-center justify-between group cursor-pointer">
-                            <div className="flex items-center gap-3">
-                                <input type="checkbox" checked={nonstop} onChange={(e) => setNonstop(e.target.checked)} className="w-4 h-4 rounded border-slate-200 text-[#7c3aed] focus:ring-[#7c3aed]" />
-                                <span className={`text-[11px] font-bold ${nonstop ? 'text-slate-900' : 'text-slate-500'}`}>Non Stop</span>
+                        <label className="group cursor-pointer flex items-center justify-between px-4 py-3 rounded-2xl border border-transparent hover:bg-slate-50 hover:border-slate-100 transition-all">
+                            <div className="flex items-center gap-4">
+                                <div className="relative flex items-center justify-center">
+                                    <input 
+                                        type="checkbox" 
+                                        checked={nonstop} 
+                                        onChange={(e) => setNonstop(e.target.checked)} 
+                                        className="peer appearance-none w-5 h-5 rounded-lg border-2 border-slate-200 checked:bg-[#7c3aed] checked:border-[#7c3aed] transition-all cursor-pointer" 
+                                    />
+                                    <Check className="absolute text-white w-3 h-3 opacity-0 peer-checked:opacity-100 pointer-events-none" strokeWidth={4} />
+                                </div>
+                                <span className={`text-xs font-black transition-colors ${nonstop ? 'text-slate-900' : 'text-slate-500'}`}>0 Stop (Non-stop)</span>
                             </div>
-                            <span className="text-[10px] font-black text-slate-400">₹7,897</span>
+                            <span className="text-[10px] font-black text-slate-300">₹7,897</span>
                         </label>
-                        <label className="flex items-center justify-between group cursor-pointer opacity-50">
-                            <div className="flex items-center gap-3">
-                                <input type="checkbox" disabled className="w-4 h-4 rounded border-slate-200 text-[#7c3aed] focus:ring-[#7c3aed]" />
-                                <span className="text-[11px] font-bold text-slate-500">Refundable Fares</span>
+                        
+                        <label className="group cursor-pointer flex items-center justify-between px-4 py-3 rounded-2xl border border-transparent hover:bg-slate-50 hover:border-slate-100 transition-all opacity-50">
+                            <div className="flex items-center gap-4">
+                                <div className="w-5 h-5 rounded-lg border-2 border-slate-200 bg-slate-100" />
+                                <span className="text-xs font-black text-slate-500">1 Stop</span>
                             </div>
-                            <span className="text-[10px] font-black text-slate-400">₹7,897</span>
+                            <span className="text-[10px] font-black text-slate-300">₹12,450</span>
                         </label>
                     </div>
                   </div>
 
+                  {/* Price Section */}
                   <div className="pt-8 border-t border-slate-100">
-                    <h4 className="text-[11px] font-black uppercase tracking-widest text-slate-900 mb-6">One Way Price</h4>
+                    <div className="flex justify-between items-end mb-8">
+                        <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400">One Way Price</h4>
+                        <span className="text-xs font-black text-[#7c3aed] bg-violet-50 px-2.5 py-1 rounded-lg">Up to ₹{maxPrice.toLocaleString()}</span>
+                    </div>
+                    
+                    <div className="px-2">
+                        <input 
+                            type="range" 
+                            min="2000" 
+                            max="60000" 
+                            step="500"
+                            value={maxPrice} 
+                            onChange={(e) => setMaxPrice(Number(e.target.value))}
+                            className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-[#7c3aed]"
+                        />
+                        <div className="flex justify-between mt-4">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">₹2,000</span>
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">₹60,000</span>
+                        </div>
+                    </div>
+                  </div>
+
+                  {/* Amenities (Visual Only) */}
+                  <div className="pt-8 border-t border-slate-100">
+                    <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 mb-6">Popular Airlines</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                         {["IndiGo", "Air India", "Vistara", "SpiceJet"].map(air => (
+                             <button key={air} className="flex flex-col items-center p-3 rounded-2xl border border-slate-100 hover:border-violet-100 hover:bg-violet-50/10 transition-all group">
+                                 <div className="w-8 h-8 rounded-lg bg-slate-50 mb-2 flex items-center justify-center text-[10px] font-black text-slate-300 group-hover:text-violet-400 transition-colors">
+                                     {air.slice(0,2).toUpperCase()}
+                                 </div>
+                                 <span className="text-[9px] font-black text-slate-500 uppercase tracking-tighter">{air}</span>
+                             </button>
+                         ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -437,31 +519,35 @@ export default function FlightSearchResultsPage() {
 
               {/* Offer Banners Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-                  <div className="bg-white border border-slate-200 rounded-2xl p-4 flex gap-4 cursor-pointer hover:shadow-md transition-all group overflow-hidden relative">
-                      <div className="w-12 h-8 bg-[#0033a0] rounded flex items-center justify-center text-white shrink-0">
-                          <span className="text-[10px] font-black italic">VISA</span>
+                  <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:shadow-md transition-all group overflow-hidden relative">
+                      <div className="w-16 h-10 rounded shrink-0 flex items-center justify-center p-1">
+                          <img src="/assets/img/visa.svg" alt="VISA" className="w-full h-full object-contain drop-shadow-sm group-hover:scale-105 transition-transform" />
                       </div>
-                      <div>
-                          <p className="text-[11px] font-black text-slate-900">VISA Exclusive Offer</p>
-                          <p className="text-[9px] font-bold text-slate-400 mt-0.5">Free Seat with VISA Signature Cards</p>
+                      <div className="flex-1">
+                          <p className="text-[12px] font-black text-slate-800 leading-tight">VISA Exclusive Offer</p>
+                          <p className="text-[10px] font-bold text-slate-500 mt-0.5 line-clamp-1">Free Seat with VISA Signature Cards</p>
                       </div>
-                      <ChevronRight size={14} className="ml-auto text-slate-300 group-hover:text-[#7c3aed] transition-colors" />
+                      <ChevronRight size={16} className="text-slate-300 group-hover:text-[#7c3aed] transition-colors shrink-0" />
                   </div>
-                  <div className="bg-white border border-slate-200 rounded-2xl p-4 flex gap-4 cursor-pointer hover:shadow-md transition-all group">
-                      <div className="w-10 h-10 bg-[#e21b22]/10 rounded-full flex items-center justify-center text-[#e21b22] shrink-0 font-black text-xs">F</div>
-                      <div>
-                          <p className="text-[11px] font-black text-slate-900">Flat 10% Instant Discount</p>
-                          <p className="text-[9px] font-bold text-slate-400 mt-0.5">on IDFC FIRST Bank Credit Cards</p>
+                  <div className="bg-white border border-slate-200 rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:shadow-md transition-all group">
+                      <div className="w-10 h-10 shrink-0">
+                          <img src="/assets/img/idfc.svg" alt="IDFC FIRST Bank" className="w-full h-full object-contain rounded-full shadow-sm group-hover:scale-105 transition-transform" />
                       </div>
-                      <ChevronRight size={14} className="ml-auto text-slate-300 group-hover:text-[#7c3aed] transition-colors" />
+                      <div className="flex-1">
+                          <p className="text-[12px] font-black text-slate-800 leading-tight">Flat 10% Instant Discount</p>
+                          <p className="text-[10px] font-bold text-slate-500 mt-0.5 line-clamp-1">on IDFC FIRST Bank Credit Cards</p>
+                      </div>
+                      <ChevronRight size={16} className="text-slate-300 group-hover:text-[#7c3aed] transition-colors shrink-0" />
                   </div>
-                   <div className="hidden lg:flex bg-white border border-slate-200 rounded-2xl p-4 gap-4 cursor-pointer hover:shadow-md transition-all group">
-                      <div className="w-10 h-10 bg-violet-50 rounded-full flex items-center justify-center text-[#7c3aed] shrink-0"><Sparkles size={18} /></div>
-                      <div>
-                          <p className="text-[11px] font-black text-slate-900">Meet and Greet</p>
-                          <p className="text-[9px] font-bold text-slate-400 mt-0.5">Elevate your travel experience</p>
+                   <div className="hidden lg:flex bg-white border border-slate-200 rounded-2xl p-4 items-center gap-4 cursor-pointer hover:shadow-md transition-all group">
+                      <div className="w-10 h-10 shrink-0">
+                          <img src="/assets/img/meetgreet.svg" alt="Meet and Greet" className="w-full h-full object-contain rounded-lg shadow-sm group-hover:scale-105 transition-transform" />
                       </div>
-                      <ChevronRight size={14} className="ml-auto text-slate-300 group-hover:text-[#7c3aed] transition-colors" />
+                      <div className="flex-1">
+                          <p className="text-[12px] font-black text-slate-800 leading-tight">Meet and Greet</p>
+                          <p className="text-[10px] font-bold text-slate-500 mt-0.5 line-clamp-1">Elevate your travel experience</p>
+                      </div>
+                      <ChevronRight size={16} className="text-slate-300 group-hover:text-[#7c3aed] transition-colors shrink-0" />
                   </div>
               </div>
 
@@ -469,44 +555,66 @@ export default function FlightSearchResultsPage() {
               <div className="bg-white border border-slate-200 rounded-xl flex overflow-hidden mb-8 shadow-sm">
                   <div className="w-12 border-r border-slate-100 flex items-center justify-center text-slate-300 cursor-pointer hover:bg-slate-50 transition-all"><ChevronDown className="rotate-90" size={16} /></div>
                   <div className="flex-1 flex overflow-x-auto no-scrollbar">
-                      {[17, 18, 19, 20, 21, 22, 23, 24].map((d, i) => (
-                          <div key={d} className={`flex-1 min-w-[100px] py-3 text-center cursor-pointer border-r border-slate-50 transition-all hover:bg-slate-50 ${i === 0 ? "border-b-4 border-b-[#7c3aed] bg-violet-50/10" : ""}`}>
-                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Tue, Mar {d}</p>
-                              <p className={`text-xs font-black mt-1 ${i === 0 ? "text-[#7c3aed]" : "text-slate-700"}`}>₹7,897</p>
+                      {dateTabs.map((dObj) => {
+                          const dStr = dObj.toISOString().split("T")[0];
+                          const isActive = dStr === date;
+                          const formattedDate = dObj.toLocaleDateString("en-US", { weekday: 'short', month: 'short', day: 'numeric' });
+                          const randomPrice = 3500 + (dStr.charCodeAt(dStr.length - 1) * 200) + (dStr.charCodeAt(dStr.length - 2) * 10);
+                          return (
+                          <div 
+                            key={dStr} 
+                            onClick={() => handleDateTabClick(dStr)}
+                            className={`flex-1 min-w-[100px] py-3 text-center cursor-pointer border-r border-slate-50 transition-all hover:bg-slate-50 ${isActive ? "border-b-4 border-b-[#7c3aed] bg-violet-50/10" : ""}`}
+                          >
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{formattedDate}</p>
+                              <p className={`text-xs font-black mt-1 ${isActive ? "text-[#7c3aed]" : "text-slate-700"}`}>₹{randomPrice.toLocaleString()}</p>
                           </div>
-                      ))}
+                      )})}
                   </div>
                   <div className="w-12 border-l border-slate-100 flex items-center justify-center text-slate-300 cursor-pointer hover:bg-slate-50 transition-all"><ChevronDown className="-rotate-90" size={16} /></div>
               </div>
 
-              <div className="space-y-6">
-                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2">
+              {/* Sorting Bar */}
+              <div className="mb-6 overflow-x-auto no-scrollbar pb-2">
+                <div className="bg-white border border-slate-200 flex rounded-lg shadow-sm overflow-hidden divide-x divide-slate-100 min-w-[600px]">
                   {[
-                    { id: 'price', label: 'CHEAPEST', desc: '₹7,897 | 02h 55m' },
-                    { id: 'duration', label: 'NON STOP FIRST', desc: '₹7,897 | 02h 55m' },
-                    { id: 'rating', label: 'YOU MAY PREFER', desc: '₹7,897 | 02h 55m' },
-                    { id: 'custom', label: 'Other Sort', desc: 'Sort results' }
-                  ].map(item => (
-                    <button
-                      key={item.id}
-                      onClick={() => item.id !== 'custom' && setSortBy(item.id)}
-                      className={`flex-1 min-w-[180px] text-left p-4 rounded-xl border-2 transition-all ${
-                        sortBy === item.id
-                        ? "bg-[#7c3aed]/5 border-[#7c3aed] shadow-lg shadow-violet-50/50"
-                        : "bg-white border-slate-100 hover:border-slate-200 text-slate-400"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                         <div className={`p-2 rounded-lg ${sortBy === item.id ? 'bg-[#7c3aed] text-white' : 'bg-slate-100 text-slate-400'}`}>
-                            {item.id === 'price' ? <TrendingDown size={14} /> : item.id === 'duration' ? <Timer size={14} /> : <Star size={14} />}
-                         </div>
-                         <div>
-                            <p className={`text-[10px] font-black uppercase tracking-widest ${sortBy === item.id ? 'text-slate-900' : 'text-slate-400'}`}>{item.label}</p>
-                            <p className="text-[11px] font-black text-slate-600 mt-0.5">{item.desc}</p>
-                         </div>
+                    { id: 'price', label: 'CHEAPEST', price: cheapestFlight.price, duration: cheapestFlight.duration, icon: TrendingDown },
+                    { id: 'duration', label: 'NON STOP FIRST', price: fastestFlight.price, duration: fastestFlight.duration, icon: Timer },
+                    { id: 'rating', label: 'YOU MAY PREFER', price: preferredFlight.price, duration: preferredFlight.duration, icon: Star }
+                  ].map(item => {
+                    const Icon = item.icon;
+                    const isActive = sortBy === item.id;
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => setSortBy(item.id)}
+                        className={`flex-1 p-3 cursor-pointer transition-all flex flex-col relative group ${
+                          isActive 
+                          ? "bg-[#e5f3ff]" 
+                          : "bg-white hover:bg-slate-50"
+                        }`}
+                      >
+                        {isActive && <div className="absolute top-0 left-0 right-0 h-1 bg-[#008cff]" />}
+                        <div className="flex items-center gap-3 w-full pl-2">
+                           <div className={`${isActive ? 'text-[#008cff]' : 'text-slate-400 group-hover:text-[#008cff] transition-colors'} shrink-0`}>
+                              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
+                           </div>
+                           <div>
+                              <p className={`text-[11px] font-bold tracking-widest uppercase ${isActive ? 'text-[#008cff]' : 'text-slate-600'}`}>
+                                {item.label}
+                              </p>
+                              {item.price ? (
+                                <p className={`text-xs font-semibold mt-0.5 ${isActive ? "text-[#008cff]" : "text-slate-500"}`}>
+                                  ₹{item.price.toLocaleString()} <span className="opacity-50 mx-1">•</span> {formatDur(item.duration)}
+                                </p>
+                              ) : (
+                                <p className="text-xs font-bold mt-0.5 text-slate-400">Loading...</p>
+                              )}
+                           </div>
+                        </div>
                       </div>
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -548,6 +656,20 @@ export default function FlightSearchResultsPage() {
         onClose={() => setShowFareModal(false)} 
         selectedFlight={selectedFlightForFare} 
         onBook={handleBookWithFare} 
+      />
+
+      <AuthModal 
+        isOpen={isAuthModalOpen} 
+        onClose={() => setIsAuthModalOpen(false)} 
+        onAuthSuccess={(newToken) => {
+          localStorage.setItem("token", newToken);
+          window.dispatchEvent(new Event("storage"));
+          setIsAuthModalOpen(false);
+          toast.success("Successfully logged in!");
+          if (selectedFlightForFare) {
+            setShowFareModal(true);
+          }
+        }}
       />
     </div>
   );

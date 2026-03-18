@@ -65,12 +65,6 @@ const BookingSelectionPage = () => {
         return 0;
     }, [type, selectedClass]);
 
-    const totalPrice = useMemo(() => {
-        if (!item) return 0;
-        const base = item.price || 0;
-        const mealPrice = (type === "flight" ? (selectedMeal.price || 0) : 0);
-        return base + ((classExtra + mealPrice) * pax);
-    }, [item, classExtra, pax, selectedMeal, type]);
 
     // --- Seat/Room Generation ---
     const seatGrid = useMemo(() => {
@@ -83,7 +77,8 @@ const BookingSelectionPage = () => {
                     const label = `${r}${String.fromCharCode(65 + c)}`;
                     const isOccupied = Math.random() < 0.3;
                     const isPremium = r < 4;
-                    grid.push({ label, isOccupied, isPremium, row: r, col: c });
+                    const price = isPremium ? 800 : (r > 8 ? 150 : 350);
+                    grid.push({ label, isOccupied, isPremium, row: r, col: c, price });
                 }
             }
             return grid;
@@ -92,15 +87,43 @@ const BookingSelectionPage = () => {
             const grid = [];
             const CABINS = 8;
             for (let c = 1; c <= CABINS; c++) {
-                ["LB", "MB", "UB", "LB", "MB", "UB", "SL", "SU"].forEach((type, i) => {
-                    const label = `${c}-${type}${i+1}`;
-                    grid.push({ label, type, isOccupied: Math.random() < 0.25 });
+                ["LB", "MB", "UB", "LB", "MB", "UB", "SL", "SU"].forEach((berthType, i) => {
+                    const label = `${c}-${berthType}${i+1}`;
+                    grid.push({ label, type: berthType, isOccupied: Math.random() < 0.25, price: berthType === "LB" ? 150 : 50 });
                 });
+            }
+            return grid;
+        }
+        if (type === "bus") {
+            const grid = [];
+            for(let r=1; r<=10; r++) {
+               ["A", "B", "C", "D"].forEach(c => {
+                  grid.push({ label: `${r}${c}`, isOccupied: Math.random() < 0.3, price: 100 });
+               });
             }
             return grid;
         }
         return [];
     }, [type]);
+
+    const seatSelectionPrice = useMemo(() => {
+        if (type === "hotel" || !seatGrid.length) return 0;
+        let sum = 0;
+        selectedItems.forEach(label => {
+            const seat = seatGrid.find(s => s.label === label);
+            if (seat && seat.price) {
+                sum += seat.price;
+            }
+        });
+        return sum;
+    }, [selectedItems, seatGrid, type]);
+
+    const totalPrice = useMemo(() => {
+        if (!item) return 0;
+        const base = item.price || 0;
+        const mealPrice = (type === "flight" ? (selectedMeal.price || 0) : 0);
+        return base + ((classExtra + mealPrice) * pax) + seatSelectionPrice;
+    }, [item, classExtra, pax, selectedMeal, type, seatSelectionPrice]);
 
     const toggleSelection = (id) => {
         if (selectedItems.includes(id)) {
@@ -115,8 +138,8 @@ const BookingSelectionPage = () => {
     };
 
     const handleConfirm = () => {
-        if (selectedItems.length < pax && type !== "hotel") {
-            toast.error(`Please select ${pax} seat${pax > 1 ? 's' : ''}`);
+        if (selectedItems.length < pax && type === "hotel") {
+            toast.error(`Please select ${pax} room${pax > 1 ? 's' : ''}`);
             return;
         }
 
@@ -398,6 +421,7 @@ const BookingSelectionPage = () => {
                                             <button 
                                                 disabled={s.isOccupied}
                                                 onClick={() => toggleSelection(s.label)}
+                                                title={s.isOccupied ? "Occupied" : `Seat ${s.label} - ₹${s.price}`}
                                                 className={`group relative aspect-square rounded-xl border-2 transition-all flex items-center justify-center ${
                                                     s.isOccupied 
                                                     ? "bg-slate-200 border-slate-300 cursor-not-allowed" 
@@ -408,10 +432,19 @@ const BookingSelectionPage = () => {
                                                     : "bg-white border-slate-100 hover:border-slate-300"
                                                 }`}
                                             >
-                                                <div className={`text-[9px] font-black ${
-                                                    selectedItems.includes(s.label) ? "text-white" : "text-slate-400"
-                                                }`}>
-                                                    {s.label}
+                                                <div className="flex flex-col items-center">
+                                                    <div className={`text-[9px] font-black ${
+                                                        selectedItems.includes(s.label) ? "text-white" : "text-slate-400"
+                                                    }`}>
+                                                        {s.label}
+                                                    </div>
+                                                    {!s.isOccupied && (
+                                                        <div className={`text-[7px] font-bold ${
+                                                            selectedItems.includes(s.label) ? "text-white/80" : "text-[#f97316]"
+                                                        }`}>
+                                                            ₹{s.price}
+                                                        </div>
+                                                    )}
                                                 </div>
                                                 
                                                 {/* Seat Arms Decoration */}
@@ -476,7 +509,12 @@ const BookingSelectionPage = () => {
                                                         >
                                                             <div className="w-2 h-8 rounded-full bg-slate-200/20" />
                                                             <span className="text-[9px] font-black uppercase tracking-widest">{berth}</span>
-                                                            <span className="text-[8px] opacity-60">{label}</span>
+                                                            <span className="text-[8px] opacity-60 leading-none">{label}</span>
+                                                            {!isOccupied && (
+                                                                <span className={`text-[8px] font-black mt-1 ${selectedItems.includes(label) ? "text-white" : "text-[#7c3aed]"}`}>
+                                                                    ₹{seatGrid.find(s => s.label === label)?.price || 0}
+                                                                </span>
+                                                            )}
                                                         </button>
                                                     );
                                                 })}
@@ -501,7 +539,12 @@ const BookingSelectionPage = () => {
                                                             }`}
                                                         >
                                                             <span className="text-[9px] font-black uppercase tracking-widest">{berth}</span>
-                                                            <span className="text-[8px] opacity-60">{label}</span>
+                                                            <span className="text-[8px] opacity-60 leading-none">{label}</span>
+                                                            {!isOccupied && (
+                                                                <span className={`text-[8px] font-black mt-1 ${selectedItems.includes(label) ? "text-white" : "text-[#CF3425]"}`}>
+                                                                    ₹{seatGrid.find(s => s.label === label)?.price || 0}
+                                                                </span>
+                                                            )}
                                                         </button>
                                                     );
                                                 })}
@@ -515,9 +558,9 @@ const BookingSelectionPage = () => {
                         {type === "hotel" && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {[
-                                    { id: "Standard", price: 0, img: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=400&q=80" },
-                                    { id: "Deluxe", price: 2500, img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=400&q=80" },
-                                    { id: "Exec Suite", price: 5500, img: "https://images.unsplash.com/photo-1582719478250-c89cae4df85b?w=400&q=80" }
+                                    { id: "Standard", price: 0, img: "/assets/img/img_d1d63b7eef.jpg" },
+                                    { id: "Deluxe", price: 2500, img: "/assets/img/img_f68a5d0002.jpg" },
+                                    { id: "Exec Suite", price: 5500, img: "/assets/img/img_dee0c63eed.jpg" }
                                 ].map(room => (
                                     <button 
                                         key={room.id}

@@ -8,8 +8,29 @@ const formatDuration = (minutes) => {
   return `${h ? `${h}h ` : ""}${m}m`;
 };
 
+const getAirlineLogo = (airlineName) => {
+  const map = {
+    "Air India": "AI",
+    "IndiGo": "6E",
+    "Indigo": "6E",
+    "Vistara": "UK",
+    "SpiceJet": "SG",
+    "Spicejet": "SG",
+    "Akasa Air": "QP",
+    "Air Connect": "FL",
+    "AirAsia India": "I5",
+    "Alliance Air": "9I"
+  };
+  const code = map[airlineName] || map[airlineName?.trim()];
+  if (code && code !== "FL") return `/assets/img/${code}.png`;
+  return null;
+};
+
 export default function FlightCard({ flight, pax, onViewPrices }) {
   const [expanded, setExpanded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const logoUrl = getAirlineLogo(flight.airline);
 
   return (
     <motion.div
@@ -30,8 +51,17 @@ export default function FlightCard({ flight, pax, onViewPrices }) {
         <div className="flex flex-wrap items-center justify-between gap-6">
           {/* Airline Identity */}
           <div className="flex items-center gap-4 group cursor-pointer w-[250px]">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-black shadow-lg transform group-hover:rotate-6 transition-all" style={{ background: flight.bg }}>
-              {flight.code}
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-black shadow-lg transform group-hover:rotate-6 transition-all ${logoUrl && !imageError ? 'bg-white border border-slate-100' : ''}`} style={(!logoUrl || imageError) ? { background: flight.bg } : {}}>
+              {logoUrl && !imageError ? (
+                <img 
+                  src={logoUrl} 
+                  alt={flight.airline} 
+                  className="w-10 h-10 object-contain rounded-lg"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                flight.code
+              )}
             </div>
             <div>
               <p className="text-sm font-black text-slate-900 group-hover:text-[#7c3aed] transition-colors">{flight.airline}</p>
@@ -41,9 +71,10 @@ export default function FlightCard({ flight, pax, onViewPrices }) {
           </div>
 
           {/* Departure */}
-          <div className="text-center w-[100px]">
+          <div className="text-center w-[120px]">
             <p className="text-2xl font-black text-slate-900 leading-none">{flight.dep}</p>
             <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-2">{flight.originCity}</p>
+            <p className="text-[9px] font-bold text-slate-400 mt-0.5 truncate px-2" title={flight.originName || flight.origin}>{flight.originName || flight.origin}</p>
           </div>
 
           {/* Route & Duration */}
@@ -58,9 +89,10 @@ export default function FlightCard({ flight, pax, onViewPrices }) {
           </div>
 
           {/* Arrival */}
-          <div className="text-center w-[100px]">
+          <div className="text-center w-[120px]">
             <p className="text-2xl font-black text-slate-900 leading-none">{flight.arr}</p>
             <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-2">{flight.destinationCity}</p>
+            <p className="text-[9px] font-bold text-slate-400 mt-0.5 truncate px-2" title={flight.destinationName || flight.destination}>{flight.destinationName || flight.destination}</p>
           </div>
 
           {/* Price & Action */}

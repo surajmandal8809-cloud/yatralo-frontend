@@ -162,7 +162,7 @@ const DealsPage = () => {
       discountedPrice: 18999,
       discount: "35% OFF",
       image:
-        "https://images.unsplash.com/photo-1504150558240-0b4fd8946624?w=500",
+        "/assets/img/img_3918b3fe56.jpg",
       rating: 4.7,
       badge: "Direct",
     },
@@ -175,7 +175,7 @@ const DealsPage = () => {
       discountedPrice: 24999,
       discount: "24% OFF",
       image:
-        "https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=500",
+        "/assets/img/img_195b80833f.jpg",
       rating: 4.9,
       badge: "Best Price",
     },
@@ -203,7 +203,7 @@ const DealsPage = () => {
       discountedPrice: 15999,
       discount: "38% OFF",
       image:
-        "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=500",
+        "/assets/img/img_ff2c69986d.jpg",
       rating: 4.9,
       badge: "Luxury",
     },
@@ -216,7 +216,7 @@ const DealsPage = () => {
       discountedPrice: 22999,
       discount: "30% OFF",
       image:
-        "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500",
+        "/assets/img/img_de616600e3.jpg",
       rating: 4.9,
       badge: "Taj View",
     },
@@ -229,7 +229,7 @@ const DealsPage = () => {
       discountedPrice: 12999,
       discount: "32% OFF",
       image:
-        "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=500",
+        "/assets/img/img_6af07bc5fe.jpg",
       rating: 4.7,
       badge: "Sea View",
     },
@@ -242,7 +242,7 @@ const DealsPage = () => {
       discountedPrice: 16999,
       discount: "26% OFF",
       image:
-        "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=500",
+        "/assets/img/img_509d8860b7.jpg",
       rating: 4.8,
       badge: "Heritage",
     },
@@ -257,7 +257,7 @@ const DealsPage = () => {
       discountedPrice: 1299,
       discount: "32% OFF",
       image:
-        "https://images.unsplash.com/photo-1570125909517-53cb21c89ff2?w=500",
+        "/assets/img/img_996d53c789.jpg",
       rating: 4.6,
       badge: "AC Sleeper",
     },
@@ -270,7 +270,7 @@ const DealsPage = () => {
       discountedPrice: 1799,
       discount: "28% OFF",
       image:
-        "https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?w=500",
+        "/assets/img/img_e652165427.jpg",
       rating: 4.5,
       badge: "Volvo AC",
     },
@@ -298,7 +298,7 @@ const DealsPage = () => {
       discountedPrice: 32999,
       discount: "28% OFF",
       image:
-        "https://images.unsplash.com/photo-1593693397690-362cb9666fc2?w=500",
+        "/assets/img/img_2b737663f6.jpg",
       rating: 4.8,
       badge: "Houseboat Stay",
     },
@@ -311,7 +311,7 @@ const DealsPage = () => {
       discountedPrice: 19999,
       discount: "31% OFF",
       image:
-        "https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=500",
+        "/assets/img/img_e1e70255e1.jpg",
       rating: 4.7,
       badge: "5* Resort",
     },
@@ -339,7 +339,7 @@ const DealsPage = () => {
       discountedPrice: 139999,
       discount: "26% OFF",
       image:
-        "https://images.unsplash.com/photo-1548574505-5e239809ee19?w=500",
+        "/assets/img/img_c68557364b.jpg",
       rating: 4.9,
       badge: "All Inclusive",
     },

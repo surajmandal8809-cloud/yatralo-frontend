@@ -35,7 +35,7 @@ const DESTINATIONS = [
         id: 1,
         name: "Goa",
         country: "India",
-        img: "https://images.unsplash.com/photo-1518639192441-8fce0a366e2e?auto=format&fit=crop&w=1200&q=80",
+        img: "/assets/img/img_cc0de3e88c.jpg",
         rating: 4.8,
         reviews: 1452,
         tag: "Sun & Sand",
@@ -48,7 +48,7 @@ const DESTINATIONS = [
         id: 2,
         name: "Manali",
         country: "India",
-        img: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=80",
+        img: "/assets/img/img_63aefca8ba.jpg",
         rating: 4.9,
         reviews: 980,
         tag: "Snow Peak",
@@ -61,7 +61,7 @@ const DESTINATIONS = [
         id: 3,
         name: "Rajasthan",
         country: "India",
-        img: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1200&q=80",
+        img: "/assets/img/img_92be5a31fd.jpg",
         rating: 4.7,
         reviews: 1210,
         tag: "Royal Heritage",
@@ -74,7 +74,7 @@ const DESTINATIONS = [
         id: 4,
         name: "Kerala",
         country: "India",
-        img: "https://images.unsplash.com/photo-1593693411515-c20261bcad6e?auto=format&fit=crop&w=1200&q=80",
+        img: "/assets/img/img_bff8837a7a.jpg",
         rating: 4.9,
         reviews: 1100,
         tag: "God's Own Country",
@@ -100,7 +100,7 @@ const DESTINATIONS = [
         id: 6,
         name: "Andaman",
         country: "India",
-        img: "https://images.unsplash.com/photo-1601919051950-bb9f3ffb3fee?auto=format&fit=crop&w=1200&q=80",
+        img: "/assets/img/img_dadb484d68.jpg",
         rating: 4.9,
         reviews: 860,
         tag: "Crystal Waters",
@@ -126,7 +126,7 @@ const DESTINATIONS = [
         id: 8,
         name: "Leh Ladakh",
         country: "India",
-        img: "https://images.unsplash.com/photo-1598091383021-15ddea10925d?auto=format&fit=crop&w=1200&q=80",
+        img: "/assets/img/img_dee0c63eed.jpg",
         rating: 4.9,
         reviews: 650,
         tag: "High Altitude",
@@ -139,7 +139,7 @@ const DESTINATIONS = [
         id: 9,
         name: "Thailand",
         country: "Thailand",
-        img: "https://images.unsplash.com/photo-1506665531195-3566af2b4dfa?auto=format&fit=crop&w=1200&q=80",
+        img: "/assets/img/img_3de209caad.jpg",
         rating: 4.8,
         reviews: 2300,
         tag: "Exotic Escape",
@@ -152,7 +152,7 @@ const DESTINATIONS = [
         id: 10,
         name: "Bali",
         country: "Indonesia",
-        img: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?auto=format&fit=crop&w=1200&q=80",
+        img: "/assets/img/img_6c4ad917dd.jpg",
         rating: 4.9,
         reviews: 3100,
         tag: "Island Paradise",
@@ -165,7 +165,7 @@ const DESTINATIONS = [
         id: 11,
         name: "France",
         country: "France",
-        img: "https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=1200&q=80",
+        img: "/assets/img/img_80d6404333.jpg",
         rating: 4.9,
         reviews: 4200,
         tag: "Romantic City",
@@ -178,7 +178,7 @@ const DESTINATIONS = [
         id: 12,
         name: "Switzerland",
         country: "Switzerland",
-        img: "https://images.unsplash.com/photo-1531210483974-4f8c1f33fd35?auto=format&fit=crop&w=1200&q=80",
+        img: "/assets/img/img_761ca4de39.jpg",
         rating: 4.9,
         reviews: 1850,
         tag: "Alpine Dream",
@@ -441,7 +441,7 @@ const DestinationCard = ({ dest, index, liked, onLike, onClick }) => (
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 onError={(e) => {
                     e.target.src =
-                        "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80";
+                        "/assets/img/img_b4622915e8.jpg";
                 }}
             />
             {/* Gradient overlay */}

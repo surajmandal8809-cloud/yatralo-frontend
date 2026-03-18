@@ -24,7 +24,8 @@ import {
   useUpdateAvatarMutation,
   useUpdateUserMutation,
 } from "../../services/userService";
-import { getBookings, cancelBooking, formatInr } from "../../utils/bookingUtils";
+import { useCancelBookingMutation, useGetMyBookingsQuery } from "../../services/bookingService";
+import { getBookings, cancelBooking as localCancelBooking, formatInr } from "../../utils/bookingUtils";
 
 
 const DEFAULT_AVATAR =
@@ -56,6 +57,8 @@ export default function ProfilePage() {
   const [updateUser, { isLoading: isSaving }] = useUpdateUserMutation();
   const [updateAvatar, { isLoading: isUploadingAvatar }] =
     useUpdateAvatarMutation();
+  const [cancelApiBooking] = useCancelBookingMutation();
+  const { refetch: refetchBookings } = useGetMyBookingsQuery();
 
   const [activeTab, setActiveTab] = useState("overview");
   const [isEditing, setIsEditing] = useState(false);
@@ -197,13 +200,25 @@ export default function ProfilePage() {
     reader.readAsDataURL(file);
   };
 
-  const handleCancelBooking = (id, status) => {
+  const handleCancelBooking = async (id, status) => {
     if (status === "cancelled") return;
     const ok = window.confirm("Cancel this booking?");
     if (!ok) return;
-    cancelBooking(id);
-    setBookings(getBookings());
-    toast.success("Booking cancelled");
+
+    try {
+      // 1. Cancel in DB
+      const bookingToCancel = bookings.find(b => b.id === id || b._id === id);
+      const dbId = bookingToCancel?._id || id;
+      await cancelApiBooking(dbId).unwrap();
+      
+      // 2. Local fallback
+      localCancelBooking(id);
+      setBookings(getBookings());
+      refetchBookings();
+      toast.success("Booking cancelled");
+    } catch (err) {
+      toast.error("Failed to cancel booking in database");
+    }
   };
 
   /* ---------------- LOGOUT ---------------- */
@@ -260,7 +275,8 @@ export default function ProfilePage() {
                 <div className="w-28 h-28 rounded-2xl overflow-hidden relative">
                   <img
                     src={avatarPreview || DEFAULT_AVATAR}
-                    alt="avatar"
+                    alt=""
+                    referrerPolicy="no-referrer"
                     className={`w-full h-full object-cover transition-opacity ${isUploadingAvatar ? "opacity-30" : "opacity-100"}`}
                   />
                   {isUploadingAvatar && (

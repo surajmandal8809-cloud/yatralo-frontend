@@ -28,7 +28,7 @@ function HotelCard({ hotel, index, onBook }) {
             <div className="flex flex-col md:flex-row">
                 <div className="md:w-72 relative overflow-hidden rounded-[2rem]">
                     <img
-                        src={hotel.image || "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=60"}
+                        src={hotel.image || "/assets/img/img_2dc438666a.jpg"}
                         alt={hotel.name}
                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 aspect-[4/3] md:aspect-square"
                     />
@@ -81,10 +81,10 @@ function HotelCard({ hotel, index, onBook }) {
 }
 
 const MOCK_HOTELS = [
-    { id: 1, name: "The Grand Regal Hotel", city: "Mumbai", price: 8500, rating: "4.8", image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=800" },
-    { id: 2, name: "Ocean Breeze Resort", city: "Goa", price: 12400, rating: "4.9", image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=800" },
-    { id: 3, name: "City Center Suites", city: "Delhi", price: 4200, rating: "4.2", image: "https://images.unsplash.com/photo-1551882547-ff43c69e5cf2?q=80&w=800" },
-    { id: 4, name: "Heritage Palace Stay", city: "Jaipur", price: 6800, rating: "4.6", image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=800" },
+    { id: 1, name: "The Grand Regal Hotel", city: "Mumbai", price: 8500, rating: "4.8", image: "/assets/img/img_f0726367ba.jpg" },
+    { id: 2, name: "Ocean Breeze Resort", city: "Goa", price: 12400, rating: "4.9", image: "/assets/img/img_30bf67cf24.jpg" },
+    { id: 3, name: "City Center Suites", city: "Delhi", price: 4200, rating: "4.2", image: "/assets/img/img_2fb2e54a39.jpg" },
+    { id: 4, name: "Heritage Palace Stay", city: "Jaipur", price: 6800, rating: "4.6", image: "/assets/img/img_11fb8a464f.jpg" },
 ];
 
 export default function HotelSearchResultsPage() {

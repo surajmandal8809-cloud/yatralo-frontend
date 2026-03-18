@@ -32,6 +32,7 @@ import {
 import toast from "react-hot-toast";
 import { useGetUserQuery } from "../../services/userService";
 import { useGetCouponsQuery } from "../../services/couponService";
+import { useCreateBookingMutation } from "../../services/bookingService";
 import { addBooking, formatInr, isInternational } from "../../utils/bookingUtils";
 
 const STEPS = ["Review", "Payment", "Success"];
@@ -53,6 +54,7 @@ export default function CheckoutPage() {
     const [appliedCoupon, setAppliedCoupon] = useState(null);
     const [promoCode, setPromoCode] = useState("");
 
+    const [createBooking] = useCreateBookingMutation();
     const { data: couponsData } = useGetCouponsQuery(type);
 
     // Pre-fill first passenger if user is logged in (only runs when userData changes)
@@ -114,41 +116,53 @@ export default function CheckoutPage() {
                 toast.error(isGlobal ? "Please fill name, age and passport details" : "Please fill all passenger details");
                 return;
             }
-            setCurrentStep(1);
-        } else if (currentStep === 1) {
-            // Simulate Payment
-            setLoading(true);
+               // Simulated / Real Payment + Save to DB
             const totalToPay = calculateTotal();
-            setTimeout(() => {
-                const result = {
-                    id: `BK-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
-                    bookingRef: `YT${Math.floor(100000 + Math.random() * 900000)}`,
-                    type,
-                    fromCode: from,
-                    toCode: to,
-                    fromName,
-                    toName,
-                    travelDate: date,
-                    departTime: item.dep,
-                    arriveTime: item.arr,
-                    passengers: pax,
-                    passengerDetails: passengers,
-                    totalPrice: totalToPay,
-                    meal: item.meal,
-                    class: item.class,
-                    isSecureTrip,
-                    coupon: appliedCoupon?.code,
-                    providerName: isFlight ? item.airline : item.name,
-                    providerCode: isFlight ? item.flightNo : item.trainNo,
-                    status: "confirmed",
-                    bookedAt: new Date().toISOString(),
-                };
-                addBooking(result);
-                setBookingResult(result);
-                setLoading(false);
-                setCurrentStep(2);
-                toast.success("Booking Confirmed!");
-            }, 2000);
+            const result = {
+                id: `BK-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`,
+                bookingRef: `YT${Math.floor(100000 + Math.random() * 900000)}`,
+                type,
+                fromCode: from,
+                toCode: to,
+                fromName,
+                toName,
+                travelDate: date,
+                departTime: item.dep,
+                arriveTime: item.arr,
+                passengers: pax,
+                passengerDetails: passengers,
+                totalPrice: totalToPay,
+                meal: item.meal,
+                class: item.class,
+                isSecureTrip,
+                coupon: appliedCoupon?.code,
+                providerName: isFlight ? item.airline : item.name,
+                providerCode: isFlight ? item.flightNo : item.trainNo,
+                status: "confirmed",
+                bookedAt: new Date().toISOString(),
+                seats: item.seats || "",
+                selection: item.selection || []
+            };
+
+            const performBooking = async () => {
+                setLoading(true);
+                try {
+                    // 1. Call Backend API to save in Mongo
+                    const response = await createBooking(result).unwrap();
+                    
+                    if (response.success) {
+                         
+                        RazorpayHandle(response);
+                    }
+                } catch (error) {
+                    console.error("Booking failed:", error);
+                    toast.error(error?.data?.message || "Failed to save booking. Please try again.");
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            performBooking();
         }
     };
 
@@ -156,6 +170,78 @@ export default function CheckoutPage() {
         if (currentStep > index) return <Check size={16} className="text-white" />;
         return <span className="text-sm font-bold">{index + 1}</span>;
     };
+
+
+    const RazorpayHandle = (response) => {
+        var options = {
+    "key": "rzp_test_SSesz1GFvxuPR3", // Enter the Key ID generated from the Dashboard
+    "amount": response.booking.totalPrice * 100, // Amount is in currency subunits.
+    "currency": "INR",
+    "name": "Yatralo", //your business name
+    "description": "Test Transaction", //optional
+    "image": "https://example.com/your_logo",
+    "order_id": response.orderId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+    "handler": function (response){
+        addBooking({
+            ...response.booking,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature
+        });
+        setBookingResult({
+            ...response.booking,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature
+        });
+        
+        setCurrentStep(1);
+        toast.success("Payment successful! Booking confirmed.");
+    },
+    "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+        "name": "Gaurav Kumar", //your customer's name
+        "email": "gaurav.kumar@example.com", 
+        "contact": "+919876543210"  //Provide the customer's phone number for better conversion rates 
+    },
+    "notes": {
+        "address": "Razorpay Corporate Office"
+    },
+    "theme": {
+        "color": "#3399cc"
+    }
+};
+var rzp1 = new window.Razorpay(options);
+rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+        
+        addBooking({
+            ...response.booking,
+            razorpay_payment_id: response.error.metadata.payment_id,
+            razorpay_order_id: response.error.metadata.order_id,
+            razorpay_signature: "FAILED"
+        });
+            setBookingResult({
+            ...response.booking,
+            razorpay_payment_id: response.error.metadata.payment_id,
+            razorpay_order_id: response.error.metadata.order_id,
+            razorpay_signature: "FAILED"
+        });
+            setCurrentStep(1);
+            toast.error("Payment failed! Please try again.");
+
+});
+
+    rzp1.open();
+ 
+
+
+}
 
     return (
         <div className="min-h-screen bg-[#f2f2f2] pt-24 pb-20 font-sans">
@@ -579,122 +665,17 @@ export default function CheckoutPage() {
 
 
 
-                {currentStep === 1 && (
-                    <div className="max-w-2xl mx-auto">
-                        <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-                            <div className="p-8 border-b border-slate-100 text-center">
-                                <div className="w-16 h-16 bg-orange-50 text-[#f97316] rounded-2xl flex items-center justify-center mx-auto mb-4">
-                                    <CreditCard size={32} />
-                                </div>
-                                <h2 className="text-2xl font-black text-slate-900">Payment Selection</h2>
-                                <p className="text-slate-500 font-bold mt-1">Select your preferred payment method</p>
-                                <div className="mt-4 inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-1.5 rounded-full text-xs font-black">
-                                    <Lock size={12} />
-                                    SECURE 256-BIT ENCRYPTION
-                                </div>
-                            </div>
 
-                            <div className="p-8 space-y-4">
-                                <div className="space-y-3">
-                                    <div className="p-5 border-2 border-[#f97316] bg-orange-50/50 rounded-2xl flex items-center justify-between cursor-pointer">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-8 h-8 rounded-full border-4 border-[#f97316] bg-white" />
-                                            <div>
-                                                <p className="text-sm font-black text-slate-900">Credit / Debit Card</p>
-                                                <p className="text-xs text-slate-500 font-bold">Visa, Mastercard, RuPay, Amex</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex gap-1">
-                                            <div className="w-8 h-5 bg-slate-200 rounded sm" />
-                                            <div className="w-8 h-5 bg-slate-200 rounded sm" />
-                                        </div>
-                                    </div>
-
-                                    <div className="p-5 border border-slate-200 rounded-2xl flex items-center justify-between opacity-60 grayscale cursor-not-allowed">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-8 h-8 rounded-full border-2 border-slate-200" />
-                                            <div>
-                                                <p className="text-sm font-black text-slate-900">UPI / QR Scan</p>
-                                                <p className="text-xs text-slate-500 font-bold">Google Pay, PhonePe, Paytm</p>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="p-5 border border-slate-200 rounded-2xl flex items-center justify-between opacity-60 grayscale cursor-not-allowed">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-8 h-8 rounded-full border-2 border-slate-200" />
-                                            <div>
-                                                <p className="text-sm font-black text-slate-900">Net Banking</p>
-                                                <p className="text-xs text-slate-500 font-bold">Safe & Secure bank transfer</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-8 p-6 bg-slate-50 rounded-2xl space-y-4">
-                                    <div>
-                                        <label className="text-[11px] font-black text-slate-500 uppercase mb-1.5 block tracking-widest">Card Number</label>
-                                        <input type="text" placeholder="XXXX XXXX XXXX XXXX" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none text-sm font-bold" />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="text-[11px] font-black text-slate-500 uppercase mb-1.5 block tracking-widest">Expiry</label>
-                                            <input type="text" placeholder="MM/YY" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none text-sm font-bold" />
-                                        </div>
-                                        <div>
-                                            <label className="text-[11px] font-black text-slate-500 uppercase mb-1.5 block tracking-widest">CVV</label>
-                                            <input type="password" placeholder="***" className="w-full px-4 py-3 rounded-xl border border-slate-200 outline-none text-sm font-bold" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="pt-4">
-                                    <div className="flex justify-between items-center mb-6">
-                                        <div>
-                                            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Amount to Pay</p>
-                                            <p className="text-2xl font-black text-slate-900">{formatInr(item.price)}</p>
-                                        </div>
-                                        <button
-                                            onClick={() => setCurrentStep(0)}
-                                            className="text-xs font-black text-[#f97316] hover:underline"
-                                        >
-                                            Back to Review
-                                        </button>
-                                    </div>
-
-                                    <button
-                                        onClick={handleNext}
-                                        disabled={loading}
-                                         className="w-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-semibold py-4 rounded-xl shadow-xl shadow-violet-100 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-                                    >
-                                        {loading ? (
-                                            <>
-                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                PROCESSING PAYMENT...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Lock size={18} />
-                                                PAY {formatInr(item.price)} NOW
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {currentStep === 2 && bookingResult && (
+                {currentStep === 1 && bookingResult && (
                     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in zoom-in duration-500">
 
                         {/* Success Hero */}
                         <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-100">
-                            <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-10 text-white text-center">
+                            <div className={`bg-gradient-to-br ${bookingResult.status === "Confirmed" ? "from-emerald-500 to-teal-600" : "from-rose-500 to-pink-600"} p-10 text-white text-center`}>
                                 <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white/30 scale-110">
                                     <CheckCircle2 size={48} />
                                 </div>
-                                <h1 className="text-4xl font-black mb-2 tracking-tight">Booking Confirmed!</h1>
+                                <h1 className="text-4xl font-black mb-2 tracking-tight">Booking {bookingResult.status}!</h1>
                                 <p className="text-emerald-50 font-bold opacity-90">Your ticket has been booked successfully</p>
                                 <div className="mt-8 inline-flex items-center gap-6 bg-black/10 px-6 py-3 rounded-2xl backdrop-blur-sm border border-white/10">
                                     <div>
@@ -704,7 +685,7 @@ export default function CheckoutPage() {
                                     <div className="w-px h-8 bg-white/20" />
                                     <div>
                                         <p className="text-[10px] uppercase font-black tracking-widest opacity-60">Status</p>
-                                        <p className="text-lg font-black uppercase">Confirmed</p>
+                                        <p className="text-lg font-black uppercase">{bookingResult.status}</p>
                                     </div>
                                 </div>
                             </div>

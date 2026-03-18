@@ -1,4 +1,17 @@
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Lato', system-ui, sans-serif;
+}
+
+html, body {
+  font-family: 'Lato', system-ui, sans-serif;
+}
+
+* {
+  font-family: 'Lato', system-ui, sans-serif;
+}
+
 /* ===== SLIDER WRAPPER ===== */
 .destination-swiper {
   padding: 40px 0 70px;

@@ -129,7 +129,7 @@ const Header = () => {
               <div className="flex items-center gap-3 px-1 py-1 rounded-2xl cursor-pointer group/profile">
                 <div className="relative">
                     {user?.avatar ? (
-                    <img src={user.avatar} alt="avatar"
+                    <img src={user.avatar} alt="avatar" referrerPolicy="no-referrer"
                         className="w-10 h-10 rounded-full border-2 border-[#7c3aed] object-cover ring-4 ring-violet-500/5" />
                     ) : (
                     <div className="w-10 h-10 rounded-full border-2 border-[#7c3aed] bg-violet-50 flex items-center justify-center text-xs font-black text-[#7c3aed] ring-4 ring-violet-500/5">
@@ -186,7 +186,7 @@ const Header = () => {
               <div className="py-4 border-b border-gray-100 mb-2">
                 <div className="flex items-center gap-4">
                   {user?.avatar ? (
-                    <img src={user.avatar} alt="avatar" className="w-12 h-12 rounded-full border-2 border-[#7c3aed] object-cover" />
+                    <img src={user.avatar} alt="avatar" referrerPolicy="no-referrer" className="w-12 h-12 rounded-full border-2 border-[#7c3aed] object-cover" />
                   ) : (
                     <div className="w-12 h-12 rounded-full border-2 border-[#7c3aed] bg-violet-50 flex items-center justify-center text-sm font-black text-[#7c3aed]">
                       {user?.first_name?.[0] || user?.email?.[0]}

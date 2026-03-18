@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { CITIES } from "../utils/bookingUtils";
+import { CITIES } from "../../utils/bookingUtils";
 import {
     Search,
     MapPin,
@@ -18,7 +18,7 @@ import {
     Sparkles
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { getBaseURL } from "../services/baseApi";
+import { getBaseURL } from "../../services/baseApi";
 
 
 const CityBox = ({ label, value, onChange }) => {

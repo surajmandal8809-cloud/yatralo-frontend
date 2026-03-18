@@ -25,7 +25,7 @@ import {
   useUpdateUserMutation,
 } from "../../services/userService";
 import { useCancelBookingMutation, useGetMyBookingsQuery } from "../../services/bookingService";
-import { getBookings, cancelBooking as localCancelBooking, formatInr } from "../../utils/bookingUtils";
+import { getBookings, cancelBooking as localCancelBooking, formatInr, clearAllBookings } from "../../utils/bookingUtils";
 
 
 const DEFAULT_AVATAR =
@@ -501,7 +501,17 @@ export default function ProfilePage() {
               <h3 className="text-lg font-black text-slate-900">Recent Bookings</h3>
               <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Manage your upcoming and past trips</p>
             </div>
-            <Ticket className="text-[#f97316]" size={24} />
+            <div className="flex items-center gap-3">
+              {recentBookings.length > 0 && (
+                <button 
+                  onClick={() => { if(window.confirm("Clear all booking history?")) clearAllBookings(); }}
+                  className="px-4 py-2 bg-rose-50 text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-100 transition-all border border-rose-100"
+                >
+                  Clear History
+                </button>
+              )}
+              <Ticket className="text-[#f97316]" size={24} />
+            </div>
           </div>
           <div className="divide-y divide-slate-100">
             {recentBookings.length === 0 ? (
@@ -572,9 +582,9 @@ export default function ProfilePage() {
               })
             )}
           </div>
-          {recentBookings.length > 0 && (
+          {recentBookings.length > 5 && (
             <div className="p-4 bg-slate-50 text-center border-t border-slate-100">
-              <Link to="/bookings" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-[#7c3aed] transition-colors">View All Bookings</Link>
+              <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Total {bookings.length} Bookings</p>
             </div>
           )}
         </div>

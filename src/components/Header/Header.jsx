@@ -64,8 +64,7 @@ const Header = () => {
     { name: "Trains", path: "/trains" },
     { name: "Buses", path: "/buses" },
     { name: "Destinations", path: "/destinations" },
-    { name: "Offers", path: "/deals" },
-    { name: "My Bookings", path: "/bookings" }
+    { name: "Offers", path: "/deals" }
   ];
 
   const isHomePage = location.pathname === "/";
@@ -157,9 +156,6 @@ const Header = () => {
                         <Link to="/profile" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-violet-50 text-sm font-bold text-gray-700 transition-colors">
                             <FiUser className="text-[#7C3AED]" /> My Profile
                         </Link>
-                        <Link to="/bookings" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-violet-50 text-sm font-bold text-gray-700 transition-colors">
-                            <FiSettings className="text-[#7C3AED]" /> Manage Bookings
-                        </Link>
                         <div className="h-px bg-gray-100 my-2" />
                         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-sm font-bold text-red-600 transition-colors">
                             <FiLogOut /> Logout
@@ -219,7 +215,6 @@ const Header = () => {
             {user && (
               <div className="space-y-2 pt-4">
                 <Link to="/profile" className="block text-sm font-bold text-gray-700 py-2">Account Settings</Link>
-                <Link to="/bookings" className="block text-sm font-bold text-gray-700 py-2">My Bookings</Link>
                 <button onClick={handleLogout}
                   className="w-full text-left text-red-600 text-sm font-black py-4 flex items-center gap-2">
                   <FiLogOut size={18} />

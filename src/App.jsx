@@ -15,12 +15,11 @@ import DealsPage from "./components/Deals/DealsPage";
 import VerifyPage from "./pages/auth/Verify";
 import Otpverifypage from "./pages/auth/Otpverifypage";
 import NotFound from "./pages/NotFound";
-import BookingsPage from "./pages/BookingsPage";
 
 // Flight Pages
 import FlightLandingPage from "./pages/flight/FlightLandingPage";
 import FlightSearchResultsPage from "./pages/flight/FlightSearchResultsPage";
-import CheckoutPage from "./pages/flight/CheckoutPage";
+import CheckoutPage from "./pages/flight/checkout/CheckoutPage";
 import BookingSelectionPage from "./pages/flight/BookingSelectionPage";
 
 // Hotel Pages
@@ -64,10 +63,8 @@ function App() {
             <Route path="buses" element={<BusLandingPage />} />
             <Route path="buses/results" element={<BusSearchResultsPage />} />
             
-            {/* Common Booking Flow */}
             <Route path="checkout" element={<CheckoutPage />} />
             <Route path="booking-selection" element={<BookingSelectionPage />} />
-            <Route path="bookings" element={<BookingsPage />} />
           </Route>
 
           {/* Auth routes */}

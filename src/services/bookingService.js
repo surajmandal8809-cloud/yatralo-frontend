@@ -10,6 +10,10 @@ export const bookingService = createApi({
             query: (body) => ({ url: "/bookings/create", method: "POST", body }),
             invalidatesTags: ["Booking"],
         }),
+        verifyPayment: builder.mutation({
+            query: (body) => ({ url: "/bookings/verify", method: "POST", body }),
+            invalidatesTags: ["Booking"],
+        }),
         getMyBookings: builder.query({
             query: () => ({ url: "/bookings/my", method: "GET" }),
             providesTags: ["Booking"],
@@ -23,6 +27,7 @@ export const bookingService = createApi({
 
 export const {
     useCreateBookingMutation,
+    useVerifyPaymentMutation,
     useGetMyBookingsQuery,
     useCancelBookingMutation
 } = bookingService;

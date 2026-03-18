@@ -78,3 +78,8 @@ export const cancelBooking = (id) => {
     localStorage.setItem("yatralo-bookings", JSON.stringify(updated));
     window.dispatchEvent(new Event("bookings-updated"));
 };
+
+export const clearAllBookings = () => {
+    localStorage.removeItem("yatralo-bookings");
+    window.dispatchEvent(new Event("bookings-updated"));
+};

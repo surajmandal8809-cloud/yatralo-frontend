@@ -29,10 +29,18 @@ export const flightService = createApi({
         method: "GET",
       }),
     }),
-    getRealtimeFlights: builder.query({
-      query: () => ({
-        url: `/flights/realtime`,
-        method: "GET",
+    createBooking: builder.mutation({
+      query: (bookingData) => ({
+        url: `/bookings/create`,
+        method: "POST",
+        body: bookingData,
+      }),
+    }),
+    verifyPayment: builder.mutation({
+      query: (paymentData) => ({
+        url: `/bookings/verify`,
+        method: "POST",
+        body: paymentData,
       }),
     }),
   }),
@@ -42,5 +50,7 @@ export const {
   useSearchFlightsQuery, 
   useLazySearchAirportsQuery,
   useGetAirportsQuery,
-  useGetRealtimeFlightsQuery
+  useGetRealtimeFlightsQuery,
+  useCreateBookingMutation,
+  useVerifyPaymentMutation
 } = flightService;

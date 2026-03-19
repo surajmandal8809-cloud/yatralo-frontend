@@ -13,6 +13,8 @@ import {
   TrendingDown
 } from "lucide-react";
 import SearchForm from "../../components/HeroSection/SearchForm";
+import FlightSearchWidget from "./FlightSearchWidget";
+
 
 const FlightLandingPage = () => {
   const navigate = useNavigate();
@@ -107,8 +109,9 @@ const FlightLandingPage = () => {
           </motion.div>
 
           <div className="w-full mt-10">
-            <SearchForm />
+            <FlightSearchWidget />
           </div>
+
         </div>
       </section>
 

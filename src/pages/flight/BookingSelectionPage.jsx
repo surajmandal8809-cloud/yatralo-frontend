@@ -1,618 +1,359 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-    Plane, 
-    Train, 
-    Hotel, 
-    ChevronLeft, 
-    ArrowRight, 
-    Check, 
-    Wifi, 
-    Coffee, 
-    Zap, 
-    Users, 
-    ShieldCheck, 
-    Sparkles,
-    Armchair,
-    Utensils,
-    Star,
-    Info,
-    X,
-    Clock,
-    ChevronDown
+  Plane, 
+  ChevronLeft, 
+  ArrowRight, 
+  Check, 
+  Wifi, 
+  Coffee, 
+  Zap, 
+  ShieldCheck, 
+  Sparkles,
+  Armchair,
+  Utensils,
+  Info,
+  X,
+  Clock,
+  Briefcase,
+  Layers,
+  ChevronDown,
+  Gift,
+  Plus,
+  Minus,
+  ChevronRight
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { MEAL_OPTIONS, formatInr } from "../../utils/bookingUtils";
 
 const BookingSelectionPage = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
-    const { 
-        type, 
-        flight, 
-        train, 
-        bus, 
-        hotel, 
-        from, 
-        to, 
-        fromName, 
-        toName, 
-        date, 
-        pax = 1 
-    } = location.state || {};
+  const navigate = useNavigate();
+  const [selectedFlight, setSelectedFlight] = useState(null);
+  
+  const [selectedSeat, setSelectedSeat] = useState([]);
+  const [selectedMeal, setSelectedMeal] = useState(null);
+  const [extraBaggage, setExtraBaggage] = useState(0);
+  const [insurance, setInsurance] = useState(true);
+  
+  const [showSeatModal, setShowSeatModal] = useState(false);
+  const [showFareBreakup, setShowFareBreakup] = useState(false);
 
-    const [bookingStep, setBookingStep] = useState(1); // 1: Class/Menu, 2: Seat/Room Selection
-    const [selectedClass, setSelectedClass] = useState(type === "flight" ? "Economy" : (type === "train" || type === "bus" ? "Standard" : "Standard"));
-    const [selectedMeal, setSelectedMeal] = useState(MEAL_OPTIONS[0]);
-    const [showMealMenu, setShowMealMenu] = useState(false);
-    const [activeCategory, setActiveCategory] = useState("Veg");
-    const [selectedItems, setSelectedItems] = useState([]); // Seats or Rooms
-    
-    // Redirect if no state
-    useEffect(() => {
-        if (!location.state) {
-            navigate("/");
-        }
-    }, [location.state, navigate]);
+  useEffect(() => {
+    const flight = localStorage.getItem("yatralo-selected-flight");
+    const info = localStorage.getItem("yatralo-booking-info");
+    if (flight) {
+      setSelectedFlight(JSON.parse(flight));
+    } else {
+      navigate("/");
+    }
+  }, [navigate]);
 
-    const item = useMemo(() => flight || train || bus || hotel, [flight, train, bus, hotel]);
+  const generateSeats = () => {
+    const seats = [];
+    const rows = 12;
+    const cols = ['A', 'B', 'C', 'D', 'E', 'F'];
+    for (let r = 1; r <= rows; r++) {
+      cols.forEach(c => {
+        const id = `${r}${c}`;
+        const isOccupied = Math.random() < 0.3;
+        const isPremium = r < 4;
+        const price = isPremium ? 800 : (r > 8 ? 150 : 350);
+        seats.push({ id, isOccupied, isPremium, price });
+      });
+    }
+    return seats;
+  };
 
-    // --- Dynamic Pricing ---
-    const classExtra = useMemo(() => {
-        if (type === "flight") return selectedClass === "Business" ? 2500 : 0;
-        if (type === "train") return selectedClass === "2A" ? 800 : (selectedClass === "1A" ? 1800 : 0);
-        return 0;
-    }, [type, selectedClass]);
+  const seatGrid = useMemo(() => generateSeats(), []);
 
+  if (!selectedFlight) return null;
 
-    // --- Seat/Room Generation ---
-    const seatGrid = useMemo(() => {
-        if (type === "flight") {
-            const grid = [];
-            const ROWS = 12;
-            const COLS = 6;
-            for (let r = 1; r <= ROWS; r++) {
-                for (let c = 0; c < COLS; c++) {
-                    const label = `${r}${String.fromCharCode(65 + c)}`;
-                    const isOccupied = Math.random() < 0.3;
-                    const isPremium = r < 4;
-                    const price = isPremium ? 800 : (r > 8 ? 150 : 350);
-                    grid.push({ label, isOccupied, isPremium, row: r, col: c, price });
-                }
-            }
-            return grid;
-        }
-        if (type === "train") {
-            const grid = [];
-            const CABINS = 8;
-            for (let c = 1; c <= CABINS; c++) {
-                ["LB", "MB", "UB", "LB", "MB", "UB", "SL", "SU"].forEach((berthType, i) => {
-                    const label = `${c}-${berthType}${i+1}`;
-                    grid.push({ label, type: berthType, isOccupied: Math.random() < 0.25, price: berthType === "LB" ? 150 : 50 });
-                });
-            }
-            return grid;
-        }
-        if (type === "bus") {
-            const grid = [];
-            for(let r=1; r<=10; r++) {
-               ["A", "B", "C", "D"].forEach(c => {
-                  grid.push({ label: `${r}${c}`, isOccupied: Math.random() < 0.3, price: 100 });
-               });
-            }
-            return grid;
-        }
-        return [];
-    }, [type]);
+  const pax = Number(selectedFlight.pax) || 1; 
+  const baseFare = Number(selectedFlight.price) || 0; 
+  const fuelSurcharge = 850 * pax;
+  const airportTax = 420 * pax;
+  const convenienceFee = 300;
+  const seatPrice = selectedSeat.reduce((acc, s) => acc + (Number(s.price) || 0), 0);
+  const mealPrice = selectedMeal ? (Number(selectedMeal.price) || 0) * pax : 0;
+  const baggagePrice = (Number(extraBaggage) || 0) * 450;
+  const insurancePrice = insurance ? 249 * pax : 0;
 
-    const seatSelectionPrice = useMemo(() => {
-        if (type === "hotel" || !seatGrid.length) return 0;
-        let sum = 0;
-        selectedItems.forEach(label => {
-            const seat = seatGrid.find(s => s.label === label);
-            if (seat && seat.price) {
-                sum += seat.price;
-            }
-        });
-        return sum;
-    }, [selectedItems, seatGrid, type]);
+  const totalPayable = baseFare + fuelSurcharge + airportTax + convenienceFee + seatPrice + mealPrice + baggagePrice + insurancePrice;
 
-    const totalPrice = useMemo(() => {
-        if (!item) return 0;
-        const base = item.price || 0;
-        const mealPrice = (type === "flight" ? (selectedMeal.price || 0) : 0);
-        return base + ((classExtra + mealPrice) * pax) + seatSelectionPrice;
-    }, [item, classExtra, pax, selectedMeal, type, seatSelectionPrice]);
+  const mealOptions = [
+    { id: 'veg-sandwich', name: 'Veg Sandwich', price: 250, icon: '🥪', category: 'Veg' },
+    { id: 'chicken-tikka', name: 'Chicken Tikka', price: 450, icon: '🍗', category: 'Non-Veg' },
+    { id: 'jain-meal', name: 'Jain Meal', price: 300, icon: '🥗', category: 'Jain' },
+  ];
 
-    const toggleSelection = (id) => {
-        if (selectedItems.includes(id)) {
-            setSelectedItems(selectedItems.filter(i => i !== id));
-        } else {
-            if (selectedItems.length < pax) {
-                setSelectedItems([...selectedItems, id]);
-            } else {
-                toast.error(`You can only select ${pax} ${type === "hotel" ? "room" : "seat"}${pax > 1 ? 's' : ''}`);
-            }
-        }
+  const handleContinue = () => {
+    const addOns = {
+      seats: selectedSeat.map(s => s.id),
+      meals: selectedMeal ? [selectedMeal.id] : [],
+      baggage: extraBaggage,
+      insurance: insurance,
+      totalPrice: totalPayable
     };
+    localStorage.setItem("yatralo-addons", JSON.stringify(addOns));
+    navigate("/checkout");
+  };
 
-    const handleConfirm = () => {
-        if (selectedItems.length < pax && type === "hotel") {
-            toast.error(`Please select ${pax} room${pax > 1 ? 's' : ''}`);
-            return;
-        }
+  return (
+    <>
+      <div className="min-h-screen bg-[#f2f2f2] font-sans pt-20 pb-20">
+        <div className="max-w-6xl mx-auto px-4">
+          
+          {/* Progress (MMT Style) */}
+          <div className="flex items-center gap-4 mb-8 text-[12px] font-bold">
+             <span className="text-[#008cff]">Flight Search</span>
+             <ChevronRight size={14} className="text-[#4a4a4a]" />
+             <span className="text-[#222]">Review Your Booking</span>
+          </div>
 
-        navigate("/checkout", {
-            state: {
-                ...location.state,
-                [type]: {
-                    ...item,
-                    price: totalPrice,
-                    class: selectedClass,
-                    meal: selectedMeal.name,
-                    selection: selectedItems,
-                    seats: selectedItems.join(", "),
-                }
-            }
-        });
-    };
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+            
+            <main className="space-y-6">
+               {/* Itinerary */}
+               <section className="bg-white rounded shadow-sm border border-[#e7e7e7] overflow-hidden">
+                  <div className="p-4 border-b border-[#f2f2f2] flex items-center justify-between bg-[#f9f9f9]">
+                     <h3 className="text-[16px] font-bold text-[#222]">Review Your Itinerary</h3>
+                  </div>
+                  
+                  <div className="p-6">
+                     <div className="flex items-center gap-4 mb-6">
+                        <img src={`https://imgak.mmtcdn.com/flights/assets/media/dt/common/icons/${selectedFlight.code}.png`} className="w-6" alt="" />
+                        <span className="text-[14px] font-bold text-[#222]">{selectedFlight.airline}</span>
+                        <span className="text-[12px] text-[#4a4a4a] px-2 py-0.5 bg-[#f2f2f2] rounded">{selectedFlight.flightNo} • ECONOMY</span>
+                     </div>
 
-    if (!item) return null;
-
-    return (
-        <div className="min-h-screen bg-slate-50 pt-24 pb-12">
-            <div className="max-w-7xl mx-auto px-6">
-                
-                {/* Header Section */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
-                    <div>
-                        <button 
-                            onClick={() => navigate(-1)}
-                            className="flex items-center gap-2 text-slate-400 hover:text-[#7c3aed] transition-colors mb-4 font-black uppercase text-[10px] tracking-widest"
-                        >
-                            <ChevronLeft size={16} /> Back to Search
-                        </button>
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tighter">
-                            Customize Your <span className="text-[#f97316]">Experience</span>
-                        </h1>
-                        <p className="text-slate-400 font-bold text-sm mt-1">
-                            {type.charAt(0).toUpperCase() + type.slice(1)} Selection for {fromName} to {toName}
-                        </p>
-                    </div>
-
-                    <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-xl shadow-slate-200/50 flex items-center gap-8">
-                        <div className="text-right">
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Total Payable</p>
-                            <p className="text-3xl font-black text-slate-900 leading-none">₹{totalPrice.toLocaleString()}</p>
-                            <p className="text-[10px] font-black text-[#f97316] mt-1.5 uppercase tracking-tighter">Inclusive of all taxes</p>
-                        </div>
-                        <button 
-                            onClick={handleConfirm}
-                            className="bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:opacity-90 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-violet-100 flex items-center gap-3 transition-all active:scale-95"
-                        >
-                            Confirm Booking <ArrowRight size={16} />
-                        </button>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-10">
-                    
-                    {/* Left: Summary & Options */}
-                    <aside className="space-y-6">
-                        {/* Summary Card */}
-                        <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden group">
-                            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                                {type === "flight" ? <Plane size={120} /> : (type === "train" || type === "bus" ? <Train size={120} /> : <Hotel size={120} />)}
-                            </div>
-                            
-                            <div className="relative z-10">
-                                <div className="flex items-center gap-4 mb-8">
-                                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-xl font-black shadow-lg" style={{ background: item.bg || '#7c3aed' }}>
-                                        {item.code || (type === "hotel" ? <Hotel /> : "T")}
-                                    </div>
-                                    <div>
-                                        <p className="text-lg font-black">{item.airline || item.name}</p>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{item.flightNo || item.trainNo || "Premium Est."}</p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-6">
-                                    <div className="flex justify-between items-center">
-                                        <div className="text-left">
-                                            <p className="text-2xl font-black leading-none">{item.dep || "14:00"}</p>
-                                            <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mt-2">{fromName}</p>
-                                        </div>
-                                        <div className="flex-1 px-4 flex flex-col items-center">
-                                            <div className="w-full h-px bg-white/10 relative">
-                                                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#f97316]" />
-                                            </div>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-2xl font-black leading-none">{item.arr || "18:00"}</p>
-                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">{toName}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4 pt-6 border-t border-white/10">
-                                        <div>
-                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Date</p>
-                                            <p className="text-xs font-black">{new Date(date).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-1">Travelers</p>
-                                            <p className="text-xs font-black">{pax} Adult{pax > 1 ? 's' : ''}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                     <div className="flex items-center justify-between bg-[#f4f4f4] p-6 rounded">
+                        <div className="text-center md:text-left">
+                           <p className="text-[24px] font-black text-[#222]">{selectedFlight.dep}</p>
+                           <p className="text-[14px] font-bold text-[#222] mt-1">{selectedFlight.originCity} ({selectedFlight.origin})</p>
                         </div>
 
-                        {/* Class & Meal Selection */}
-                        <div className="bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm space-y-8">
-                            <div>
-                                <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
-                                    <Sparkles size={16} className="text-amber-500" /> Choose Class
-                                </h3>
-                                <div className="grid grid-cols-1 gap-3">
-                                    {(type === "flight" ? ["Economy", "Business"] : (type === "train" ? ["3A", "2A", "1A"] : ["Standard", "Deluxe", "Suite"])).map(c => (
-                                        <button 
-                                            key={c}
-                                            onClick={() => setSelectedClass(c)}
-                                            className={`flex items-center justify-between p-4 rounded-2xl border-2 transition-all ${
-                                                selectedClass === c 
-                                                ? "border-[#7c3aed] bg-violet-50/50 shadow-lg" 
-                                                : "border-slate-50 hover:border-slate-200 bg-white"
-                                            }`}
-                                        >
-                                            <div className="flex items-center gap-3">
-                                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${selectedClass === c ? "bg-[#7c3aed] text-white" : "bg-slate-100 text-slate-400"}`}>
-                                                    <Armchair size={18} />
-                                                </div>
-                                                <div className="text-left">
-                                                    <p className={`text-sm font-black ${selectedClass === c ? "text-slate-900" : "text-slate-600"}`}>{c}</p>
-                                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">Availability: High</p>
-                                                </div>
-                                            </div>
-                                            {selectedClass === c && <Check size={16} className="text-[#7c3aed]" />}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {type !== "hotel" && (
-                                <div>
-                                    <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
-                                        <Utensils size={16} className="text-[#f97316]" /> Meal Selection
-                                    </h3>
-                                    
-                                    {type === "flight" && selectedClass === "Business" ? (
-                                        <div className="space-y-4">
-                                            <div className="flex bg-slate-100 p-1 rounded-2xl">
-                                                {["Veg", "Non-Veg"].map(cat => (
-                                                    <button
-                                                        key={cat}
-                                                        onClick={() => setActiveCategory(cat)}
-                                                        className={`flex-1 py-2 text-[10px] font-black rounded-xl transition-all ${activeCategory === cat ? "bg-white text-[#7c3aed] shadow-sm" : "text-slate-500 hover:text-slate-700"}`}
-                                                    >
-                                                        {cat}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                            
-                                            <div className="relative">
-                                                <button 
-                                                    onClick={() => setShowMealMenu(!showMealMenu)}
-                                                    className="w-full flex items-center justify-between p-4 rounded-2xl border-2 border-slate-100 bg-slate-50 hover:bg-white hover:border-[#7c3aed]/30 transition-all font-bold text-sm text-slate-800"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <span>{selectedMeal.icon}</span>
-                                                        <span>{selectedMeal.name}</span>
-                                                    </div>
-                                                    <ChevronDown size={16} className={`transition-transform ${showMealMenu ? 'rotate-180' : ''}`} />
-                                                </button>
-                                                
-                                                <AnimatePresence>
-                                                    {showMealMenu && (
-                                                        <motion.div 
-                                                            initial={{ opacity: 0, y: 10 }}
-                                                            animate={{ opacity: 1, y: 0 }}
-                                                            exit={{ opacity: 0, y: 10 }}
-                                                            className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-slate-200 shadow-2xl z-50 p-2 max-h-[240px] overflow-y-auto custom-scrollbar"
-                                                        >
-                                                            {MEAL_OPTIONS.filter(m => m.category === activeCategory || m.category === "Standard").map(m => (
-                                                                <button
-                                                                    key={m.id}
-                                                                    onClick={() => {
-                                                                        setSelectedMeal(m);
-                                                                        setShowMealMenu(false);
-                                                                    }}
-                                                                    className={`w-full flex items-center justify-between p-3 rounded-xl transition-all ${selectedMeal.id === m.id ? "bg-violet-50 text-[#7c3aed]" : "hover:bg-slate-50 text-slate-700"}`}
-                                                                >
-                                                                    <div className="flex items-center gap-3">
-                                                                        <span className="text-lg">{m.icon}</span>
-                                                                        <div className="text-left">
-                                                                            <p className="text-[11px] font-black">{m.name}</p>
-                                                                            <p className="text-[9px] font-bold opacity-60 tracking-wider">
-                                                                                {m.price > 0 ? `+ ${formatInr(m.price)}` : "COMPLIMENTARY"}
-                                                                            </p>
-                                                                        </div>
-                                                                    </div>
-                                                                    {selectedMeal.id === m.id && <Check size={14} />}
-                                                                </button>
-                                                            ))}
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
-                                            </div>
-                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center px-4">
-                                                Exclusively curated for our {selectedClass} class travelers
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <div className="grid grid-cols-2 gap-3">
-                                            {MEAL_OPTIONS.filter(m => m.category === "Standard").map(m => (
-                                                <button 
-                                                    key={m.id}
-                                                    onClick={() => setSelectedMeal(m)}
-                                                    className={`p-3 rounded-2xl border-2 transition-all flex flex-col items-center gap-1 ${
-                                                        selectedMeal.id === m.id 
-                                                        ? "bg-slate-900 text-white border-slate-900 shadow-lg" 
-                                                        : "bg-white text-slate-500 border-slate-50 hover:border-slate-200"
-                                                    }`}
-                                                >
-                                                    <span className="text-xl">{m.icon}</span>
-                                                    <div className="text-center">
-                                                        <p className="text-[10px] font-black uppercase tracking-tight leading-none mb-1">{m.name}</p>
-                                                        <p className={`text-[8px] font-bold ${selectedMeal.id === m.id ? "text-white/60" : "text-slate-400"}`}>
-                                                            {m.price > 0 ? `+ ${formatInr(m.price)}` : "FREE"}
-                                                        </p>
-                                                    </div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </aside>
-
-                    {/* Right: Interactive Seat Map */}
-                    <main className="bg-white rounded-[3rem] border border-slate-100 p-8 md:p-12 shadow-sm relative overflow-hidden min-h-[800px]">
-                        <div className="flex items-center justify-between mb-12">
-                            <div>
-                                <h3 className="text-2xl font-black text-slate-900 tracking-tight">
-                                    {type === "flight" ? "Aircraft Cabin" : "Coach Compartment"}
-                                </h3>
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Select your preferred {type === "hotel" ? "room" : "seat"}</p>
-                            </div>
-                            <div className="flex items-center gap-4 bg-slate-50 px-5 py-2.5 rounded-2xl border border-slate-100">
-                                <div className="text-center border-r border-slate-200 pr-5">
-                                    <p className="text-[9px] font-black text-slate-400 uppercase mb-0.5">Selected</p>
-                                    <p className="text-sm font-black text-slate-900">{selectedItems.length} / {pax}</p>
-                                </div>
-                                <div className="text-left">
-                                     <p className="text-[9px] font-black text-[#f97316] uppercase mb-0.5">Items</p>
-                                     <p className="text-[10px] font-black text-slate-800 truncate max-w-[100px]">{selectedItems.join(", ") || "-"}</p>
-                                </div>
-                            </div>
+                        <div className="flex-1 flex flex-col items-center">
+                           <p className="text-[11px] text-[#4a4a4a] mb-1">{Math.floor((selectedFlight?.duration || 0)/60)}h {(selectedFlight?.duration || 0)%60}m</p>
+                           <div className="w-1/2 h-[1px] bg-[#e7e7e7] relative">
+                              <Plane size={14} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-[#4a4a4a]" />
+                           </div>
+                           <p className="text-[11px] text-[#4a4a4a] mt-1">Non-stop</p>
                         </div>
 
-                        {type === "flight" && (
-                            <div className="relative max-w-[450px] mx-auto bg-slate-50 rounded-[5rem] p-12 shadow-inner border border-slate-200">
-                                {/* Plane Nose */}
-                                <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-80 h-80 bg-slate-50 border-x-4 border-t-4 border-slate-200 rounded-full z-0 flex flex-col items-center pt-16">
-                                    <div className="w-48 h-10 bg-slate-200/50 rounded-full blur-xl" />
-                                    <div className="flex gap-4 mt-4">
-                                        <div className="w-16 h-8 bg-slate-900/5 rounded-t-lg border-x border-t border-slate-200 flex items-center justify-center">
-                                            <div className="w-10 h-1 bg-white/20 rounded-full" />
-                                        </div>
-                                        <div className="w-16 h-8 bg-slate-900/5 rounded-t-lg border-x border-t border-slate-200 flex items-center justify-center">
-                                            <div className="w-10 h-1 bg-white/20 rounded-full" />
-                                        </div>
-                                    </div>
-                                </div>
+                        <div className="text-center md:text-right">
+                           <p className="text-[24px] font-black text-[#222]">{selectedFlight.arr}</p>
+                           <p className="text-[14px] font-bold text-[#222] mt-1">{selectedFlight.destinationCity} ({selectedFlight.destination})</p>
+                        </div>
+                     </div>
+                  </div>
+               </section>
 
-                                {/* Seat Map Scroll Area */}
-                                <div className="relative z-10 grid grid-cols-6 gap-x-4 gap-y-6 pt-10">
-                                    {seatGrid.map((s, i) => (
-                                        <React.Fragment key={s.label}>
-                                            {i % 6 === 3 && <div className="w-8" />} {/* Aisle */}
-                                            <button 
-                                                disabled={s.isOccupied}
-                                                onClick={() => toggleSelection(s.label)}
-                                                title={s.isOccupied ? "Occupied" : `Seat ${s.label} - ₹${s.price}`}
-                                                className={`group relative aspect-square rounded-xl border-2 transition-all flex items-center justify-center ${
-                                                    s.isOccupied 
-                                                    ? "bg-slate-200 border-slate-300 cursor-not-allowed" 
-                                                    : selectedItems.includes(s.label)
-                                                    ? "bg-[#7c3aed] border-[#7c3aed] shadow-lg shadow-[#7c3aed]/30 scale-110"
-                                                    : s.isPremium 
-                                                    ? "bg-amber-50 border-amber-200 hover:border-amber-400"
-                                                    : "bg-white border-slate-100 hover:border-slate-300"
-                                                }`}
-                                            >
-                                                <div className="flex flex-col items-center">
-                                                    <div className={`text-[9px] font-black ${
-                                                        selectedItems.includes(s.label) ? "text-white" : "text-slate-400"
-                                                    }`}>
-                                                        {s.label}
-                                                    </div>
-                                                    {!s.isOccupied && (
-                                                        <div className={`text-[7px] font-bold ${
-                                                            selectedItems.includes(s.label) ? "text-white/80" : "text-[#f97316]"
-                                                        }`}>
-                                                            ₹{s.price}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                
-                                                {/* Seat Arms Decoration */}
-                                                {!s.isOccupied && (
-                                                    <div className={`absolute -bottom-1 w-2/3 h-1 rounded-full ${
-                                                        selectedItems.includes(s.label) ? "bg-white/40" : "bg-slate-100"
-                                                    }`} />
-                                                )}
-                                            </button>
-                                        </React.Fragment>
-                                    ))}
-                                </div>
+               {/* Add-ons */}
+               <div className="space-y-4">
+                  <h4 className="text-[16px] font-bold text-[#222]">Add-ons & More</h4>
+                  
+                  <div className="bg-white rounded shadow-sm border border-[#e7e7e7] p-5 flex items-center justify-between group cursor-pointer" onClick={() => setShowSeatModal(true)}>
+                     <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded bg-blue-50 text-[#008cff] flex items-center justify-center">
+                           <Armchair size={22} />
+                        </div>
+                        <div>
+                           <p className="text-[14px] font-bold text-[#222]">Select Seats</p>
+                           <p className="text-[11px] text-[#4a4a4a]">Choose your preferred seat from the map</p>
+                        </div>
+                     </div>
+                     {selectedSeat.length > 0 ? (
+                        <span className="text-[12px] font-bold text-[#008cff]">Seats: {selectedSeat.map(s => s.id).join(", ")} • ₹{seatPrice}</span>
+                     ) : (
+                        <Plus size={18} className="text-[#008cff]" />
+                     )}
+                  </div>
 
-                                {/* Legend */}
-                                <div className="mt-16 flex justify-center gap-6 border-t border-slate-200 pt-8">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 rounded-md bg-white border border-slate-200" />
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Available</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 rounded-md bg-amber-50 border border-amber-200" />
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Premium</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 rounded-md bg-[#7c3aed]" />
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Selected</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-4 h-4 rounded-md bg-slate-200" />
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Occupied</span>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
+                  <div className="bg-white rounded shadow-sm border border-[#e7e7e7] p-5">
+                     <div className="flex items-center gap-4 mb-4">
+                        <div className="w-10 h-10 rounded bg-orange-50 text-[#f26722] flex items-center justify-center">
+                           <Utensils size={22} />
+                        </div>
+                        <div>
+                           <p className="text-[14px] font-bold text-[#222]">Gourmet Meals</p>
+                           <p className="text-[11px] text-[#4a4a4a]">Pre-book meals and save on airport prices</p>
+                        </div>
+                     </div>
+                     <div className="flex gap-2">
+                        {mealOptions.map(meal => (
+                          <button 
+                            key={meal.id}
+                            onClick={() => setSelectedMeal(meal)}
+                            className={`flex-1 flex items-center gap-2 p-3 rounded border transition-all ${selectedMeal?.id === meal.id ? 'bg-orange-50 border-[#f26722]' : 'bg-white border-[#e7e7e7] hover:border-[#f26722]'}`}
+                          >
+                             <span className="text-xl">{meal.icon}</span>
+                             <div className="text-left">
+                                <p className="text-[11px] font-bold text-[#222] truncate">{meal.name}</p>
+                                <p className="text-[10px] text-[#f26722]">₹{meal.price}</p>
+                             </div>
+                          </button>
+                        ))}
+                     </div>
+                  </div>
 
-                        {type === "train" && (
-                            <div className="max-w-[600px] mx-auto space-y-12 pb-20">
-                                <p className="text-center font-black text-slate-300 uppercase tracking-[0.4em] text-xs">A-Coach Compartment View</p>
-                                
-                                <div className="space-y-4">
-                                    {Array.from({ length: 4 }).map((_, cabinIdx) => (
-                                        <div key={cabinIdx} className="bg-slate-50 border-2 border-slate-100 rounded-[2rem] p-8 grid grid-cols-2 gap-10 relative group hover:border-[#7c3aed]/10 transition-colors">
-                                           <div className="absolute top-1/2 left-0 right-0 h-px bg-slate-200 -translate-y-1/2 pointer-events-none z-0" />
-                                           
-                                           {/* Main Cubicle (LB, MB, UB) */}
-                                           <div className="grid grid-cols-3 gap-3 relative z-10">
-                                                {["LB", "MB", "UB", "LB", "MB", "UB"].slice(0, 3).map((berth, i) => {
-                                                    const label = `${cabinIdx + 1}-${berth}${i + 1}`;
-                                                    const isOccupied = seatGrid.find(s => s.label === label)?.isOccupied;
-                                                    return (
-                                                        <button 
-                                                            key={label}
-                                                            disabled={isOccupied}
-                                                            onClick={() => toggleSelection(label)}
-                                                            className={`h-24 rounded-xl border-2 transition-all flex flex-col items-center justify-center gap-2 ${
-                                                                isOccupied 
-                                                                ? "bg-slate-200 border-slate-300"
-                                                                : selectedItems.includes(label)
-                                                                ? "bg-[#7c3aed] border-[#7c3aed] text-white shadow-xl scale-105"
-                                                                : "bg-white border-slate-200 hover:border-[#7c3aed]/40"
-                                                            }`}
-                                                        >
-                                                            <div className="w-2 h-8 rounded-full bg-slate-200/20" />
-                                                            <span className="text-[9px] font-black uppercase tracking-widest">{berth}</span>
-                                                            <span className="text-[8px] opacity-60 leading-none">{label}</span>
-                                                            {!isOccupied && (
-                                                                <span className={`text-[8px] font-black mt-1 ${selectedItems.includes(label) ? "text-white" : "text-[#7c3aed]"}`}>
-                                                                    ₹{seatGrid.find(s => s.label === label)?.price || 0}
-                                                                </span>
-                                                            )}
-                                                        </button>
-                                                    );
-                                                })}
-                                           </div>
+                  <div className="bg-white rounded shadow-sm border border-[#e7e7e7] p-5 flex items-center justify-between">
+                     <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded bg-indigo-50 text-[#4f46e5] flex items-center justify-center">
+                           <Briefcase size={22} />
+                        </div>
+                        <div>
+                           <p className="text-[14px] font-bold text-[#222]">Extra Baggage</p>
+                           <p className="text-[11px] text-[#4a4a4a]">Need more space? Add extra kilos.</p>
+                        </div>
+                     </div>
+                     <div className="flex items-center gap-4">
+                        <button onClick={() => setExtraBaggage(Math.max(0, extraBaggage - 5))} className="w-8 h-8 rounded border border-[#e7e7e7] text-[#4a4a4a] font-bold">-</button>
+                        <span className="text-[14px] font-bold text-[#222] min-w-[50px] text-center">{extraBaggage} KG</span>
+                        <button onClick={() => setExtraBaggage(Math.min(30, extraBaggage + 5))} className="w-8 h-8 rounded bg-[#008cff] text-white font-bold">+</button>
+                     </div>
+                  </div>
 
-                                           {/* Side Berths (SL, SU) */}
-                                           <div className="flex flex-col gap-3 justify-center relative z-10 pl-10 border-l border-dashed border-slate-200">
-                                                {["SL", "SU"].map((berth, i) => {
-                                                    const label = `${cabinIdx + 1}-${berth}${i + 1}`;
-                                                    const isOccupied = seatGrid.find(s => s.label === label)?.isOccupied;
-                                                    return (
-                                                        <button 
-                                                            key={label}
-                                                            disabled={isOccupied}
-                                                            onClick={() => toggleSelection(label)}
-                                                            className={`h-16 w-32 rounded-xl border-2 transition-all flex flex-col items-center justify-center ${
-                                                                isOccupied 
-                                                                ? "bg-slate-200 border-slate-300"
-                                                                : selectedItems.includes(label)
-                                                                ? "bg-[#CF3425] border-[#CF3425] text-white shadow-xl scale-105"
-                                                                : "bg-white border-slate-200 hover:border-[#CF3425]/40"
-                                                            }`}
-                                                        >
-                                                            <span className="text-[9px] font-black uppercase tracking-widest">{berth}</span>
-                                                            <span className="text-[8px] opacity-60 leading-none">{label}</span>
-                                                            {!isOccupied && (
-                                                                <span className={`text-[8px] font-black mt-1 ${selectedItems.includes(label) ? "text-white" : "text-[#CF3425]"}`}>
-                                                                    ₹{seatGrid.find(s => s.label === label)?.price || 0}
-                                                                </span>
-                                                            )}
-                                                        </button>
-                                                    );
-                                                })}
-                                           </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                  <div className={`p-5 rounded border-2 transition-all ${insurance ? 'bg-blue-50 border-[#008cff]' : 'bg-white border-[#e7e7e7]'}`}>
+                     <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-4">
+                           <div className={`w-10 h-10 rounded flex items-center justify-center ${insurance ? 'bg-[#008cff] text-white' : 'bg-green-50 text-green-600'}`}>
+                              <ShieldCheck size={22} />
+                           </div>
+                           <div>
+                              <p className="text-[14px] font-bold text-[#222]">Secure Your Journey</p>
+                              <p className="text-[11px] text-[#4a4a4a]">Comprehensive protection for just ₹249</p>
+                           </div>
+                        </div>
+                        <div onClick={() => setInsurance(!insurance)} className={`w-10 h-5 rounded-full p-1 cursor-pointer transition-all ${insurance ? 'bg-[#008cff]' : 'bg-[#e7e7e7]'}`}>
+                           <div className={`w-3 h-3 bg-white rounded-full transition-transform ${insurance ? 'translate-x-5' : 'translate-x-0'}`} />
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </main>
 
-                        {type === "hotel" && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {[
-                                    { id: "Standard", price: 0, img: "/assets/img/img_d1d63b7eef.jpg" },
-                                    { id: "Deluxe", price: 2500, img: "/assets/img/img_f68a5d0002.jpg" },
-                                    { id: "Exec Suite", price: 5500, img: "/assets/img/img_dee0c63eed.jpg" }
-                                ].map(room => (
-                                    <button 
-                                        key={room.id}
-                                        onClick={() => toggleSelection(room.id)}
-                                        className={`group rounded-[2rem] border-2 overflow-hidden transition-all text-left ${
-                                            selectedItems.includes(room.id) 
-                                            ? "border-[#7c3aed] bg-white shadow-2xl scale-[1.02]" 
-                                            : "border-slate-100 hover:border-slate-200 bg-white"
-                                        }`}
-                                    >
-                                        <div className="h-48 overflow-hidden relative">
-                                            <img src={room.img} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={room.id} />
-                                            <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-xl flex items-center gap-1.5">
-                                                <Star size={12} className="text-amber-500 fill-amber-500" />
-                                                <span className="text-xs font-black">4.9</span>
-                                            </div>
-                                        </div>
-                                        <div className="p-6">
-                                            <div className="flex justify-between items-start mb-2">
-                                                <h4 className="text-lg font-black text-slate-800">{room.id} Room</h4>
-                                                <p className="text-sm font-black text-[#f97316]">+ ₹{room.price.toLocaleString()}</p>
-                                            </div>
-                                            <p className="text-xs text-slate-400 font-bold leading-relaxed mb-6">
-                                                Premium bedding, high-speed WiFi, and 24/7 room service included.
-                                            </p>
-                                            <div className="flex items-center gap-4">
-                                                <div className="flex items-center gap-1 text-[10px] font-black text-slate-500 uppercase tracking-widest"><Wifi size={12} /> Wifi</div>
-                                                <div className="flex items-center gap-1 text-[10px] font-black text-slate-500 uppercase tracking-widest"><Coffee size={12} /> Breakfast</div>
-                                            </div>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                        
-                        {/* Decorative background circle */}
-                        <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#7c3aed]/5 blur-[100px] rounded-full pointer-events-none" />
-                    </main>
-                </div>
-            </div>
+            <aside className="lg:block">
+               <div className="sticky top-24 bg-white rounded shadow-sm border border-[#e7e7e7] overflow-hidden">
+                  <div className="p-4 bg-[#f9f9f9] border-b border-[#f2f2f2]">
+                     <h3 className="text-[14px] font-bold text-[#222]">Fare Summary</h3>
+                  </div>
+                  
+                  <div className="p-5 space-y-4">
+                     <div className="flex justify-between text-[12px] text-[#4a4a4a]">
+                        <span>Base Fare ({pax} Traveller)</span>
+                        <span className="font-bold text-[#222]">₹{baseFare.toLocaleString()}</span>
+                     </div>
+                     <div className="flex justify-between text-[12px] text-[#4a4a4a]">
+                        <span>Fee & Surcharges</span>
+                        <span className="font-bold text-[#222]">₹{(fuelSurcharge + airportTax + convenienceFee).toLocaleString()}</span>
+                     </div>
+                     
+                     {(seatPrice > 0 || mealPrice > 0 || baggagePrice > 0 || insurancePrice > 0) && (
+                        <div className="pt-4 border-t border-[#f2f2f2] space-y-3">
+                           {seatPrice > 0 && <div className="flex justify-between text-[11px] text-[#008cff] font-bold"><span>Seats</span> <span>₹{seatPrice}</span></div>}
+                           {mealPrice > 0 && <div className="flex justify-between text-[11px] text-[#f26722] font-bold"><span>Meals</span> <span>₹{mealPrice}</span></div>}
+                           {baggagePrice > 0 && <div className="flex justify-between text-[11px] text-[#4f46e5] font-bold"><span>Baggage</span> <span>₹{baggagePrice}</span></div>}
+                           {insurancePrice > 0 && <div className="flex justify-between text-[11px] text-green-600 font-bold"><span>Insurance</span> <span>₹{insurancePrice}</span></div>}
+                        </div>
+                     )}
 
-            {/* Float Bottom Mobile Action */}
-            <div className="md:hidden fixed bottom-6 left-6 right-6 z-50">
-                <button 
-                    onClick={handleConfirm}
-                    className="w-full bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white py-5 rounded-[2rem] font-black uppercase tracking-widest shadow-2xl flex items-center justify-center gap-3"
-                >
-                    Pay ₹{totalPrice.toLocaleString()} <ArrowRight size={18} />
-                </button>
-            </div>
+                     <div className="pt-4 border-t border-[#f2f2f2] flex justify-between items-center">
+                        <span className="text-[14px] font-bold text-[#222]">Total Amount</span>
+                        <span className="text-[20px] font-black text-[#222]">₹{totalPayable.toLocaleString()}</span>
+                     </div>
+
+                     <button 
+                      onClick={handleContinue}
+                      className="w-full mt-6 py-3 bg-[#008cff] hover:bg-[#007ad9] text-white rounded font-bold text-[14px] uppercase shadow-lg shadow-blue-100 transition-colors"
+                     >
+                        Proceed to Checkout
+                     </button>
+                  </div>
+               </div>
+            </aside>
+          </div>
         </div>
-    );
+      </div>
+
+      <AnimatePresence>
+        {showSeatModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowSeatModal(false)} className="absolute inset-0 bg-black/60 shadow-inner" />
+             <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} className="relative bg-white rounded-lg shadow-2xl w-full max-w-4xl h-[90vh] flex flex-col overflow-hidden">
+                <div className="p-4 border-b border-[#f2f2f2] flex items-center justify-between">
+                   <h3 className="text-[18px] font-bold text-[#222]">Select Seats</h3>
+                   <button onClick={() => setShowSeatModal(false)} className="text-[#4a4a4a]"><X size={20}/></button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-12 bg-[#f2f2f2] flex justify-center">
+                   <div className="bg-white rounded-[50px] p-10 border border-[#e7e7e7] shadow-lg w-fit">
+                      <div className="grid grid-cols-7 gap-y-4 gap-x-2">
+                         {seatGrid.map((s, i) => (
+                           <React.Fragment key={s.id}>
+                              {i % 6 === 3 && <div className="w-8 flex items-center justify-center text-[10px] font-bold text-[#4a4a4a]">{Math.floor(i/6)+1}</div>}
+                              <button 
+                                disabled={s.isOccupied}
+                                onClick={() => {
+                                   if (selectedSeat.find(ss => ss.id === s.id)) {
+                                      setSelectedSeat(selectedSeat.filter(ss => ss.id !== s.id));
+                                   } else {
+                                      if (selectedSeat.length >= pax) {
+                                         toast.error(`You can only select up to ${pax} seats`);
+                                         return;
+                                      }
+                                      setSelectedSeat([...selectedSeat, s]);
+                                   }
+                                }}
+                                className={`w-8 h-8 rounded border transition-all text-[10px] font-bold ${s.isOccupied ? 'bg-[#e7e7e7] text-[#4a4a4a]' : selectedSeat.find(ss => ss.id === s.id) ? 'bg-[#008cff] text-white border-[#008cff]' : 'bg-white border-[#008cff] text-[#008cff] hover:bg-blue-50'}`}
+                              >
+                                 {s.id}
+                              </button>
+                           </React.Fragment>
+                         ))}
+                      </div>
+                   </div>
+                </div>
+
+                <div className="p-4 bg-white border-t border-[#f2f2f2] flex justify-between items-center">
+                   <div className="flex gap-4 text-[11px] text-[#4a4a4a] font-bold uppercase">
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-white border border-[#008cff]"/> Available</div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-[#008cff]"/> Selected</div>
+                      <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-[#e7e7e7]"/> Occupied</div>
+                   </div>
+                   <button onClick={() => setShowSeatModal(false)} className="bg-[#008cff] text-white px-8 py-2 rounded font-bold text-[14px]">DONE</button>
+                </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <FareBreakupModal isOpen={showFareBreakup} onClose={() => setShowFareBreakup(false)} fares={{ base: baseFare, taxes: fuelSurcharge+airportTax+convenienceFee, addons: seatPrice+mealPrice+baggagePrice+insurancePrice, total: totalPayable }} />
+    </>
+  );
 };
+
+function FareBreakupModal({ isOpen, onClose, fares }) {
+   if (!isOpen) return null;
+   return (
+      <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" />
+         <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="relative bg-white rounded-[3rem] shadow-2xl w-full max-w-md p-10 overflow-hidden">
+            <h3 className="text-2xl font-black text-slate-900 tracking-tight mb-8">Detailed Breakup</h3>
+            <div className="space-y-6">
+               <div className="flex justify-between items-center"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Base Fare</span> <span className="font-black text-slate-900">₹{fares.base.toLocaleString()}</span></div>
+               <div className="flex justify-between items-center"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Convenience Fee</span> <span className="font-black text-slate-900">₹300</span></div>
+               <div className="flex justify-between items-center"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fuel & Airport Tax</span> <span className="font-black text-slate-900">₹{(fares.taxes - 300).toLocaleString()}</span></div>
+               {fares.addons > 0 && <div className="flex justify-between items-center"><span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Special Services</span> <span className="font-black text-indigo-600">₹{fares.addons.toLocaleString()}</span></div>}
+               <div className="pt-8 border-t-2 border-slate-50 flex justify-between items-end">
+                  <span className="text-sm font-black text-slate-900 uppercase tracking-[0.2em]">Total</span>
+                  <span className="text-4xl font-black text-slate-900 tracking-tighter">₹{fares.total.toLocaleString()}</span>
+               </div>
+            </div>
+            <button onClick={onClose} className="w-full mt-10 py-4 bg-slate-50 text-slate-900 rounded-2xl font-black uppercase text-[10px] tracking-widest hover:bg-slate-100 transition-all">Close</button>
+            <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-50/50 rounded-full -mr-12 -mt-12" />
+         </motion.div>
+      </div>
+   )
+}
 
 export default BookingSelectionPage;

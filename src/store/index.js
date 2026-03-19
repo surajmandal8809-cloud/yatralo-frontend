@@ -5,7 +5,6 @@ import { flightService } from "../services/flightService"
 import { couponService } from "../services/couponService"
 import { bookingService } from "../services/bookingService"
 import userReducer from '../slices/userSlice';
-
 export const store = configureStore({
         reducer: {
                 [authService.reducerPath]: authService.reducer,

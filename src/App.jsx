@@ -63,7 +63,9 @@ function App() {
             <Route path="buses" element={<BusLandingPage />} />
             <Route path="buses/results" element={<BusSearchResultsPage />} />
             
+            <Route path="checkout/:step" element={<CheckoutPage />} />
             <Route path="checkout" element={<CheckoutPage />} />
+
             <Route path="booking-selection" element={<BookingSelectionPage />} />
           </Route>
 

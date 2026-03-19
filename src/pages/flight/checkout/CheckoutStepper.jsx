@@ -2,31 +2,35 @@ import React from "react";
 import { Check } from "lucide-react";
 
 export default function CheckoutStepper({ currentStep, steps }) {
-    const renderStepIcon = (index) => {
-        if (currentStep > index) return <Check size={16} className="text-white" />;
-        return <span className="text-sm font-bold">{index + 1}</span>;
-    };
-
-    return (
-        <div className="flex items-center justify-center mb-10">
-            {steps.map((step, index) => (
-                <React.Fragment key={step}>
-                    <div className="flex flex-col items-center">
-                        <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${currentStep >= index ? "bg-gradient-to-br from-[#7c3aed] to-[#6d28d9] text-white shadow-lg shadow-violet-200" : "bg-white text-slate-400 border border-slate-200"
-                                }`}
-                        >
-                            {renderStepIcon(index)}
-                        </div>
-                        <span className={`text-[13px] font-bold mt-2 ${currentStep >= index ? "text-slate-900" : "text-slate-400"}`}>
-                            {step}
-                        </span>
-                    </div>
-                    {index < steps.length - 1 && (
-                        <div className={`w-16 md:w-32 h-[2px] mx-2 -mt-6 transition-all duration-300 ${currentStep > index ? "bg-[#7c3aed]" : "bg-slate-200"}`} />
-                    )}
-                </React.Fragment>
-            ))}
-        </div>
-    );
+  return (
+    <div className="flex items-center gap-6">
+      {steps.map((step, idx) => (
+        <React.Fragment key={step}>
+          <div className="flex items-center gap-3">
+            <div 
+              className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-black transition-all duration-500 ${
+                idx < currentStep 
+                  ? "bg-emerald-500 text-white shadow-lg shadow-emerald-100" 
+                  : idx === currentStep 
+                    ? "bg-slate-900 text-white shadow-xl shadow-slate-200" 
+                    : "bg-white border-2 border-slate-100 text-slate-300"
+              }`}
+            >
+              {idx < currentStep ? <Check size={20} strokeWidth={3} /> : idx + 1}
+            </div>
+            <span 
+              className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${
+                idx <= currentStep ? "text-slate-900" : "text-slate-300"
+              }`}
+            >
+              {step}
+            </span>
+          </div>
+          {idx < steps.length - 1 && (
+            <div className={`w-12 h-px transition-all duration-700 ${idx < currentStep ? "bg-emerald-500" : "bg-slate-200"}`} />
+          )}
+        </React.Fragment>
+      ))}
+    </div>
+  );
 }

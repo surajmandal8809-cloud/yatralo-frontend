@@ -1,164 +1,163 @@
 import React, { useState } from "react";
+import { 
+  Plane, 
+  Clock, 
+  Briefcase, 
+  Coffee, 
+  Wifi, 
+  Monitor, 
+  ShieldCheck, 
+  ChevronDown, 
+  ChevronUp, 
+  Info, 
+  AlertCircle, 
+  Wind,
+  Zap,
+  Luggage
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plane, ChevronDown, ChevronUp, Zap, Wifi, Coffee, CheckCircle2, Users, Star } from "lucide-react";
 
-const formatDuration = (minutes) => {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${h ? `${h}h ` : ""}${m}m`;
-};
+const FlightCard = ({ flight, onViewPrices, pax = 1 }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
 
-const getAirlineLogo = (airlineName) => {
-  const map = {
-    "Air India": "AI",
-    "IndiGo": "6E",
-    "Indigo": "6E",
-    "Vistara": "UK",
-    "SpiceJet": "SG",
-    "Spicejet": "SG",
-    "Akasa Air": "QP",
-    "Air Connect": "FL",
-    "AirAsia India": "I5",
-    "Alliance Air": "9I"
+  const getAirlineLogo = (code) => {
+    return `https://imgak.mmtcdn.com/flights/assets/media/dt/common/icons/${code}.png`;
   };
-  const code = map[airlineName] || map[airlineName?.trim()];
-  if (code && code !== "FL") return `/assets/img/${code}.png`;
-  return null;
-};
-
-export default function FlightCard({ flight, pax, onViewPrices }) {
-  const [expanded, setExpanded] = useState(false);
-  const [imageError, setImageError] = useState(false);
-
-  const logoUrl = getAirlineLogo(flight.airline);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-violet-200 transition-all overflow-hidden group"
-    >
-      {/* Status Ribbon if Delayed/Cancelled */}
-      {flight.status !== 'scheduled' && (
-        <div className={`py-1.5 px-6 text-[10px] font-black uppercase tracking-[0.2em] text-center ${
-          flight.status === 'delayed' ? 'bg-amber-500 text-white' : 'bg-slate-900 text-white'
-        }`}>
-          Flight Status: {flight.status}
-        </div>
-      )}
-
-      <div className="p-6">
-        <div className="flex flex-wrap items-center justify-between gap-6">
-          {/* Airline Identity */}
-          <div className="flex items-center gap-4 group cursor-pointer w-[250px]">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-white text-lg font-black shadow-lg transform group-hover:rotate-6 transition-all ${logoUrl && !imageError ? 'bg-white border border-slate-100' : ''}`} style={(!logoUrl || imageError) ? { background: flight.bg } : {}}>
-              {logoUrl && !imageError ? (
-                <img 
-                  src={logoUrl} 
-                  alt={flight.airline} 
-                  className="w-10 h-10 object-contain rounded-lg"
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                flight.code
-              )}
-            </div>
+    <div className="bg-white rounded-lg border border-[#e7e7e7] shadow-sm hover:shadow-md transition-shadow overflow-hidden font-sans">
+      
+      {/* Main Card Content */}
+      <div className="p-4 md:p-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
+          
+          {/* Airline Info */}
+          <div className="flex items-center gap-3 min-w-[140px]">
+            <img 
+              src={getAirlineLogo(flight.code)} 
+              alt={flight.airline} 
+              className="w-8 h-8 object-contain"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://imgak.mmtcdn.com/flights/assets/media/dt/common/icons/6E.png";
+              }}
+            />
             <div>
-              <p className="text-sm font-black text-slate-900 group-hover:text-[#7c3aed] transition-colors">{flight.airline}</p>
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mt-1">{flight.flightNo}</p>
-              <button className="text-[10px] font-black text-[#7c3aed] uppercase mt-2 hover:underline">Add to compare +</button>
+               <p className="text-[14px] font-bold text-[#222] leading-tight">{flight.airline}</p>
+               <p className="text-[11px] text-[#4a4a4a]">{flight.flightNo}</p>
             </div>
           </div>
 
-          {/* Departure */}
-          <div className="text-center w-[120px]">
-            <p className="text-2xl font-black text-slate-900 leading-none">{flight.dep}</p>
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-2">{flight.originCity}</p>
-            <p className="text-[9px] font-bold text-slate-400 mt-0.5 truncate px-2" title={flight.originName || flight.origin}>{flight.originName || flight.origin}</p>
-          </div>
-
-          {/* Route & Duration */}
-          <div className="flex flex-col items-center flex-1 max-w-[200px]">
-             <p className="text-[10px] font-black text-slate-300 uppercase tracking-tighter mb-2">{formatDuration(flight.duration)}</p>
-             <div className="w-full flex items-center gap-2">
-                 <div className="h-px bg-slate-200 flex-1 border-t border-dashed" />
-                 <Plane size={14} className="text-slate-300 transform rotate-90" />
-                 <div className="h-px bg-slate-200 flex-1 border-t border-dashed" />
+          {/* Time & Route Info */}
+          <div className="flex-1 flex items-center justify-between gap-4 md:gap-10">
+             <div className="text-center md:text-left">
+                <p className="text-[22px] font-black text-[#222] tracking-tighter">{flight.dep}</p>
+                <p className="text-[12px] font-bold text-[#222] mt-1">{flight.origin}</p>
              </div>
-             <p className="text-[9px] font-black text-slate-400 uppercase mt-2 tracking-widest">Non stop</p>
-          </div>
 
-          {/* Arrival */}
-          <div className="text-center w-[120px]">
-            <p className="text-2xl font-black text-slate-900 leading-none">{flight.arr}</p>
-            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mt-2">{flight.destinationCity}</p>
-            <p className="text-[9px] font-bold text-slate-400 mt-0.5 truncate px-2" title={flight.destinationName || flight.destination}>{flight.destinationName || flight.destination}</p>
-          </div>
-
-          {/* Price & Action */}
-          <div className="flex items-center gap-6 border-l border-slate-100 pl-8 ml-auto">
-             <div className="text-right">
-                <div className="flex items-center justify-end gap-2 text-emerald-600 mb-1">
-                   <Zap size={10} fill="currentColor" />
-                   <span className="text-[10px] font-black uppercase tracking-widest">83% on time</span>
+             <div className="flex-1 flex flex-col items-center">
+                <p className="text-[11px] text-[#4a4a4a] mb-1">{Math.floor(flight.duration / 60)}h {flight.duration % 60}m</p>
+                <div className="w-full h-[2px] bg-[#e7e7e7] relative">
+                   <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-[#e7e7e7]" />
                 </div>
-                <p className="text-2xl font-black text-slate-900 leading-none">₹{flight.price.toLocaleString()}</p>
-                <p className="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tighter">/adult</p>
+                <p className={`text-[11px] mt-1 ${flight.stops === 0 ? 'text-[#00a69a]' : 'text-[#f26722]'}`}>
+                   {flight.stops === 0 ? 'Non-stop' : `${flight.stops} Stop${flight.stops > 1 ? 's' : ''}`}
+                </p>
              </div>
-             <button
-              onClick={() => onViewPrices(flight)}
-              className="px-8 py-3 bg-white border-2 border-[#7c3aed] text-[#7c3aed] hover:bg-[#7c3aed] hover:text-white text-[11px] font-black rounded-full transition-all shadow-sm uppercase tracking-widest active:scale-95"
-            >
-              View Prices
-            </button>
+
+             <div className="text-center md:text-right">
+                <p className="text-[22px] font-black text-[#222] tracking-tighter">{flight.arr}</p>
+                <p className="text-[12px] font-bold text-[#222] mt-1">{flight.destination}</p>
+             </div>
           </div>
+
+          {/* Pricing & CTA */}
+          <div className="flex items-center md:flex-col md:items-end gap-4 md:pl-8 md:border-l md:border-[#e7e7e7]">
+             <div className="text-right">
+                <p className="text-[22px] font-black text-[#222] tracking-tight">₹{flight.price.toLocaleString()}</p>
+                <p className="text-[10px] text-[#4a4a4a]">per adult</p>
+             </div>
+             <button 
+              onClick={() => onViewPrices(flight)}
+              className="bg-[#008cff] hover:bg-[#007ad9] text-white px-6 py-2 rounded-full font-bold text-[14px] uppercase tracking-wide transition-colors shadow-lg shadow-blue-100"
+             >
+                View Prices
+             </button>
+          </div>
+        </div>
+
+        {/* Footer info & Toggle */}
+        <div className="mt-6 pt-4 border-t border-[#f2f2f2] flex items-center justify-between">
+           <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 text-[#4a4a4a]">
+                 <span className="text-[10px] bg-[#f2f2f2] px-2 py-0.5 rounded text-[#4a4a4a] font-bold">Free Meal</span>
+                 <span className="text-[10px] bg-[#f2f2f2] px-2 py-0.5 rounded text-[#4a4a4a] font-bold">Emissions: 104kg CO₂</span>
+              </div>
+           </div>
+           <button 
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-[12px] font-bold text-[#008cff] flex items-center gap-1 hover:underline"
+           >
+              {isExpanded ? 'Hide' : 'Flight'} Details {isExpanded ? <ChevronUp size={14}/> : <ChevronDown size={14} />}
+           </button>
         </div>
       </div>
 
-        <div className="flex flex-wrap gap-2 mt-6">
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600">
-            <Zap size={10} className="text-yellow-500 fill-yellow-500" />
-            {flight.status === 'scheduled' ? 'On Time' : flight.status.toUpperCase()}
-          </span>
-          {flight.wifi && <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600"><Wifi size={10} className="text-[#7c3aed]" /> Free Wifi</span>}
-          {flight.meal && <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600"><Coffee size={10} className="text-orange-500" /> Meal Included</span>}
-          {flight.refundable && <span className="flex items-center gap-1.5 px-3 py-1 bg-orange-50 border border-orange-100 rounded-lg text-[10px] font-bold text-orange-600"><CheckCircle2 size={10} /> Refundable</span>}
-          <span className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 ml-auto">
-            <Users size={10} /> Only {flight.seats} seats left
-          </span>
-        </div>
-
+      {/* Expanded Details Drawer */}
       <AnimatePresence>
-        {expanded && (
-          <motion.div
+        {isExpanded && (
+          <motion.div 
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="border-t border-slate-50 bg-slate-50/50 overflow-hidden"
+            className="bg-[#f9f9f9] border-t border-[#e7e7e7] overflow-hidden"
           >
-            <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-              <div>
-                <p className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Baggage</p>
-                <p className="text-xs font-bold text-slate-700">7kg Cabin, 15kg Check-in</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Cabin</p>
-                <p className="text-xs font-bold text-slate-700">Economy Class</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Aircraft</p>
-                <p className="text-xs font-bold text-slate-700">Airbus A320-200</p>
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Cancellation</p>
-                <p className={`text-xs font-bold ${flight.refundable ? 'text-emerald-600' : 'text-slate-400'}`}>
-                  {flight.refundable ? 'Free before 24h' : 'Non-refundable'}
-                </p>
-              </div>
-            </div>
+             <div className="p-6">
+                <div className="bg-white rounded-lg border border-[#e7e7e7] overflow-hidden">
+                   <div className="flex border-b border-[#e7e7e7]">
+                      {['FLIGHT DETAILS', 'BAGGAGE', 'CANCELLATION', 'DATE CHANGE'].map((tab, idx) => (
+                        <button key={tab} className={`px-6 py-3 text-[11px] font-bold tracking-wider ${idx === 0 ? 'text-[#008cff] border-b-2 border-[#008cff]' : 'text-[#4a4a4a]'}`}>{tab}</button>
+                      ))}
+                   </div>
+                   <div className="p-6">
+                      <div className="flex items-start gap-8">
+                         <div className="flex flex-col items-center gap-2 text-[#4a4a4a]">
+                            <img src={getAirlineLogo(flight.code)} className="w-6" alt="" />
+                            <span className="text-[10px] whitespace-nowrap">{flight.airline}</span>
+                            <span className="text-[10px]">{flight.flightNo}</span>
+                         </div>
+                         <div className="flex-1 space-y-6 relative pl-4 border-l-2 border-[#e7e7e7]">
+                            <div className="flex items-center gap-12">
+                               <div className="flex items-center gap-3">
+                                  <span className="text-[14px] font-bold text-[#222]">{flight.dep}</span>
+                                  <span className="text-[12px] text-[#4a4a4a]">{flight.origin} • {flight.originCity}</span>
+                               </div>
+                               <span className="text-[11px] text-[#4a4a4a]">{Math.floor(flight.duration / 60)}h {flight.duration % 60}m</span>
+                               <div className="flex items-center gap-3">
+                                  <span className="text-[14px] font-bold text-[#222]">{flight.arr}</span>
+                                  <span className="text-[12px] text-[#4a4a4a]">{flight.destination} • {flight.destinationCity}</span>
+                               </div>
+                            </div>
+                            <div className="flex gap-4">
+                               <div className="bg-[#f2f2f2] px-3 py-2 rounded text-[11px] text-[#4a4a4a]">
+                                  <p className="font-bold">Check-in Baggage</p>
+                                  <p>15 Kgs (1 piece only)</p>
+                               </div>
+                               <div className="bg-[#f2f2f2] px-3 py-2 rounded text-[11px] text-[#4a4a4a]">
+                                  <p className="font-bold">Cabin Baggage</p>
+                                  <p>7 Kgs (1 piece only)</p>
+                               </div>
+                            </div>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </div>
   );
-}
+};
+
+export default FlightCard;

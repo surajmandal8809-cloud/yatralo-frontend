@@ -1,26 +1,25 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
+import { Provider } from "react-redux"
+import { store } from './store.js'
 import App from './App.jsx'
+import './index.css'
 
-import { store } from './store/index.js'
-import {Provider} from "react-redux"
-
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <Provider store={store}>
-
-    <App />
-
-    </Provider>
-  </StrictMode>,
-)
-
-const appLoader = document.getElementById('app-loader')
-
-if (appLoader) {
-  requestAnimationFrame(() => {
-    appLoader.classList.add('is-hidden')
-    setTimeout(() => appLoader.remove(), 260)
-  })
+const rootElement = document.getElementById('root');
+if (rootElement) {
+    try {
+        const root = createRoot(rootElement);
+        root.render(
+            <Provider store={store}>
+                <App />
+            </Provider>
+        );
+    } catch(e) {
+        console.error("Mount error:", e);
+    }
+} else {
+    console.error("No root element found");
 }
+
+window.addEventListener('error', (e) => {
+    console.error("UNCAUGHT RUNTIME ERROR:", e.message, e.filename, e.lineno);
+});

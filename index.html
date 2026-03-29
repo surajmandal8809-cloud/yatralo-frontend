@@ -162,6 +162,21 @@
       100% { transform: scale(1.2); opacity: 1; }
     }
   </style>
+  <script>
+    // Robust loader hiding logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const hideLoader = () => {
+        const loader = document.getElementById('app-loader');
+        if (loader) {
+          loader.classList.add('is-hidden');
+          setTimeout(() => loader.remove(), 500);
+        }
+      };
+      // Hide on window load or absolute timeout
+      window.addEventListener('load', hideLoader);
+      setTimeout(hideLoader, 5000); // Max wait 5s
+    });
+  </script>
 </head>
 
 <body>

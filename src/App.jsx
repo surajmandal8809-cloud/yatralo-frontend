@@ -25,14 +25,20 @@ import BookingSelectionPage from "./pages/flight/BookingSelectionPage";
 // Hotel Pages
 import HotelLandingPage from "./pages/hotel/HotelLandingPage";
 import HotelSearchResultsPage from "./pages/hotel/HotelSearchResultsPage";
+import HotelBookingSelectionPage from "./pages/hotel/HotelBookingSelectionPage";
+import HotelCheckoutPage from "./pages/hotel/checkout/HotelCheckoutPage";
 
 // Train Pages
 import TrainLandingPage from "./pages/train/TrainLandingPage";
 import TrainSearchResultsPage from "./pages/train/TrainSearchResultsPage";
+import TrainBookingSelectionPage from "./pages/train/TrainBookingSelectionPage";
+import TrainCheckoutPage from "./pages/train/TrainCheckoutPage";
 
 // Bus Pages
 import BusLandingPage from "./pages/bus/BusLandingPage";
 import BusSearchResultsPage from "./pages/bus/BusSearchResultsPage";
+import BusBookingSelectionPage from "./pages/bus/BusBookingSelectionPage";
+import BusCheckoutPage from "./pages/bus/BusCheckoutPage";
 
 function App() {
   return (
@@ -54,14 +60,20 @@ function App() {
             {/* Hotels */}
             <Route path="hotels" element={<HotelLandingPage />} />
             <Route path="hotels/results" element={<HotelSearchResultsPage />} />
+            <Route path="hotels/booking" element={<HotelBookingSelectionPage />} />
+            <Route path="hotels/checkout" element={<HotelCheckoutPage />} />
             
             {/* Trains */}
             <Route path="trains" element={<TrainLandingPage />} />
             <Route path="trains/results" element={<TrainSearchResultsPage />} />
+            <Route path="trains/booking" element={<TrainBookingSelectionPage />} />
+            <Route path="trains/checkout" element={<TrainCheckoutPage />} />
             
             {/* Buses */}
             <Route path="buses" element={<BusLandingPage />} />
             <Route path="buses/results" element={<BusSearchResultsPage />} />
+            <Route path="buses/booking" element={<BusBookingSelectionPage />} />
+            <Route path="buses/checkout" element={<BusCheckoutPage />} />
             
             <Route path="checkout/:step" element={<CheckoutPage />} />
             <Route path="checkout" element={<CheckoutPage />} />

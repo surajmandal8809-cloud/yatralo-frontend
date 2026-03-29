@@ -199,13 +199,9 @@ export default function BusSearchResultsPage() {
                  bus={bus} 
                  onBook={(b) => {
                     toast.success(`Redirecting to seat selection for ${b.operator}`);
-                    navigate("/booking-selection", {
+                    navigate("/buses/booking", {
                       state: {
-                        type: "bus",
                         bus: b,
-                        from: b.from,
-                        to: b.to,
-                        date: date,
                         pax: 1
                       }
                     });

@@ -9,7 +9,7 @@ import {
     useVerifyPaymentMutation 
 } from "../../../services/flightService";
 import { formatInr } from "../../../utils/bookingUtils";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, Calendar, Info, ArrowRight, User, Phone, Mail, UserCheck, ChevronRight, X as CloseIcon } from "lucide-react";
 
 
 // New Components
@@ -45,13 +45,13 @@ export default function CheckoutPage() {
     const [verifyPayment] = useVerifyPaymentMutation();
 
     useEffect(() => {
-        // Load Razorpay SDK once
+        // Load pay SDK once
         const script = document.createElement("script");
-        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.src = "https://checkout.pay.com/v1/checkout.js";
         script.async = true;
         script.onerror = () => {
-            console.error("Razorpay SDK could not be loaded. Please disable AdBlockers or check your connection.");
-            toast.error("Security Service Blocked (Razorpay). Please check your internet.");
+            console.error("pay SDK could not be loaded. Please disable AdBlockers or check your connection.");
+            toast.error("Security Service Blocked (pay). Please check your internet.");
         };
         document.body.appendChild(script);
 
@@ -121,10 +121,10 @@ export default function CheckoutPage() {
         navigate("/checkout/review");
     };
 
-    const handleRazorpayPayment = async () => {
-        console.log("Initiating Razorpay Flow...");
-        if (!window.Razorpay) {
-            toast.error("Razorpay SDK is still loading...");
+    const handlepayPayment = async () => {
+        console.log("Initiating pay Flow...");
+        if (!window.pay) {
+            toast.error("pay SDK is still loading...");
             return;
         }
 
@@ -168,9 +168,9 @@ export default function CheckoutPage() {
                     try {
                         setIsProcessing(true);
                         const verifyPayload = {
-                            razorpay_order_id: response.razorpay_order_id,
-                            razorpay_payment_id: response.razorpay_payment_id,
-                            razorpay_signature: response.razorpay_signature,
+                            pay_order_id: response.pay_order_id,
+                            pay_payment_id: response.pay_payment_id,
+                            pay_signature: response.pay_signature,
                             bookingId: createResponse.bookingId // Corrected from .booking._id
                         };
 
@@ -204,7 +204,7 @@ export default function CheckoutPage() {
             };
 
 
-            const rzp = new window.Razorpay(options);
+            const rzp = new window.pay(options);
             rzp.open();
         } catch (err) {
             const errMsg = err?.data?.message || err?.message || "Initiation Aborted by Backend Service.";
@@ -257,7 +257,7 @@ export default function CheckoutPage() {
                                 contactInfo={contactInfoLocal}
                                 addOns={addOns}
                                 calculateTotal={calculateTotal}
-                                onNext={handleRazorpayPayment}
+                                onNext={handlepayPayment}
                                 onBack={() => navigate("/checkout/passengers")}
                                 isLoading={isProcessing || isMutationLoading}
                             />
@@ -275,34 +275,63 @@ export default function CheckoutPage() {
 
                     {currentStep < 2 && (
                         <aside className="space-y-6">
-                           <div className="sticky top-40 bg-white rounded-[3rem] border border-slate-200 p-8 shadow-sm group hover:shadow-xl hover:border-indigo-100 transition-all">
-                              <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-10 text-center">Itinerary Summary</h3>
-                              <div className="bg-slate-50 p-6 rounded-[2rem] flex items-center justify-between gap-4 mb-8">
-                                 <div>
-                                    <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest leading-none mb-1">{selectedFlight.code} {selectedFlight.flightNo}</p>
-                                    <p className="text-xl font-black text-slate-800 tracking-tight">{selectedFlight.origin} → {selectedFlight.destination}</p>
-                                    <p className="text-[9px] font-black text-slate-400 mt-2 uppercase tracking-tighter">{selectedFlight.depDate} • Economy</p>
+                           <div className="sticky top-40 bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
+                              <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
+                              <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                                 <div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                                 Fare Summary
+                              </h3>
+
+                              <div className="bg-slate-50 p-6 rounded-2xl space-y-4 mb-8 group-hover:bg-blue-50/30 transition-colors">
+                                 <div className="flex items-center justify-between gap-4">
+                                    <div className="flex-1">
+                                       <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest leading-none mb-1.5">{selectedFlight.code} {selectedFlight.flightNo}</p>
+                                       <p className="text-xl font-black text-slate-800 tracking-tight leading-tight">{selectedFlight.origin} <span className="text-slate-300 mx-1">→</span> {selectedFlight.destination}</p>
+                                    </div>
+                                    <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-900 shadow-sm group-hover:scale-110 transition-transform">
+                                       <img src={`https://imgak.mmtcdn.com/flights/assets/media/dt/common/icons/${selectedFlight.code}.png`} className="w-8" alt={selectedFlight.airline} />
+                                    </div>
                                  </div>
-                                 <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-900 shadow-sm transition-transform group-hover:scale-110">
-                                    <img src={`https://imgak.mmtcdn.com/flights/assets/media/dt/common/icons/${selectedFlight.code}.png`} className="w-8" alt={selectedFlight.airline} />
-                                 </div>
+                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter flex items-center gap-2">
+                                    <Calendar size={12} className="text-slate-300" /> {selectedFlight.depDate} • Economy
+                                 </p>
                               </div>
                               
-                              <div className="space-y-5 pt-6 border-t border-slate-100">
-                                 <div className="flex justify-between items-center"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Base Fare</span> <span className="font-black text-slate-900">₹{selectedFlight.price.toLocaleString()}</span></div>
-                                 <div className="flex justify-between items-center"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fee & Taxes</span> <span className="font-black text-slate-900">₹{( (850* (selectedFlight.pax||bookingInfo.pax||1) ) + (420* (selectedFlight.pax||bookingInfo.pax||1)) + 300 ).toLocaleString()}</span></div>
-                                 {(addOns.insurance || addOns.baggage > 0) && (
-                                   <div className="flex justify-between items-center font-bold text-indigo-600"><span className="text-[10px] uppercase tracking-widest">Add-ons</span> <span className="font-black">₹{( (addOns.insurance ? 249*(selectedFlight.pax||bookingInfo.pax||1) : 0) + (addOns.baggage*450) ).toLocaleString()}</span></div>
+                              <div className="space-y-4 pt-4 border-t border-slate-100">
+                                 <div className="flex justify-between items-center">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Base Fare</span> 
+                                    <span className="font-bold text-slate-700">₹{selectedFlight.price.toLocaleString()}</span>
+                                 </div>
+                                 <div className="flex justify-between items-center">
+                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Taxes & Fees</span> 
+                                    <span className="font-bold text-slate-700">₹{( (850* (selectedFlight.pax||bookingInfo.pax||1) ) + (420* (selectedFlight.pax||bookingInfo.pax||1)) + 300 ).toLocaleString()}</span>
+                                 </div>
+                                 {(addOns.insurance || (addOns.baggage && addOns.baggage > 0)) && (
+                                   <div className="flex justify-between items-center">
+                                      <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Add-ons</span> 
+                                      <span className="font-black text-blue-600">₹{( (addOns.insurance ? 249*(selectedFlight.pax||bookingInfo.pax||1) : 0) + ((addOns.baggage || 0)*450) ).toLocaleString()}</span>
+                                   </div>
                                  )}
-                                 <div className="pt-8 border-t border-slate-100 flex justify-between items-end">
+
+                                 <div className="mt-8 pt-8 border-t border-slate-100 flex justify-between items-end bg-gradient-to-b from-transparent to-slate-50/50 -mx-8 px-8 -mb-8 pb-8">
                                     <div>
-                                       <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-2">Total Amount</p>
+                                       <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-2">Grand Total</p>
                                        <h4 className="text-4xl font-black text-slate-900 tracking-tighter">₹{calculateTotal().toLocaleString()}</h4>
                                     </div>
-                                    <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center">
-                                       <ShieldCheck size={20} />
+                                    <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform">
+                                       <ShieldCheck size={24} strokeWidth={2.5} />
                                     </div>
                                  </div>
+                              </div>
+                           </div>
+
+                           <div className="bg-white rounded-2xl border border-slate-100 p-6 flex items-start gap-4">
+                              <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                                 <Info size={20} />
+                              </div>
+                              <div>
+                                 <p className="text-xs font-black text-slate-800 uppercase tracking-tight">Need Assistance?</p>
+                                 <p className="text-[10px] font-bold text-slate-400 mt-1">Our support team is available 24/7 for your booking queries.</p>
                               </div>
                            </div>
                         </aside>

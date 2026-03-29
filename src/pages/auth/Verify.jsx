@@ -69,6 +69,7 @@ const VerifyPage = () => {
             <p className="mt-4 text-sm text-gray-500 font-medium leading-relaxed max-w-[250px] mx-auto">
               We've dispatched a secure code to confirm your identity. Check your {type === 'email' ? 'inbox' : 'messages'}.
             </p>
+          
           </div>
 
           <form className="space-y-8" onSubmit={handleSubmit}>
@@ -117,3 +118,4 @@ const VerifyPage = () => {
 };
 
 export default VerifyPage;
+

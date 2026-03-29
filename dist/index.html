@@ -5,19 +5,47 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <title>Yatralo - Flight & Hotel Booking</title>
   <style>
+    /* Yatralo Initial App Loader Styling */
     #app-loader {
       position: fixed;
       inset: 0;
       display: grid;
       place-items: center;
-      background:
-        radial-gradient(circle at 15% 20%, #fff1f1 0%, transparent 45%),
-        radial-gradient(circle at 85% 80%, #ffe8ea 0%, transparent 48%),
-        #ffffff;
+      background: #fdfdfd;
       z-index: 9999;
-      transition: opacity 0.25s ease, visibility 0.25s ease;
+      transition: opacity 0.5s ease, visibility 0.5s ease;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    #app-loader::before,
+    #app-loader::after {
+      content: "";
+      position: absolute;
+      width: 40vh;
+      height: 40vh;
+      border-radius: 50%;
+      filter: blur(100px);
+      z-index: 0;
+      animation: html-pulse-bg 4s ease-in-out infinite alternate;
+    }
+
+    #app-loader::before {
+      top: 10%;
+      left: 10%;
+      background: rgba(124, 58, 237, 0.15); /* Purple/Violet orb */
+    }
+
+    #app-loader::after {
+      bottom: 10%;
+      right: 10%;
+      background: rgba(249, 115, 22, 0.15); /* Orange orb */
+      animation-delay: 2s;
     }
 
     #app-loader.is-hidden {
@@ -26,58 +54,138 @@
       pointer-events: none;
     }
 
-    .loader-card {
-      min-width: 220px;
-      padding: 28px 24px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 20px 40px rgba(239, 68, 68, 0.12);
-      border: 1px solid rgba(239, 68, 68, 0.12);
-      text-align: center;
-      backdrop-filter: blur(2px);
+    .html-loader-container {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
     }
 
-    .loader-spinner {
-      width: 48px;
-      height: 48px;
-      margin: 0 auto 14px;
-      border: 4px solid #ffe3e3;
-      border-top-color: #ef4444;
+    /* Counter-rotating rings */
+    .html-loader-ring {
+      position: absolute;
+      top: 35%;
+      left: 50%;
+      transform: translate(-50%, -50%);
       border-radius: 50%;
-      animation: loader-spin 0.8s linear infinite;
+      border: 3px solid transparent;
     }
 
-    .loader-title {
+    .html-loader-ring-1 {
+      width: 130px;
+      height: 130px;
+      border-top-color: rgba(124, 58, 237, 0.5); /* Violet */
+      border-right-color: rgba(124, 58, 237, 0.5);
+      animation: html-spin 2s linear infinite;
+    }
+
+    .html-loader-ring-2 {
+      width: 150px;
+      height: 150px;
+      border-bottom-color: rgba(249, 115, 22, 0.5); /* Orange */
+      border-left-color: rgba(249, 115, 22, 0.5);
+      animation: html-spin 3s linear infinite reverse;
+    }
+
+    /* Glowing central glass orb */
+    .html-loader-svg-box {
+      width: 90px;
+      height: 90px;
+      background: white;
+      border-radius: 50%;
+      box-shadow: 0 20px 40px rgba(124, 58, 237, 0.15);
+      border: 1px solid rgba(255,255,255,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    /* SVG Plane flying animation */
+    .html-loader-plane {
+      width: 38px;
+      height: 38px;
+      fill: none;
+      stroke: #7c3aed;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      animation: html-fly 2.5s ease-in-out infinite alternate;
+      transform: rotate(45deg);
+    }
+
+    .html-loader-text {
+      margin-top: 60px;
+      text-align: center;
+    }
+
+    .html-loader-title {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      color: #1e293b;
       margin: 0;
-      font-size: 18px;
-      font-weight: 700;
-      color: #111827;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
 
-    .loader-text {
-      margin: 6px 0 0;
-      font-size: 13px;
-      color: #6b7280;
+    .html-loader-title span {
+      color: #f97316;
     }
 
-    @keyframes loader-spin {
-      to {
-        transform: rotate(360deg);
-      }
+    .html-loader-subtitle {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      color: #94a3b8;
+      margin: 12px 0 0 0;
+      font-weight: 800;
+      animation: html-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes html-spin {
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes html-fly {
+      0% { transform: translateY(6px) translateX(-6px) rotate(40deg); }
+      100% { transform: translateY(-6px) translateX(6px) rotate(50deg); }
+    }
+
+    @keyframes html-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    @keyframes html-pulse-bg {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(1.2); opacity: 1; }
     }
   </style>
-  <script type="module" crossorigin src="/assets/index-Dy4gxW9f.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-BMVsZXoY.css">
+  <script type="module" crossorigin src="/assets/index-Bwc324FI.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-CLXY9aP9.css">
 </head>
 
 <body>
+  <!-- This loader displays initially while JavaScript downloads -->
   <div id="app-loader" aria-live="polite" aria-label="Loading">
-    <div class="loader-card">
-      <div class="loader-spinner"></div>
-      <p class="loader-title">Yatralo</p>
-      <p class="loader-text">Preparing your trip...</p>
+    <div class="html-loader-container">
+      <div class="html-loader-ring html-loader-ring-1"></div>
+      <div class="html-loader-ring html-loader-ring-2"></div>
+      
+      <div class="html-loader-svg-box">
+        <svg class="html-loader-plane" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.8 19.2L16 11l4-4a2.1 2.1 0 1 0-3-3l-4 4-8.2-1.8L4 7.6l6 3.4-3.5 3.5L4 13l-1 1 2.5 1.5L7 18l1-1-1.5-2.5 3.5-3.5 3.4 6 1.4-1z"/>
+        </svg>
+      </div>
+
+      <div class="html-loader-text">
+        <p class="html-loader-title">Yatra<span>lo</span></p>
+        <p class="html-loader-subtitle">Preparing Your Journey</p>
+      </div>
     </div>
   </div>
+
   <div id="root"></div>
 </body>
 

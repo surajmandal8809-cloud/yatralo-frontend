@@ -181,15 +181,9 @@ export default function TrainSearchResultsPage() {
                   index={i} 
                   onBook={(train) => {
                     toast.success("Proceeding to passenger details");
-                    navigate("/booking-selection", {
+                    navigate("/trains/booking", {
                       state: {
-                        type: "train",
                         train: train,
-                        from,
-                        to,
-                        fromName: from,
-                        toName: to,
-                        date,
                         pax: Number(searchParams.get("pax")) || 1,
                       }
                     });

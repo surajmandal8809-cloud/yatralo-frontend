@@ -1,6 +1,8 @@
 import {fetchBaseQuery} from '@reduxjs/toolkit/query/react'
 
-const BASE_URL = "https://yatralo-backend.onrender.com";
+const BASE_URL = process.env.NODE_ENV === "development"
+  ? "http://localhost:5000" 
+  : "https://yatralo-backend.onrender.com";
 
 export const getBaseURL = () => BASE_URL;
 

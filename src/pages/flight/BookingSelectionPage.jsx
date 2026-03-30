@@ -94,8 +94,12 @@ const BookingSelectionPage = () => {
       insurance: insurance,
       totalPrice: totalPayable
     };
+    
+    const searchParams = new URLSearchParams(window.location.search);
+    const token = searchParams.get("token");
+    
     localStorage.setItem("yatralo-addons", JSON.stringify(addOns));
-    navigate("/checkout");
+    navigate(`/checkout/passengers${token ? `?token=${token}` : ''}`);
   };
 
   return (

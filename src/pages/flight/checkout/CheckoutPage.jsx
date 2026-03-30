@@ -8,8 +8,7 @@ import {
     useCreateBookingMutation, 
     useVerifyPaymentMutation 
 } from "../../../services/flightService";
-import { formatInr } from "../../../utils/bookingUtils";
-import { ShieldCheck, Calendar, Info, ArrowRight, User, Phone, Mail, UserCheck, ChevronRight, X as CloseIcon } from "lucide-react";
+import { ShieldCheck, Calendar, Info, ArrowRight, User, Phone, Mail, UserCheck, ChevronRight, X as CloseIcon, Gift } from "lucide-react";
 
 
 // New Components
@@ -17,6 +16,7 @@ import CheckoutStepper from "./CheckoutStepper";
 import PassengerDetailsComponent from "./PassengerDetailsComponent";
 import ReviewDetailsComponent from "./ReviewDetailsComponent";
 import StatusPageComponent from "./StatusPageComponent";
+import AuthModal from "../../../components/Auth/AuthModal";
 
 const STEPS = ["Travellers", "Review", "Status"];
 
@@ -29,7 +29,7 @@ export default function CheckoutPage() {
 
     // Booking State from localStorage
     const [selectedFlight, setSelectedFlight] = useState(null);
-    const [addOns, setAddOns] = useState(null);
+    const [addOns, setAddOns] = useState({});
     const [bookingInfo, setBookingInfo] = useState({ pax: 1, tripType: "oneway" });
 
     const [token, setToken] = useState(localStorage.getItem("token"));
@@ -39,19 +39,20 @@ export default function CheckoutPage() {
     const [contactInfoLocal, setContactInfoLocal] = useState({ email: "", phone: "", countryCode: "+91" });
     const [bookingResult, setBookingResultLocal] = useState(null);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
 
     const [createBooking, { isLoading: isMutationLoading }] = useCreateBookingMutation();
     const [verifyPayment] = useVerifyPaymentMutation();
 
     useEffect(() => {
-        // Load pay SDK once
+        // Load Razorpay SDK once
         const script = document.createElement("script");
-        script.src = "https://checkout.pay.com/v1/checkout.js";
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
         script.async = true;
         script.onerror = () => {
-            console.error("pay SDK could not be loaded. Please disable AdBlockers or check your connection.");
-            toast.error("Security Service Blocked (pay). Please check your internet.");
+            console.error("Razorpay SDK could not be loaded. Please disable AdBlockers or check your connection.");
+            toast.error("Security Service Blocked (Razorpay). Please check your internet.");
         };
         document.body.appendChild(script);
 
@@ -93,6 +94,26 @@ export default function CheckoutPage() {
         }
     }, [navigate, step]); // Added step to dependency array
 
+    const [couponCode, setCouponCode] = useState("");
+    const [discount, setDiscount] = useState(0);
+    const [appliedCoupon, setAppliedCoupon] = useState("");
+
+    const handleApplyCoupon = (e) => {
+        e.preventDefault();
+        const code = couponCode.toUpperCase();
+        if (code === "MMT600") {
+            setDiscount(600);
+            setAppliedCoupon("MMT600");
+            toast.success("Coupon MMT600 Applied! You saved ₹600");
+        } else if (code === "FLY700") {
+            setDiscount(700);
+            setAppliedCoupon("FLY700");
+            toast.success("FLY700 Applied! You saved ₹700");
+        } else {
+            toast.error("Invalid Coupon Code");
+        }
+    };
+
     const calculateTotal = () => {
         let total = Number(selectedFlight?.price) || 0;
         const pCount = Number(selectedFlight?.pax || bookingInfo?.pax || 1);
@@ -102,8 +123,7 @@ export default function CheckoutPage() {
         const convenienceFee = 300;
 
         const addOnsPrice = ((addOns?.insurance ? 249 : 0) * pCount) + ((addOns?.baggage || 0) * 450) + (addOns?.seatPrice || 0);
-        return total + fuelSurcharge + airportTax + convenienceFee + addOnsPrice;
-
+        return (total + fuelSurcharge + airportTax + convenienceFee + addOnsPrice) - discount;
     };
 
     const handlePassengerSubmit = () => {
@@ -118,13 +138,21 @@ export default function CheckoutPage() {
         }
         localStorage.setItem("yatralo-passengers", JSON.stringify(passengersLocal));
         localStorage.setItem("yatralo-contact", JSON.stringify(contactInfoLocal));
-        navigate("/checkout/review");
+        
+        const searchParams = new URLSearchParams(window.location.search);
+        const urlToken = searchParams.get("token");
+        navigate(`/checkout/review${urlToken ? `?token=${urlToken}` : ''}`);
     };
 
-    const handlepayPayment = async () => {
-        console.log("Initiating pay Flow...");
-        if (!window.pay) {
-            toast.error("pay SDK is still loading...");
+    const handleRazorpayPayment = async () => {
+        if (!token) {
+            setIsAuthModalOpen(true);
+            return;
+        }
+
+        console.log("Initiating Razorpay Flow...");
+        if (!window.Razorpay) {
+            toast.error("Razorpay SDK is still loading...");
             return;
         }
 
@@ -132,7 +160,6 @@ export default function CheckoutPage() {
         setIsProcessing(true);
 
         try {
-            // 1. Create PRE-PAYMENT Booking in Backend
             const bookingPayload = {
                 type: "flight",
                 fromCode: selectedFlight.origin,
@@ -158,7 +185,7 @@ export default function CheckoutPage() {
             }
 
             const options = {
-                key: "rzp_test_SSesz1GFvxuPR3", // Corrected key to match backend .env
+                key: "rzp_test_SSesz1GFvxuPR3", 
                 amount: Math.round(totalAmount * 100),
                 currency: "INR",
                 name: "Yatralo Travels",
@@ -168,10 +195,10 @@ export default function CheckoutPage() {
                     try {
                         setIsProcessing(true);
                         const verifyPayload = {
-                            pay_order_id: response.pay_order_id,
-                            pay_payment_id: response.pay_payment_id,
-                            pay_signature: response.pay_signature,
-                            bookingId: createResponse.bookingId // Corrected from .booking._id
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            bookingId: createResponse.bookingId 
                         };
 
                         const verifyResponse = await verifyPayment(verifyPayload).unwrap();
@@ -203,23 +230,18 @@ export default function CheckoutPage() {
                 theme: { color: "#4f46e5" },
             };
 
-
-            const rzp = new window.pay(options);
+            const rzp = new window.Razorpay(options);
             rzp.open();
         } catch (err) {
             const errMsg = err?.data?.message || err?.message || "Initiation Aborted by Backend Service.";
             toast.error(errMsg);
-            console.error("Initiation Error:", err);
             setIsProcessing(false);
         }
     };
 
-
-
     const handleBookingSuccess = (result) => {
         setBookingResultLocal(result);
         navigate("/checkout/status");
-
         localStorage.setItem("yatralo-last-booking", JSON.stringify({
             result,
             passengers: passengersLocal,
@@ -227,7 +249,7 @@ export default function CheckoutPage() {
         }));
     };
 
-    if (!selectedFlight || !addOns) return null;
+    if (!selectedFlight) return null;
 
     return (
         <div className="min-h-screen bg-[#f5f7fa] pt-24 pb-20 font-sans">
@@ -257,7 +279,7 @@ export default function CheckoutPage() {
                                 contactInfo={contactInfoLocal}
                                 addOns={addOns}
                                 calculateTotal={calculateTotal}
-                                onNext={handlepayPayment}
+                                onNext={handleRazorpayPayment}
                                 onBack={() => navigate("/checkout/passengers")}
                                 isLoading={isProcessing || isMutationLoading}
                             />
@@ -275,7 +297,42 @@ export default function CheckoutPage() {
 
                     {currentStep < 2 && (
                         <aside className="space-y-6">
-                           <div className="sticky top-40 bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
+                           {/* Coupon Section */}
+                           <div className="bg-white rounded-3xl border border-dashed border-blue-200 p-8 shadow-sm group hover:shadow-lg transition-all duration-500">
+                             <div className="flex items-center gap-3 mb-6">
+                                <Gift className="text-blue-500 animate-bounce" size={20} />
+                                <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Offers & Coupons</h3>
+                             </div>
+                             
+                             <form onSubmit={handleApplyCoupon} className="flex gap-2">
+                                <div className="flex-1 relative">
+                                   <input 
+                                     type="text" 
+                                     placeholder="Enter Code"
+                                     value={couponCode}
+                                     onChange={(e) => setCouponCode(e.target.value)}
+                                     className="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-black text-slate-800 text-xs placeholder:text-slate-300 uppercase"
+                                   />
+                                   {appliedCoupon && (
+                                     <div className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 bg-emerald-100 text-emerald-600 rounded-lg">
+                                        <ShieldCheck size={14} />
+                                     </div>
+                                   )}
+                                </div>
+                                <button type="submit" className="px-6 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all">Apply</button>
+                             </form>
+
+                             <div className="mt-6 space-y-3">
+                                {['MMT600', 'FLY700'].map(c => (
+                                  <div key={c} onClick={() => { setCouponCode(c); }} className="p-3 border border-slate-50 rounded-xl flex items-center justify-between group/c cursor-pointer hover:bg-blue-50 transition-all">
+                                     <span className="text-[10px] font-black text-slate-800 uppercase tracking-widest border border-dashed border-slate-300 px-2 py-1 rounded bg-white group-hover/c:border-blue-500">{c}</span>
+                                     <span className="text-[9px] font-black text-blue-500 uppercase">Save {c === 'MMT600' ? '₹600' : '₹700'}</span>
+                                  </div>
+                                ))}
+                             </div>
+                           </div>
+
+                           <div className="sticky top-40 bg-white rounded-3xl border border-slate-200 p-8 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden group">
                               <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
                               <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-8 flex items-center gap-2">
                                  <div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
@@ -292,7 +349,7 @@ export default function CheckoutPage() {
                                        <img src={`https://imgak.mmtcdn.com/flights/assets/media/dt/common/icons/${selectedFlight.code}.png`} className="w-8" alt={selectedFlight.airline} />
                                     </div>
                                  </div>
-                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter flex items-center gap-2">
+                                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <Calendar size={12} className="text-slate-300" /> {selectedFlight.depDate} • Economy
                                  </p>
                               </div>
@@ -310,6 +367,13 @@ export default function CheckoutPage() {
                                    <div className="flex justify-between items-center">
                                       <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Add-ons</span> 
                                       <span className="font-black text-blue-600">₹{( (addOns.insurance ? 249*(selectedFlight.pax||bookingInfo.pax||1) : 0) + ((addOns.baggage || 0)*450) ).toLocaleString()}</span>
+                                   </div>
+                                 )}
+
+                                 {discount > 0 && (
+                                   <div className="flex justify-between items-center">
+                                      <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Discount ({appliedCoupon})</span> 
+                                      <span className="font-black text-emerald-600">- ₹{discount.toLocaleString()}</span>
                                    </div>
                                  )}
 
@@ -338,8 +402,21 @@ export default function CheckoutPage() {
                     )}
                 </div>
             </div>
+            
+            <AuthModal 
+                isOpen={isAuthModalOpen} 
+                onClose={() => setIsAuthModalOpen(false)} 
+                onAuthSuccess={(newToken) => {
+                    localStorage.setItem("token", newToken);
+                    setToken(newToken);
+                    setIsAuthModalOpen(false);
+                    // Automatically retry payment after login
+                    setTimeout(() => handleRazorpayPayment(), 500);
+                }} 
+            />
         </div>
     );
 }
+
 
 

@@ -91,7 +91,7 @@ const SearchForm = ({ defaultTab = "flight" }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex-1 flex items-center justify-center gap-2 px-6 py-4 text-sm font-semibold transition-all ${
+                className={`relative flex-1 flex items-center justify-center gap-2 px-6 py-4 text-xs font-black uppercase tracking-[0.15em] transition-all ${
                   isActive ? "text-[#7c3aed]" : "text-slate-500 hover:text-slate-800"
                 }`}
               >
@@ -269,7 +269,7 @@ const SearchButton = ({ text }) => (
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
       type="submit"
-      className="h-12 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-xl font-semibold flex items-center justify-center gap-2 shadow-lg shadow-violet-100 transition-all text-sm group"
+      className="h-14 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl font-black uppercase tracking-[0.1em] flex items-center justify-center gap-3 shadow-lg shadow-violet-100 transition-all text-[12px] group"
     >
       <Search size={16} />
       {text}

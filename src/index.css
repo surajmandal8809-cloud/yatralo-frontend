@@ -10,6 +10,16 @@ html, body {
 
 * {
   font-family: 'Lato', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 900 !important;
+  letter-spacing: -0.04em !important;
+}
+
+button, input, select, label {
+  font-family: 'Lato', system-ui, sans-serif;
 }
 
 /* ===== SLIDER WRAPPER ===== */

@@ -7,7 +7,7 @@ export const userService = createApi({
     tagTypes: ["User"],
     endpoints: builder => ({
         getUser: builder.query({
-            query: (token) => ({ url: "/user/get", method: "GET" }),
+            query: () => ({ url: "/user/get", method: "GET" }),
             providesTags: ["User"],
         }),
         updateUser: builder.mutation({
@@ -18,6 +18,14 @@ export const userService = createApi({
             query: (body) => ({ url: "/user/avatar", method: "PUT", body }),
             invalidatesTags: ["User"],
         }),
+        addSavedTraveller: builder.mutation({
+            query: (body) => ({ url: "/user/saved-traveller", method: "POST", body }),
+            invalidatesTags: ["User"],
+        }),
+        deleteSavedTraveller: builder.mutation({
+            query: (travellerId) => ({ url: `/user/saved-traveller/${travellerId}`, method: "DELETE" }),
+            invalidatesTags: ["User"],
+        }),
     }),
 });
 
@@ -25,4 +33,6 @@ export const {
     useGetUserQuery,
     useUpdateUserMutation,
     useUpdateAvatarMutation,
+    useAddSavedTravellerMutation,
+    useDeleteSavedTravellerMutation,
 } = userService;

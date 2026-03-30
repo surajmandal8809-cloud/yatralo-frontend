@@ -1,35 +1,56 @@
 import React, { useState } from "react";
-import { User, Plus, Phone, Mail, Calendar, UserCheck, ShieldCheck, ArrowRight, X as CloseIcon, Info, ChevronRight } from "lucide-react";
+import { User, Plus, Phone, Mail, Calendar, UserCheck, ShieldCheck, ArrowRight, X as CloseIcon, Info, ChevronRight, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAddSavedTravellerMutation, useDeleteSavedTravellerMutation } from "../../../services/userService";
+import toast from "react-hot-toast";
 
 const TITLES = ["Mr", "Mrs", "Ms", "Miss", "Dr"];
 const NATIONALITIES = ["India", "United Arab Emirates", "Singapore", "United Kingdom", "USA", "Canada", "Australia"];
 
 export default function PassengerDetailsComponent({ passengers, setPassengers, pax, userData, onNext, contactInfo, setContactInfo }) {
   const [showSavedModal, setShowSavedModal] = useState(false);
-  
+  const [addSavedTraveller] = useAddSavedTravellerMutation();
+  const [deleteSavedTraveller] = useDeleteSavedTravellerMutation();
+
   const handleInputChange = (index, field, value) => {
     const newPassengers = [...passengers];
     newPassengers[index] = { ...newPassengers[index], [field]: value };
     setPassengers(newPassengers);
   };
 
-  const savedTravellers = [
-    { title: "Mr", firstName: "Rahul", lastName: "Sharma", gender: "Male", dob: "1990-05-15", nationality: "India" },
-    { title: "Mrs", firstName: "Priya", lastName: "Sharma", gender: "Female", dob: "1992-08-20", nationality: "India" },
-    { title: "Mr", firstName: "Amit", lastName: "Verma", gender: "Male", dob: "1985-11-10", nationality: "India" },
-  ];
+  const handleSaveTraveller = async (p) => {
+    if (!userData) return toast.error("Please login to save travellers");
+    if (!p.firstName || !p.lastName) return toast.error("Please fill name first");
+    try {
+      await addSavedTraveller({
+        first_name: p.firstName,
+        last_name: p.lastName,
+        gender: p.gender?.toUpperCase() || 'MALE',
+        type: 'ADULT'
+      }).unwrap();
+      toast.success("Traveller saved successfully!");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to save traveller");
+    }
+  };
+
+  const handleDeleteSaved = async (id) => {
+    try {
+      await deleteSavedTraveller(id).unwrap();
+      toast.success("Traveller deleted!");
+    } catch (err) {
+      toast.error("Failed to delete traveller");
+    }
+  };
 
   const selectSaved = (t) => {
     const emptyIndex = passengers.findIndex(p => !p.firstName);
-    if (emptyIndex !== -1) {
-      handleInputChange(emptyIndex, 'title', t.title);
-      handleInputChange(emptyIndex, 'firstName', t.firstName);
-      handleInputChange(emptyIndex, 'lastName', t.lastName);
-      handleInputChange(emptyIndex, 'gender', t.gender);
-      handleInputChange(emptyIndex, 'dob', t.dob);
-      handleInputChange(emptyIndex, 'nationality', t.nationality);
-    }
+    const targetIndex = emptyIndex !== -1 ? emptyIndex : 0;
+    
+    handleInputChange(targetIndex, 'title', t.gender === 'FEMALE' ? 'Mrs' : 'Mr');
+    handleInputChange(targetIndex, 'firstName', t.first_name);
+    handleInputChange(targetIndex, 'lastName', t.last_name);
+    handleInputChange(targetIndex, 'gender', t.gender === 'MALE' ? 'Male' : 'Female');
     setShowSavedModal(false);
   };
 
@@ -62,77 +83,80 @@ export default function PassengerDetailsComponent({ passengers, setPassengers, p
              initial={{ opacity: 0, y: 15 }}
              animate={{ opacity: 1, y: 0 }}
              transition={{ delay: i * 0.1 }}
-             className="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
+             className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-all duration-300"
            >
-              <div className="px-8 py-5 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+              <div className="px-8 py-4 bg-slate-50/80 border-b border-slate-100 flex items-center justify-between">
                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-black">
+                    <span className="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-[10px] font-black">
                        {i + 1}
                     </span>
-                    <p className="text-xs font-black text-slate-700 uppercase tracking-[0.15em]">
+                    <p className="text-[11px] font-black text-slate-800 uppercase tracking-widest">
                        Adult Traveller
                     </p>
                  </div>
-                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-white border border-slate-200 px-3 py-1.5 rounded-full">Primary Info</span>
+                 <div className="flex items-center gap-2 px-2 py-1 bg-white border border-slate-100 rounded-lg">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+                    <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Primary ID Required</span>
+                 </div>
               </div>
               
               <div className="p-8 space-y-8">
-                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    <div className="md:col-span-3">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block ml-1">Title</label>
+                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="relative group">
+                       <label className="absolute -top-2 left-4 bg-white px-2 text-[9px] font-black text-slate-400 group-focus-within:text-blue-600 uppercase tracking-[0.2em] transition-all z-10">Title</label>
                        <select 
                          value={passengers[i]?.title || "Mr"}
                          onChange={(e) => handleInputChange(i, 'title', e.target.value)}
-                         className="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-600/30 focus:shadow-lg focus:shadow-blue-50 transition-all font-bold text-slate-900 text-sm appearance-none"
+                         className="w-full bg-white border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-900 text-sm appearance-none"
                        >
                           {TITLES.map(t => <option key={t} value={t}>{t}</option>)}
                        </select>
+                       <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 rotate-90 pointer-events-none" size={16} />
                     </div>
-                    <div className="md:col-span-4">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block ml-1">First & Middle Name</label>
+                    <div className="md:col-span-1.5 relative group">
+                       <label className="absolute -top-2 left-4 bg-white px-2 text-[9px] font-black text-slate-400 group-focus-within:text-blue-600 uppercase tracking-[0.2em] transition-all z-10">First & Middle Name</label>
                        <input 
                          type="text" 
-                         placeholder="e.g. Rahul"
+                         placeholder="As per Passport"
                          value={passengers[i]?.firstName || ""}
                          onChange={(e) => handleInputChange(i, 'firstName', e.target.value)}
-                         className="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-600/30 focus:shadow-lg focus:shadow-blue-50 transition-all font-bold text-slate-900 text-sm"
+                         className="w-full bg-white border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-900 text-sm placeholder:text-slate-200"
                        />
                     </div>
-                    <div className="md:col-span-5">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block ml-1">Last Name</label>
+                    <div className="md:col-span-1.5 relative group">
+                       <label className="absolute -top-2 left-4 bg-white px-2 text-[9px] font-black text-slate-400 group-focus-within:text-blue-600 uppercase tracking-[0.2em] transition-all z-10">Last Name</label>
                        <input 
                          type="text" 
-                         placeholder="e.g. Sharma"
+                         placeholder="As per Passport"
                          value={passengers[i]?.lastName || ""}
                          onChange={(e) => handleInputChange(i, 'lastName', e.target.value)}
-                         className="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-600/30 focus:shadow-lg focus:shadow-blue-50 transition-all font-bold text-slate-900 text-sm"
+                         className="w-full bg-white border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-900 text-sm placeholder:text-slate-200"
                        />
                     </div>
                  </div>
 
-                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                    <div className="md:col-span-4">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block ml-1">Date of Birth</label>
+                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="relative group">
+                       <label className="absolute -top-2 left-4 bg-white px-2 text-[9px] font-black text-slate-400 group-focus-within:text-blue-600 uppercase tracking-[0.2em] transition-all z-10">Date of Birth</label>
                        <div className="relative">
-                          <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                           <input 
-                           type="date" 
-                           value={passengers[i]?.dob || ""}
-                           onChange={(e) => handleInputChange(i, 'dob', e.target.value)}
-                           className="w-full bg-white border-2 border-slate-100 p-4 pl-12 rounded-2xl outline-none focus:border-blue-600/30 focus:shadow-lg focus:shadow-blue-50 transition-all font-bold text-slate-900 text-sm"
+                            type="date" 
+                            value={passengers[i]?.dob || ""}
+                            onChange={(e) => handleInputChange(i, 'dob', e.target.value)}
+                            className="w-full bg-white border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-900 text-sm"
                           />
                        </div>
                     </div>
 
-                    <div className="md:col-span-4">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block ml-1">Gender</label>
-                       <div className="flex bg-slate-100 p-1.5 rounded-[1.25rem] border border-slate-200">
-                          {["Male", "Female"].map(g => (
+                    <div className="relative group">
+                       <label className="absolute -top-2 left-4 bg-white px-2 text-[9px] font-black text-slate-400 group-focus-within:text-blue-600 uppercase tracking-[0.2em] transition-all z-10">Gender</label>
+                       <div className="flex bg-slate-50 p-1 rounded-xl border border-slate-100">
+                          {["Male", "Female", "Other"].map(g => (
                             <button 
                               key={g}
                               type="button"
                               onClick={() => handleInputChange(i, 'gender', g)}
-                              className={`flex-1 py-3 text-[10px] font-black rounded-xl transition-all ${passengers[i]?.gender === g ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                              className={`flex-1 py-3 text-[10px] font-black rounded-lg transition-all ${passengers[i]?.gender === g ? 'bg-white text-blue-600 shadow-sm border border-slate-100' : 'text-slate-400 hover:text-slate-600'}`}
                             >
                                {g}
                             </button>
@@ -140,15 +164,32 @@ export default function PassengerDetailsComponent({ passengers, setPassengers, p
                        </div>
                     </div>
 
-                    <div className="md:col-span-4">
-                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block ml-1">Nationality</label>
+                    <div className="md:col-span-1.2 relative group flex-1">
+                       <label className="absolute -top-2 left-4 bg-white px-2 text-[9px] font-black text-slate-400 group-focus-within:text-blue-600 uppercase tracking-[0.2em] transition-all z-10">Nationality</label>
                        <select 
                          value={passengers[i]?.nationality || "India"}
                          onChange={(e) => handleInputChange(i, 'nationality', e.target.value)}
-                         className="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl outline-none focus:border-blue-600/30 focus:shadow-lg focus:shadow-blue-50 transition-all font-bold text-slate-900 text-sm appearance-none"
+                         className="w-full bg-white border border-slate-200 p-4 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-900 text-sm appearance-none"
                        >
                           {NATIONALITIES.map(n => <option key={n} value={n}>{n}</option>)}
                        </select>
+                       <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-300 rotate-90 pointer-events-none" size={16} />
+                    </div>
+                 </div>
+
+                 <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
+                    <button 
+                      onClick={() => handleSaveTraveller(passengers[i])}
+                      className="flex items-center gap-3 group/save cursor-pointer"
+                    >
+                      <div className="w-5 h-5 rounded-lg border-2 border-slate-200 flex items-center justify-center transition-all group-hover/save:border-blue-600 group-hover/save:bg-blue-50">
+                        <UserCheck size={12} className="text-blue-600 scale-0 group-hover/save:scale-110 transition-transform" />
+                      </div>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover/save:text-blue-600 transition-colors">Save this traveller for future use</span>
+                    </button>
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50/50 rounded-lg">
+                      <ShieldCheck size={12} className="text-blue-500" />
+                      <span className="text-[9px] font-black text-blue-400 uppercase tracking-tighter">Your details are safe with us</span>
                     </div>
                  </div>
               </div>
@@ -157,63 +198,58 @@ export default function PassengerDetailsComponent({ passengers, setPassengers, p
       </div>
 
       {/* Contact Details Section */}
-      <section className="bg-white rounded-[2rem] border border-slate-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
-         <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center animate-pulse">
-               <Phone size={22} />
+      <section className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm hover:shadow-md transition-all duration-300">
+         <div className="flex items-center gap-4 mb-10">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+               <Phone size={20} />
             </div>
             <div>
-               <h3 className="text-xl font-black text-slate-900 tracking-tight">Contact Information</h3>
-               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Your ticket will be sent to these details</p>
+               <h3 className="text-lg font-black text-slate-900 tracking-tight">Contact Information</h3>
+               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Updates will be sent to the primary contact</p>
             </div>
          </div>
          
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="group">
-               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block ml-1 transition-colors group-focus-within:text-blue-600">Email Address</label>
-               <div className="relative">
-                  <Mail size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500" />
-                  <input 
-                    type="email" 
-                    placeholder="e.g. rahul.sharma@gmail.com"
-                    value={contactInfo.email}
-                    onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
-                    className="w-full bg-white border-2 border-slate-100 p-5 pl-14 rounded-2xl outline-none focus:border-blue-600/30 focus:shadow-lg focus:shadow-blue-50 transition-all font-bold text-slate-900 text-sm"
-                  />
-               </div>
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="relative group">
+               <label className="absolute -top-2 left-4 bg-white px-2 text-[9px] font-black text-slate-400 group-focus-within:text-blue-600 uppercase tracking-[0.2em] transition-all z-10">Email Address</label>
+               <input 
+                 type="email" 
+                 placeholder="e.g. rahul.sharma@example.com"
+                 value={contactInfo.email}
+                 onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
+                 className="w-full bg-white border border-slate-200 p-5 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-900 text-sm"
+               />
             </div>
-            <div className="group">
-               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block ml-1 transition-colors group-focus-within:text-blue-600">Mobile Number</label>
-               <div className="flex gap-4">
+            <div className="flex gap-4">
+               <div className="relative group w-32 shrink-0">
+                  <label className="absolute -top-2 left-4 bg-white px-2 text-[9px] font-black text-slate-400 group-focus-within:text-blue-600 uppercase tracking-[0.2em] transition-all z-10">Code</label>
                   <select 
                     value={contactInfo.countryCode}
                     onChange={(e) => setContactInfo({ ...contactInfo, countryCode: e.target.value })}
-                    className="w-24 bg-white border-2 border-slate-100 p-5 rounded-2xl outline-none font-bold text-slate-900 text-sm appearance-none"
+                    className="w-full bg-white border border-slate-200 p-5 rounded-xl outline-none font-black text-slate-900 text-sm appearance-none"
                   >
-                     <option>+91</option>
-                     <option>+1</option>
-                     <option>+44</option>
-                     <option>+65</option>
+                     {["+91", "+1", "+44", "+65", "+971"].map(c => <option key={c}>{c}</option>)}
                   </select>
-                  <div className="flex-1 relative">
-                     <Phone size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500" />
-                     <input 
-                       type="tel" 
-                       placeholder="10-digit number"
-                       value={contactInfo.phone}
-                       onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
-                       className="w-full bg-white border-2 border-slate-100 p-5 pl-14 rounded-2xl outline-none focus:border-blue-600/30 focus:shadow-lg focus:shadow-blue-50 transition-all font-bold text-slate-900 text-sm"
-                     />
-                  </div>
+               </div>
+               <div className="relative group flex-1">
+                  <label className="absolute -top-2 left-4 bg-white px-2 text-[9px] font-black text-slate-400 group-focus-within:text-blue-600 uppercase tracking-[0.2em] transition-all z-10">Mobile Number</label>
+                  <input 
+                    type="tel" 
+                    placeholder="10-digit number"
+                    value={contactInfo.phone}
+                    onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
+                    className="w-full bg-white border border-slate-200 p-5 rounded-xl outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-50 transition-all font-black text-slate-900 text-sm"
+                  />
                </div>
             </div>
          </div>
 
-         <div className="mt-8 p-6 bg-slate-50 border border-slate-200/60 rounded-2xl flex items-center gap-4 group/info">
-            <Info className="text-blue-600 shrink-0 group-hover/info:scale-110 transition-transform" size={20} />
-            <p className="text-[11px] font-bold text-slate-500 leading-relaxed uppercase tracking-wider">Note: E-Ticket and flight updates will be sent to the provided email and phone number.</p>
+         <div className="mt-8 p-5 bg-blue-50/30 border border-blue-100 rounded-2xl flex items-center gap-4">
+            <ShieldCheck className="text-blue-500 shrink-0" size={20} />
+            <p className="text-[10px] font-bold text-blue-600 leading-relaxed uppercase tracking-wider">Your data is secured using industry-standard TLS encryption.</p>
          </div>
       </section>
+
 
       {/* Action Button */}
       <div className="flex justify-between items-center bg-white p-8 rounded-[2rem] border border-slate-200 shadow-sm border-b-4 border-b-blue-600">
@@ -250,26 +286,43 @@ export default function PassengerDetailsComponent({ passengers, setPassengers, p
                    <button onClick={() => setShowSavedModal(false)} className="p-3 hover:bg-slate-200/50 rounded-full transition-colors"><CloseIcon size={24} className="text-slate-400" /></button>
                 </div>
                 <div className="p-8 space-y-4 max-h-[60vh] overflow-y-auto">
-                   {savedTravellers.map((t, idx) => (
-                     <button 
-                      key={idx} 
-                      onClick={() => selectSaved(t)}
-                      className="w-full flex items-center gap-6 p-6 rounded-[2rem] bg-white border-2 border-slate-100 hover:border-blue-600/30 hover:bg-blue-50/30 hover:shadow-lg hover:shadow-blue-50/50 transition-all text-left group"
-                     >
-                        <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 shadow-sm transition-all group-hover:bg-blue-600 group-hover:text-white group-hover:scale-105">
-                           <User size={32} />
+                   {userData?.saved_travellers?.length > 0 ? (
+                      userData.saved_travellers.map((t, idx) => (
+                        <div key={idx} className="relative group/card">
+                          <button 
+                            onClick={() => selectSaved(t)}
+                            className="w-full flex items-center gap-6 p-6 rounded-[2rem] bg-white border-2 border-slate-100 hover:border-blue-600/30 hover:bg-blue-50/30 transition-all text-left group"
+                          >
+                            <div className="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400 shadow-sm transition-all group-hover:bg-blue-600 group-hover:text-white">
+                                <User size={32} />
+                            </div>
+                            <div className="flex-1">
+                                <p className="text-lg font-black text-slate-900 uppercase tracking-tight">{t.first_name} {t.last_name}</p>
+                                <p className="text-[11px] font-black text-slate-400 mt-2 uppercase tracking-[0.2em] flex items-center gap-3">
+                                  {t.gender} <span className="w-1 h-1 rounded-full bg-slate-300" /> {t.type}
+                                </p>
+                            </div>
+                            <div className="w-10 h-10 rounded-full border-2 border-slate-100 flex items-center justify-center text-slate-200 group-hover:border-blue-600 group-hover:text-blue-600">
+                                <ChevronRight size={20} strokeWidth={3} />
+                            </div>
+                          </button>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); handleDeleteSaved(t._id); }}
+                            className="absolute top-2 right-2 w-10 h-10 bg-white shadow-xl rounded-full flex items-center justify-center text-slate-300 hover:text-red-500 hover:scale-110 transition-all border border-slate-100 opacity-0 group-hover/card:opacity-100 z-10"
+                            title="Delete Saved Traveller"
+                          >
+                            <Trash2 size={16} />
+                          </button>
                         </div>
-                        <div className="flex-1">
-                           <p className="text-lg font-black text-slate-900">{t.title}. {t.firstName} {t.lastName}</p>
-                           <p className="text-[11px] font-black text-slate-400 mt-2 uppercase tracking-[0.2em] leading-none flex items-center gap-3">
-                              {t.gender} <span className="w-1 h-1 rounded-full bg-slate-300" /> {t.nationality}
-                           </p>
-                        </div>
-                        <div className="w-10 h-10 rounded-full border-2 border-slate-200 flex items-center justify-center text-slate-200 group-hover:border-blue-600 group-hover:text-blue-600 transition-colors">
-                           <ChevronRight size={20} strokeWidth={3} />
-                        </div>
-                     </button>
-                   ))}
+                      ))
+                    ) : (
+                      <div className="py-20 text-center space-y-4">
+                         <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto text-slate-200">
+                            <User size={40} />
+                         </div>
+                         <p className="text-sm font-black text-slate-400 uppercase tracking-widest">No saved travellers found</p>
+                      </div>
+                    )}
                 </div>
                 <div className="p-8 bg-slate-50 border-t border-slate-200 flex justify-center">
                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">

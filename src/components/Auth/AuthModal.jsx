@@ -89,7 +89,8 @@ const AuthModal = ({ isOpen, onClose, onAuthSuccess, initialMode = "login" }) =>
     if (!form.password) return toast.error("Password is required");
 
     try {
-      const res = await register(form).unwrap();
+      const { otp, confirm_password, ...payload } = form;
+      const res = await register(payload).unwrap();
       if (res.status) {
         toast.success(res.message);
         setAuthData({ ...res.data, flow: "register" });

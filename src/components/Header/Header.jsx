@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiMenu, FiX, FiUser, FiChevronDown, FiLogOut, FiSettings } from "react-icons/fi";
+import { FiMenu, FiX, FiUser, FiChevronDown, FiLogOut, FiSettings, FiCreditCard, FiShoppingBag, FiActivity, FiLock } from "react-icons/fi";
 import { useGetUserQuery } from "../../services/userService";
 import toast from "react-hot-toast";
 import Logo from "../common/Logo";
 import AuthModal from "../Auth/AuthModal";
+
+const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=7c3aed&color=fff&name=Traveller&size=100";
 
 const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,6 +43,8 @@ const Header = () => {
     }
   }, [error]);
 
+  const isUserPage = ['/profile', '/wallet', '/bookings', '/settings', '/activity', '/account'].includes(location.pathname);
+
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 30);
     window.addEventListener("scroll", onScroll);
@@ -68,7 +72,7 @@ const Header = () => {
   ];
 
   const isHomePage = location.pathname === "/";
-  const scrolled = isScrolled || !isHomePage;
+  const scrolled = isScrolled || !isHomePage || isUserPage;
 
   return (
     <header className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? "bg-white shadow-sm border-b border-gray-100 py-2" : "bg-gradient-to-b from-black/50 to-transparent py-4"
@@ -146,19 +150,37 @@ const Header = () => {
                 </div>
                 <FiChevronDown size={14} className={`opacity-40 transition-transform group-hover/profile:rotate-180 ${scrolled ? "text-slate-800" : "text-white"}`} />
 
-                {/* Dropdown Menu */}
-                <div className="absolute top-full right-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 opacity-0 invisible group-hover/profile:opacity-100 group-hover/profile:visible transition-all duration-200 translate-y-2 group-hover/profile:translate-y-0 z-[60] overflow-hidden">
-                    <div className="p-4 bg-gray-50 border-b border-gray-100">
-                        <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-1">My Account</p>
-                        <p className="text-sm font-bold text-gray-800 truncate">{user?.email}</p>
+                <div className="absolute top-full right-0 mt-3 w-72 bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.2)] border border-slate-100 opacity-0 invisible group-hover/profile:opacity-100 group-hover/profile:visible transition-all duration-300 translate-y-2 group-hover/profile:translate-y-0 z-[60] overflow-hidden">
+                    {/* MMT Style Header */}
+                    <div className="p-6 bg-gradient-to-br from-slate-900 to-[#1b1b1b] text-white">
+                        <div className="flex items-center gap-3">
+                           <div className="w-10 h-10 rounded-full border-2 border-white/20 overflow-hidden">
+                              <img src={user?.avatar || DEFAULT_AVATAR} alt="" className="w-full h-full object-cover" />
+                           </div>
+                           <div className="flex-1 overflow-hidden">
+                              <p className="text-sm font-black truncate">{user?.first_name} {user?.last_name}</p>
+                              <p className="text-[10px] font-bold text-white/50 truncate tracking-tight">{user?.email}</p>
+                           </div>
+                        </div>
                     </div>
-                    <div className="p-2">
-                        <Link to="/profile" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-violet-50 text-sm font-bold text-gray-700 transition-colors">
-                            <FiUser className="text-[#7C3AED]" /> My Profile
-                        </Link>
-                        <div className="h-px bg-gray-100 my-2" />
-                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-sm font-bold text-red-600 transition-colors">
-                            <FiLogOut /> Logout
+                    
+                    <div className="p-3 bg-white">
+                        <ul className="space-y-0.5">
+                            <DropdownItem to="/profile" icon={<FiUser />} label="My Profile" desc="Manage profile and settings" />
+                            <DropdownItem to="/bookings" icon={<FiShoppingBag />} label="My Trips" desc="Manage bookings & history" />
+                            <DropdownItem to="/wallet" icon={<FiCreditCard />} label="YatraLo Wallet" desc="Balance: ₹450" />
+                            <DropdownItem to="/settings" icon={<FiSettings />} label="Manage Settings" desc="2FA, Login & Security" />
+                            <DropdownItem to="/activity" icon={<FiActivity />} label="Security Activity" desc="Login history & IP logs" />
+                            <DropdownItem to="/account" icon={<FiLock />} label="My Account" desc="VIP Status & Identity" />
+                        </ul>
+                        <div className="h-px bg-slate-50 my-2 mx-2" />
+                        <button onClick={handleLogout} className="w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-800 transition-all group/item">
+                            <div className="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center group-hover/item:bg-red-500 group-hover/item:text-white transition-all">
+                               <FiLogOut size={16} />
+                            </div>
+                            <div className="text-left">
+                               <p className="text-xs font-black uppercase tracking-widest">Logout</p>
+                            </div>
                         </button>
                     </div>
                 </div>
@@ -239,6 +261,18 @@ const Header = () => {
     </header>
   );
 };
+
+const DropdownItem = ({ to, icon, label, desc }) => (
+  <li>
+    <Link to={to} className="flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-600 transition-all group/item">
+      <div className="text-slate-400 group-hover/item:text-[#7C3AED] transition-colors">{React.cloneElement(icon, { size: 18 })}</div>
+      <div className="text-left">
+        <p className="text-xs font-black text-slate-800 group-hover/item:text-[#7C3AED] transition-colors">{label}</p>
+        <p className="text-[10px] font-bold text-slate-400 leading-none mt-1">{desc}</p>
+      </div>
+    </Link>
+  </li>
+);
 
 export default Header;
 

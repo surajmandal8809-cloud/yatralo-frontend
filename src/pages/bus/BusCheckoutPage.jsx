@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ShieldCheck, Bus } from "lucide-react";
+import { addBooking } from "../../utils/bookingUtils";
 
 export default function BusCheckoutPage() {
     const navigate = useNavigate();
@@ -59,8 +60,17 @@ export default function BusCheckoutPage() {
                  name: "Yatralo Bus",
                  description: "Bus Booking Payment",
                  handler: function (response) {
-                     toast.success("Payment Verified! Booking Confirmed.");
-                     navigate("/buses"); // To home or success
+                     addBooking({
+                         type: 'bus',
+                         fromCode: bus.from,
+                         toCode: bus.to,
+                         travelDate: bus.depDate || new Date().toLocaleDateString(),
+                         totalPrice: totalAmount,
+                         providerName: bus.operator,
+                         status: 'confirmed',
+                         details: { bus, passengers, contactInfo }
+                     });
+                     navigate("/bookings");
                  },
                  prefill: {
                      name: passengers[0].firstName + " " + passengers[0].lastName,

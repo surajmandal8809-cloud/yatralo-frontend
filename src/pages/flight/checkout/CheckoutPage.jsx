@@ -204,7 +204,6 @@ export default function CheckoutPage() {
                         const verifyResponse = await verifyPayment(verifyPayload).unwrap();
 
                         if (verifyResponse.success) {
-                            toast.success("Payment Verified! Fetching E-Ticket...");
                             handleBookingSuccess({
                                 ...verifyResponse.booking,
                                 amount: totalAmount,
@@ -241,6 +240,15 @@ export default function CheckoutPage() {
 
     const handleBookingSuccess = (result) => {
         setBookingResultLocal(result);
+        
+        // Add to local booking history for immediate UI updates
+        try {
+            const { addBooking } = require("../../../utils/bookingUtils");
+            addBooking(result);
+        } catch (e) {
+            console.error("Failed to add booking to local history", e);
+        }
+
         navigate("/checkout/status");
         localStorage.setItem("yatralo-last-booking", JSON.stringify({
             result,

@@ -1,29 +1,56 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import HotelGuestForm from "../HotelGuestForm";
-import HotelCheckoutSummary from "../HotelCheckoutSummary";
+import HotelCheckoutStepper from "./HotelCheckoutStepper";
+import HotelGuestDetails from "./HotelGuestDetails";
+import HotelReviewSection from "./HotelReviewSection";
+import HotelStatusSection from "./HotelStatusSection";
+import { Star, Calendar, Users, ShieldCheck } from "lucide-react";
+import { useCreateBookingMutation, useVerifyPaymentMutation } from "../../../services/flightService";
+import { addBooking } from "../../../utils/bookingUtils";
+
+const STEPS = ["Guests", "Review & Pay", "Confirmation"];
 
 export default function HotelCheckoutPage() {
     const navigate = useNavigate();
     const location = useLocation();
     
+    const [currentStep, setCurrentStep] = useState(0);
     const [hotel, setHotel] = useState(null);
     const [totalAmount, setTotalAmount] = useState(0);
-    const [pax, setPax] = useState(2);
-    const [isProcessing, setIsProcessing] = useState(false);
-
-    const [primaryGuest, setPrimaryGuest] = useState({ firstName: "", lastName: "" });
+    const [guests, setGuests] = useState([]);
     const [contactInfo, setContactInfo] = useState({ email: "", phone: "" });
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [bookingResult, setBookingResult] = useState(null);
+    const token = localStorage.getItem("token");
+
+    const [createBooking, { isLoading: isBookingLoading }] = useCreateBookingMutation();
+    const [verifyPayment] = useVerifyPaymentMutation();
 
     useEffect(() => {
-        if (!location.state?.hotel) {
+        // Find hotel from state or fallback
+        const state = location.state;
+        const savedHotel = localStorage.getItem("yatralo-selected-hotel");
+
+        if (state?.hotel) {
+            setHotel(state.hotel);
+            setTotalAmount(state.totalAmount || state.hotel.price);
+            const pax = state.pax || 2;
+            setGuests(Array.from({ length: pax }, () => ({ title: "Mr", firstName: "", lastName: "" })));
+        } else if (savedHotel) {
+            const h = JSON.parse(savedHotel);
+            setHotel(h);
+            setTotalAmount(h.price);
+            setGuests(Array.from({ length: 2 }, () => ({ title: "Mr", firstName: "", lastName: "" })));
+        } else {
             navigate("/hotels");
             return;
         }
-        setHotel(location.state.hotel);
-        setTotalAmount(location.state.totalAmount);
-        setPax(location.state.pax || 2);
+
+        // Load contact from local storage if exists
+        const savedContact = localStorage.getItem("yatralo-contact");
+        if (savedContact) setContactInfo(JSON.parse(savedContact));
+
     }, [location.state, navigate]);
 
     useEffect(() => {
@@ -33,73 +60,227 @@ export default function HotelCheckoutPage() {
         document.body.appendChild(script);
     }, []);
 
-    const handleRazorpayPayment = async () => {
-        if (!primaryGuest.firstName || !primaryGuest.lastName || !contactInfo.email || !contactInfo.phone) {
-            toast.error("Please fill all details!");
-            return;
+    const handleNext = () => {
+        if (currentStep === 0) {
+            // Validate Guests
+            const isValid = guests.every(g => g.firstName && g.lastName);
+            if (!isValid || !contactInfo.email || !contactInfo.phone) {
+                toast.error("Please provide all required guest and contact details.");
+                return;
+            }
+            if (!token) {
+                toast.error("Please login to continue with the booking.");
+                return;
+            }
+            localStorage.setItem("yatralo-contact", JSON.stringify(contactInfo));
+            setCurrentStep(1);
+        } else if (currentStep === 1) {
+            handleRazorpayPayment();
         }
+    };
 
+    const handleBack = () => {
+        if (currentStep > 0) setCurrentStep(currentStep - 1);
+        else navigate(-1);
+    };
+
+    const handleRazorpayPayment = async () => {
         if (!window.Razorpay) {
-            toast.error("Razorpay SDK is still loading...");
+            toast.error("Razorpay Service is initializing. Please wait...");
             return;
         }
 
         setIsProcessing(true);
-        toast.loading("Initiating Payment...", { duration: 1500 });
 
-        setTimeout(() => {
-            setIsProcessing(false);
-            const rzp = new window.Razorpay({
-                 key: "rzp_test_SSesz1GFvxuPR3",
-                 amount: Math.round(totalAmount * 100),
-                 currency: "INR",
-                 name: "Yatralo Hotels",
-                 description: "Hotel Booking Payment",
-                 handler: function (response) {
-                     toast.success("Payment Verified! Booking Confirmed.");
-                     navigate("/hotels"); // To home or success
-                 },
-                 prefill: {
-                     name: primaryGuest.firstName + " " + primaryGuest.lastName,
-                     email: contactInfo.email,
-                     contact: contactInfo.phone,
-                 },
-                 theme: { color: "#3b82f6" }
-            });
+        try {
+            const bookingPayload = {
+                type: "hotel",
+                from: hotel.city,
+                to: hotel.name,
+                travelDate: location.state?.checkIn || new Date().toLocaleDateString(),
+                totalPrice: totalAmount,
+                providerName: hotel.name,
+                passengers: guests.length,
+                details: {
+                    hotel: hotel,
+                    contact: contactInfo,
+                    guests: guests
+                }
+            };
+
+            const createResponse = await createBooking(bookingPayload).unwrap();
+
+            if (!createResponse.success || !createResponse.orderId) {
+                toast.error(createResponse.message || "Failed to initiate booking.");
+                setIsProcessing(false);
+                return;
+            }
+
+            const options = {
+                key: "rzp_test_SSesz1GFvxuPR3",
+                amount: Math.round(totalAmount * 100),
+                currency: "INR",
+                name: "Yatralo Hotels",
+                description: `Stay at ${hotel.name}`,
+                order_id: createResponse.orderId,
+                handler: async (response) => {
+                    try {
+                        setIsProcessing(true);
+                        const verifyPayload = {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            bookingId: createResponse.bookingId 
+                        };
+
+                        const verifyResponse = await verifyPayment(verifyPayload).unwrap();
+
+                        if (verifyResponse.success) {
+                            const result = {
+                                bookingId: verifyResponse.booking._id,
+                                hotelDetails: hotel,
+                                amount: totalAmount,
+                                guests: guests,
+                                date: new Date().toLocaleDateString(),
+                                checkIn: location.state?.checkIn || "20 Apr 2026",
+                                checkOut: location.state?.checkOut || "21 Apr 2026",
+                                nights: location.state?.nights || 1
+                            };
+                            
+                            setBookingResult(result);
+                            setCurrentStep(2);
+                            
+                            addBooking({ 
+                                ...result, 
+                                type: 'hotel', 
+                                fromCode: hotel.city, 
+                                toCode: hotel.name,
+                                totalPrice: totalAmount,
+                                travelDate: result.checkIn,
+                                providerName: hotel.name,
+                                status: 'confirmed'
+                            });
+                        } else {
+                            toast.error("Payment verification failed.");
+                        }
+                    } catch (err) {
+                        toast.error("Verification error occurred.");
+                    } finally {
+                        setIsProcessing(false);
+                    }
+                },
+                prefill: {
+                    name: guests[0].firstName + " " + guests[0].lastName,
+                    email: contactInfo.email,
+                    contact: contactInfo.phone,
+                },
+                theme: { color: "#2563eb" },
+                modal: { ondismiss: () => setIsProcessing(false) }
+            };
+
+            const rzp = new window.Razorpay(options);
             rzp.open();
-        }, 1500);
+        } catch (err) {
+            toast.error(err?.data?.message || "Initiation failed.");
+            setIsProcessing(false);
+        }
     };
 
     if (!hotel) return null;
 
     return (
-        <div className="min-h-screen bg-[#f5f7fa] pt-24 pb-20 font-sans">
-            <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 space-y-8">
-                    <HotelGuestForm 
-                        primaryGuest={primaryGuest} 
-                        setPrimaryGuest={setPrimaryGuest} 
-                        contactInfo={contactInfo} 
-                        setContactInfo={setContactInfo} 
-                    />
-
-                    <button 
-                        onClick={handleRazorpayPayment} 
-                        disabled={isProcessing}
-                        className="w-full py-5 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl font-black text-lg transition-all uppercase tracking-[0.2em] shadow-xl shadow-violet-100 disabled:opacity-50 hover:scale-[1.01] active:scale-[0.99]"
-                    >
-                        {isProcessing ? "Processing..." : `Pay ₹${totalAmount}`}
-                    </button>
+        <div className="min-h-screen bg-[#f5f7fa] pt-28 pb-20 font-sans">
+            <div className="max-w-7xl mx-auto px-6">
+                
+                <div className="flex justify-center mb-16">
+                    <HotelCheckoutStepper currentStep={currentStep} steps={STEPS} />
                 </div>
 
-                <aside>
-                    <HotelCheckoutSummary 
-                        hotel={hotel} 
-                        checkIn={location.state?.checkIn} 
-                        checkOut={location.state?.checkOut} 
-                        totalAmount={totalAmount} 
-                    />
-                </aside>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+                   <div className="lg:col-span-2">
+                        {currentStep === 0 && (
+                            <HotelGuestDetails 
+                                guests={guests} 
+                                setGuests={setGuests} 
+                                contactInfo={contactInfo} 
+                                setContactInfo={setContactInfo} 
+                                onNext={handleNext} 
+                            />
+                        )}
+                        {currentStep === 1 && (
+                            <HotelReviewSection 
+                                hotel={hotel} 
+                                guests={guests} 
+                                contactInfo={contactInfo} 
+                                totalAmount={totalAmount} 
+                                onNext={handleNext} 
+                                onBack={handleBack} 
+                                isLoading={isProcessing}
+                                checkIn={location.state?.checkIn}
+                                checkOut={location.state?.checkOut}
+                                nights={location.state?.nights}
+                            />
+                        )}
+                        {currentStep === 2 && (
+                            <HotelStatusSection 
+                                bookingResult={bookingResult} 
+                                guests={guests}
+                                fromName={hotel.city} 
+                                toName={hotel.name} 
+                            />
+                        )}
+                   </div>
+
+                   {currentStep < 2 && (
+                      <aside className="space-y-6">
+                         {/* Sticky Selection Summary */}
+                         <div className="sticky top-40 bg-white rounded-[2.5rem] p-10 border border-slate-200 shadow-sm hover:shadow-2xl transition-all duration-700 group overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
+                            <h3 className="text-[12px] font-black text-slate-400 uppercase tracking-widest mb-10 flex items-center gap-3">
+                               <div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                               Selection Overview
+                            </h3>
+                            
+                            <div className="bg-slate-50 p-6 rounded-3xl mb-10 group-hover:bg-blue-50/50 transition-colors">
+                               <div className="flex items-center gap-4 mb-6">
+                                  <div className="w-14 h-14 rounded-2xl overflow-hidden bg-white shadow-sm border border-slate-100 p-0.5 group-hover:scale-110 transition-transform duration-500">
+                                     <img src={hotel.image || hotel.images?.[0] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'} className="w-full h-full object-cover rounded-xl" alt="" />
+                                  </div>
+                                  <div>
+                                     <p className="text-sm font-black text-slate-900 tracking-tight leading-none uppercase italic">{hotel.name}</p>
+                                     <div className="flex items-center gap-1 mt-1 font-black text-blue-600">
+                                        <Star size={10} className="fill-blue-600" />
+                                        <span className="text-[10px] uppercase tracking-widest">{hotel.rating} Excellent</span>
+                                     </div>
+                                  </div>
+                               </div>
+                               <div className="space-y-4 pt-6 border-t border-slate-200/50">
+                                  <div className="flex items-center gap-3">
+                                     <Calendar size={14} className="text-slate-300" />
+                                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{location.state?.checkIn || '20 Apr'} - {location.state?.checkOut || '21 Apr'}</p>
+                                  </div>
+                                  <div className="flex items-center gap-3">
+                                     <Users size={14} className="text-slate-300" />
+                                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{guests.length} Adults | 1 Room</p>
+                                  </div>
+                               </div>
+                            </div>
+
+                            <div className="space-y-4 pt-10 border-t border-slate-100">
+                               <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest text-slate-400"><span>Net Fare</span><span className="text-slate-700">₹ {Math.round(totalAmount*0.82).toLocaleString()}</span></div>
+                               <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest text-slate-400"><span>Tax & Service Fees</span><span className="text-slate-700">₹ {Math.round(totalAmount*0.18).toLocaleString()}</span></div>
+                               <div className="pt-8 flex justify-between items-end bg-gradient-to-b from-transparent to-slate-50/50 -mx-10 px-10 -mb-10 pb-10">
+                                  <div>
+                                     <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2 leading-none">Grand Total</p>
+                                     <h4 className="text-4xl font-black text-slate-900 tracking-tighter">₹ {totalAmount.toLocaleString()}</h4>
+                                  </div>
+                                  <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shadow-inner group-hover:rotate-12 transition-transform"><ShieldCheck size={24} /></div>
+                               </div>
+                            </div>
+                         </div>
+                      </aside>
+                   )}
+                </div>
             </div>
         </div>
     );

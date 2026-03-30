@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ShieldCheck, Train } from "lucide-react";
+import { addBooking } from "../../utils/bookingUtils";
 
 export default function TrainCheckoutPage() {
     const navigate = useNavigate();
@@ -59,8 +60,17 @@ export default function TrainCheckoutPage() {
                  name: "Yatralo Train",
                  description: "Train Booking Payment",
                  handler: function (response) {
-                     toast.success("Payment Verified! Booking Confirmed.");
-                     navigate("/trains"); // To home or success
+                     addBooking({
+                         type: 'train',
+                         fromCode: train.from,
+                         toCode: train.to,
+                         travelDate: train.depDate || new Date().toLocaleDateString(),
+                         totalPrice: totalAmount,
+                         providerName: train.name,
+                         status: 'confirmed',
+                         details: { train, passengers, contactInfo }
+                     });
+                     navigate("/bookings");
                  },
                  prefill: {
                      name: passengers[0].firstName + " " + passengers[0].lastName,

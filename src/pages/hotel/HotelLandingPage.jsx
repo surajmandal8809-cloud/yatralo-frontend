@@ -1,195 +1,290 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { 
-  Hotel, 
-  MapPin, 
-  ShieldCheck, 
-  Zap, 
-  Award, 
-  Compass, 
+import {
+  Hotel,
+  ShieldCheck,
+  Zap,
+  Award,
+  Compass,
   Sparkles,
   ArrowRight,
   ChevronRight,
-  TrendingDown,
+  MapPin,
   Star,
   Coffee,
   Waves
 } from "lucide-react";
-import SearchForm from "../../components/HeroSection/SearchForm";
+import HotelSearchWidget from "./HotelSearchWidget";
 
 const HotelLandingPage = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const offers = [
-        {
-            title: "First Booking Deals",
-            desc: "Get up to ₹2000 OFF on your first hotel stay.",
-            code: "WELCOMESTAY",
-            bg: "from-blue-600 to-indigo-600",
-            icon: Hotel
-        },
-        {
-            title: "Summer Retreat",
-            desc: "Flat 25% OFF on luxury beach resorts.",
-            code: "SUMMERSTAY",
-            bg: "from-orange-500 to-red-500",
-            icon: Waves
-        },
-        {
-            title: "Member Exclusive",
-            desc: "Extra benefits & early check-in for members.",
-            code: "YATRAPLUS",
-            bg: "from-violet-600 to-purple-700",
-            icon: Star
-        }
-    ];
+  const offers = [
+    {
+      title: "Luxury Retreats",
+      desc: "Get up to 35% OFF on 5-star properties worldwide.",
+      code: "LUXE35",
+      bg: "from-amber-600 to-orange-600",
+      icon: Award
+    },
+    {
+      title: "Workations",
+      desc: "Stay longer & save more. Special weekly & monthly rates.",
+      code: "WORK20",
+      bg: "from-blue-600 to-indigo-600",
+      icon: Coffee
+    },
+    {
+      title: "Beach Escapes",
+      desc: "Flat ₹5000 OFF on premium beach resorts.",
+      code: "BEACH5K",
+      bg: "from-emerald-500 to-teal-500",
+      icon: Waves
+    }
+  ];
 
-    const popularProperties = [
-        { name: "The Taj Palace", location: "Mumbai", price: "₹18,500", img: "/assets/img/img_11fb8a464f.jpg", rating: "4.9" },
-        { name: "Oceanic Resort", location: "Goa", price: "₹9,200", img: "/assets/img/img_55007fab14.jpg", rating: "4.8" },
-        { name: "Mountain View", location: "Manali", price: "₹5,400", img: "/assets/img/img_52f6d35149.jpg", rating: "4.7" },
-        { name: "Royal Plaza", location: "Delhi", price: "₹7,800", img: "/assets/img/img_2fb2e54a39.jpg", rating: "4.6" }
-    ];
+  const popularStays = [
+    {
+      name: "Taj Palace",
+      location: "New Delhi",
+      price: "₹12,500",
+      img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      rating: 4.9
+    },
+    {
+      name: "The Oberoi",
+      location: "Mumbai",
+      price: "₹15,900",
+      img: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      rating: 4.8
+    },
+    {
+      name: "JW Marriott",
+      location: "Bangalore",
+      price: "₹10,200",
+      img: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      rating: 4.7
+    },
+    {
+      name: "ITC Grand Chola",
+      location: "Chennai",
+      price: "₹11,150",
+      img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
+      rating: 4.9
+    }
+  ];
 
-    return (
-        <div className="min-h-screen bg-slate-50 pt-20">
-            {/* Hero Section */}
-            <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden py-24">
-                <div className="absolute inset-0 z-0">
-                    <video
-                        autoPlay
-                        loop
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover"
-                    >
-                        <source src="/assets/video/hotel.mp4" type="video/mp4" />
-                    </video>
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#1e1b4b]/80 via-[#7c3aed]/40 to-slate-50"></div>
-                </div>
+  return (
+    <div className="min-h-screen bg-slate-50 pt-20">
+      
+      {/* HERO SECTION WITH VIDEO */}
+      <section className="relative min-h-[75vh] flex items-center justify-center overflow-hidden py-24">
+        
+        <div className="absolute inset-0 z-0">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          >
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-resort-swimming-pool-area-at-night-4433-large.mp4" type="video/mp4" />
+          </video>
 
-                <div className="relative z-10 w-full max-w-7xl mx-auto px-6 text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="mb-12"
-                    >
-                        <h1 className="text-white text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-tight">
-                            Your Perfect <br />
-                            <span className="text-orange-400 font-black">Getaway</span> Starts Here
-                        </h1>
-                        <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto font-medium">
-                            Book from 1M+ hotels and vacation rentals worldwide.
-                            Lowest prices guaranteed. Verified guest reviews.
-                        </p>
-                    </motion.div>
-
-                    <div className="w-full mt-10">
-                        <SearchForm defaultTab="hotel" />
-                    </div>
-                </div>
-            </section>
-
-            {/* Featured Offers */}
-            <section className="max-w-7xl mx-auto px-6 py-20">
-                <div className="flex items-center justify-between mb-10">
-                    <div>
-                        <h2 className="text-4xl font-black text-slate-900 tracking-tight">Handpicked Hotel Deals</h2>
-                        <p className="text-slate-500 font-bold text-sm mt-1 uppercase tracking-widest">Exclusive savings for your next stay</p>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {offers.map((offer, i) => (
-                        <motion.div
-                            key={i}
-                            whileHover={{ y: -8 }}
-                            className={`p-1 rounded-[2.5rem] bg-gradient-to-br ${offer.bg} shadow-2xl shadow-indigo-100`}
-                        >
-                            <div className="bg-white/10 backdrop-blur-md h-full rounded-[2.3rem] p-8 text-white relative overflow-hidden group">
-                                <offer.icon className="absolute -top-4 -right-4 w-32 h-32 opacity-10 group-hover:scale-110 transition-transform" />
-                                <div className="relative z-10">
-                                    <div className="bg-white/20 w-fit p-4 rounded-3xl mb-6 shadow-xl border border-white/20">
-                                        <offer.icon size={28} />
-                                    </div>
-                                    <h3 className="text-2xl font-black mb-2">{offer.title}</h3>
-                                    <p className="text-white/80 text-sm font-medium mb-8 leading-relaxed">{offer.desc}</p>
-                                    <div className="flex items-center justify-between pt-6 border-t border-white/20">
-                                        <div>
-                                            <p className="text-[10px] font-black uppercase tracking-widest opacity-60">Promo Code</p>
-                                            <p className="text-xl font-black tracking-widest leading-none mt-1">{offer.code}</p>
-                                        </div>
-                                        <button className="w-12 h-12 bg-white text-slate-900 rounded-full flex items-center justify-center hover:scale-110 transition-all shadow-xl">
-                                            <ArrowRight size={20} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    ))}
-                </div>
-            </section>
-
-            {/* Luxury stays Section */}
-            <section className="bg-slate-900 py-32 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-[#7c3aed]/10 blur-[150px] rounded-full" />
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/10 blur-[150px] rounded-full" />
-                
-                <div className="max-w-7xl mx-auto px-6 relative z-10">
-                    <div className="flex justify-between items-end mb-16">
-                        <div>
-                             <span className="text-[#f97316] text-xs font-black uppercase tracking-[0.4em] mb-4 block">Luxury Stays</span>
-                             <h2 className="text-4xl md:text-5xl font-black tracking-tighter">Most Gifted Properties</h2>
-                        </div>
-                        <p className="text-white/40 max-w-sm text-right font-medium hidden md:block">Experience world-class hospitality at our most popular destinations.</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {popularProperties.map((prop, i) => (
-                            <motion.div
-                                key={i}
-                                whileHover={{ y: -12 }}
-                                className="group cursor-pointer"
-                            >
-                                <div className="relative h-96 rounded-[3rem] overflow-hidden shadow-2xl mb-4 border border-white/5">
-                                    <img src={prop.img} alt={prop.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
-                                    <div className="absolute top-6 right-6 bg-white/10 backdrop-blur-md px-3 py-1 rounded-xl text-xs font-black border border-white/20 flex items-center gap-1.5">
-                                        <Star size={12} className="text-yellow-400 fill-yellow-400" /> {prop.rating}
-                                    </div>
-                                    <div className="absolute bottom-8 left-8 right-8">
-                                        <p className="text-xs font-black text-[#f97316] uppercase tracking-widest mb-1">{prop.location}</p>
-                                        <h3 className="text-2xl font-black tracking-tight mb-2 leading-none">{prop.name}</h3>
-                                        <p className="text-xl font-black text-white/90">{prop.price}<span className="text-[10px] font-bold text-white/40 ml-1">/ Night</span></p>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Why Book with Yatralo */}
-            <section className="max-w-7xl mx-auto px-6 py-32">
-                <div className="grid md:grid-cols-3 gap-16">
-                    {[
-                        { title: "Safe & Clean", desc: "Properties follow strict hygiene and safety protocols.", icon: ShieldCheck, color: "bg-indigo-50 text-indigo-600" },
-                        { title: "24/7 Concierge", desc: "Dedicated support team for a hassle-free stay experience.", icon: Zap, color: "bg-amber-50 text-amber-600" },
-                        { title: "Price Assurance", desc: "Find the same room cheaper? We'll match the price.", icon: Award, color: "bg-emerald-50 text-emerald-600" }
-                    ].map((item, i) => (
-                        <div key={i} className="flex flex-col items-center text-center group">
-                            <div className={`w-24 h-24 ${item.color} rounded-[2.5rem] flex items-center justify-center mb-10 shadow-sm group-hover:scale-110 transition-all duration-500 ring-4 ring-transparent group-hover:ring-slate-50`}>
-                                <item.icon size={40} />
-                            </div>
-                            <h3 className="text-2xl font-black mb-4 text-slate-900 tracking-tight">{item.title}</h3>
-                            <p className="text-slate-500 font-medium leading-relaxed max-xs">{item.desc}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
+          {/* Premium Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a]/80 via-[#1e293b]/60 to-slate-50"></div>
         </div>
-    );
+
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12"
+          >
+            <span className="inline-block px-4 py-1.5 bg-blue-500/20 backdrop-blur-md rounded-full text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mb-6">
+              Exclusive Hotel Stays
+            </span>
+            <h1 className="text-white text-5xl md:text-8xl font-black mb-8 tracking-tighter leading-[0.9]">
+              Find your <br />
+              <span className="text-blue-400">Perfect Stay.</span>
+            </h1>
+
+            <p className="text-white/70 text-lg md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
+              Book from over 1.2 Million hotels worldwide. <br />
+              Trusted by 5M+ travelers for business & leisure.
+            </p>
+          </motion.div>
+
+          <div className="w-full mt-10">
+            <HotelSearchWidget />
+          </div>
+
+        </div>
+      </section>
+
+      {/* OFFERS */}
+      <section className="max-w-7xl mx-auto px-6 py-24">
+        <div className="flex items-end justify-between mb-12">
+          <div>
+             <p className="text-blue-600 font-black text-[10px] uppercase tracking-[0.3em] mb-2">Exclusive Deals</p>
+            <h2 className="text-4xl font-black text-slate-900 tracking-tight">
+              Best Hotel Offers
+            </h2>
+          </div>
+
+          <button className="flex items-center gap-2 text-blue-600 font-black text-[11px] uppercase tracking-widest group">
+            View All Stays <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {offers.map((offer, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ y: -10 }}
+              className={`p-1 rounded-[2.5rem] bg-gradient-to-br shadow-xl ${offer.bg}`}
+            >
+              <div className="bg-white/5 backdrop-blur-xl rounded-[2.3rem] p-10 text-white relative h-full flex flex-col justify-between">
+                <offer.icon className="absolute -top-6 -right-6 w-40 h-40 opacity-5 pointer-events-none" />
+
+                <div>
+                  <div className="bg-white/20 w-fit p-4 rounded-3xl mb-8">
+                    <offer.icon size={28} />
+                  </div>
+
+                  <h3 className="text-2xl font-black mb-3">
+                    {offer.title}
+                  </h3>
+
+                  <p className="text-white/70 text-sm font-medium leading-relaxed mb-10">
+                    {offer.desc}
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                  <div>
+                    <p className="text-[10px] uppercase font-black opacity-50 tracking-widest mb-1.5">
+                      Coupon Code
+                    </p>
+                    <p className="text-xl font-black tracking-widest">
+                      {offer.code}
+                    </p>
+                  </div>
+
+                  <button className="w-12 h-12 bg-white text-slate-900 rounded-2xl flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
+                    <ArrowRight size={20} />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* TRENDING STAYS */}
+      <section className="bg-slate-900 py-32 text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-500/10 rounded-full blur-[120px] -mr-32 -mt-32"></div>
+        
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-6">
+            <div>
+              <h2 className="text-5xl font-black mb-4 tracking-tighter">
+                Premium Getaways
+              </h2>
+              <p className="text-white/40 font-bold max-w-lg text-lg">
+                Handpicked luxury escapes for an unforgettable experience.
+              </p>
+            </div>
+            <div className="flex gap-4">
+               <div className="flex items-center gap-2 px-6 py-3 bg-white/5 rounded-2xl border border-white/10">
+                  <Star className="text-amber-400 fill-amber-400" size={16} />
+                  <span className="text-sm font-black">4.8+ Avg Rating</span>
+               </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {popularStays.map((stay, i) => (
+              <motion.div 
+                key={i} 
+                whileHover={{ y: -12 }}
+                className="group cursor-pointer"
+              >
+                <div className="relative h-[480px] rounded-[2.5rem] overflow-hidden shadow-2xl">
+                  <img
+                    src={stay.img}
+                    alt={stay.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                  />
+
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent"></div>
+
+                  <div className="absolute bottom-10 left-10 right-10">
+                    <div className="flex items-center gap-2 mb-3">
+                       <MapPin size={14} className="text-blue-400" />
+                       <span className="text-[10px] font-black uppercase tracking-widest text-white/60">{stay.location}</span>
+                    </div>
+                    <h3 className="text-2xl font-black mb-2 tracking-tight group-hover:text-blue-400 transition-colors">
+                      {stay.name}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                       <p className="text-lg font-black text-white">
+                         {stay.price}
+                       </p>
+                       <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-md rounded-full border border-white/10">
+                          <Star size={12} className="text-amber-400 fill-amber-400" />
+                          <span className="text-[10px] font-bold">{stay.rating}</span>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FEATURES */}
+      <section className="max-w-7xl mx-auto px-6 py-32">
+        <div className="grid md:grid-cols-3 gap-16">
+          {[
+            {
+              title: "Pay at Hotel",
+              desc: "Don't pay anything until you arrive at the property.",
+              icon: ShieldCheck,
+              color: "text-blue-600",
+              bg: "bg-blue-50"
+            },
+            {
+              title: "Free Upgrades",
+              desc: "Exclusive room upgrades for our premium members.",
+              icon: Sparkles,
+              color: "text-amber-600",
+              bg: "bg-amber-50"
+            },
+            {
+              title: "Instant Support",
+              desc: "24/7 concierge service for all your travel needs.",
+              icon: Zap,
+              color: "text-purple-600",
+              bg: "bg-purple-50"
+            }
+          ].map((item, i) => (
+            <div key={i} className="text-center group">
+              <div className={`w-20 h-20 ${item.bg} ${item.color} rounded-[2rem] flex items-center justify-center mx-auto mb-8 group-hover:scale-110 transition-transform shadow-sm`}>
+                 <item.icon size={36} />
+              </div>
+              <h3 className="text-2xl font-black mb-4 text-slate-900">{item.title}</h3>
+              <p className="text-slate-500 font-medium leading-relaxed">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+    </div>
+  );
 };
 
 export default HotelLandingPage;

@@ -8,7 +8,12 @@ import { Toaster } from "react-hot-toast";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import LoginSuccessPage from "./pages/auth/Social/LoginSuccess";
-import ProfilePage from "./pages/Profile/Profile";
+import ProfilePage from "./pages/User/ProfilePage";
+import WalletPage from "./pages/User/WalletPage";
+import BookingsPage from "./pages/User/BookingsPage";
+import SettingsPage from "./pages/User/SettingsPage";
+import ActivityPage from "./pages/User/ActivityPage";
+import AccountPage from "./pages/User/AccountPage";
 import DestinationsPage from "./pages/DestinationsPage";
 import BenefitsPage from "./pages/BenefitsPage";
 import DealsPage from "./components/Deals/DealsPage";
@@ -49,6 +54,11 @@ function App() {
           <Route path="/" element={<AppLayout />}>
             <Route index element={<Homepage />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="wallet" element={<WalletPage />} />
+            <Route path="bookings" element={<BookingsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="activity" element={<ActivityPage />} />
+            <Route path="account" element={<AccountPage />} />
             <Route path="destinations" element={<DestinationsPage />} />
             <Route path="deals" element={<DealsPage />} />
             <Route path="benefits" element={<BenefitsPage />} />

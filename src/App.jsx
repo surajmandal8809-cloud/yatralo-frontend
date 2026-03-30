@@ -97,7 +97,7 @@ function App() {
             <Route path="/auth/register" element={<RegisterPage />} />
             <Route path="/auth/forgotpassword" element={<ForgotPassword />} />
             <Route path="/auth/resetpassword" element={<ResetPassword />} />
-            <Route path="/auth/success" element={<LoginSuccessPage />} />
+            <Route path="/auth/login-success" element={<LoginSuccessPage />} />
             <Route path="/auth/verify" element={<VerifyPage />} />
             <Route path="/auth/otp-verify" element={<Otpverifypage />} />
           </Route>

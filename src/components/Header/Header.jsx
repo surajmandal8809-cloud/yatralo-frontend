@@ -81,7 +81,7 @@ const Header = () => {
 
         <Link to="/" className="flex items-center gap-2 group">
           <span className={`text-2xl font-black tracking-tighter ${scrolled ? "text-violet-600" : "text-white"}`}>
-            Yatra<span className="text-[#f97316]">lo</span>
+            Yatra<span className="text-[#f97316]">Lo</span>
           </span>
         </Link>
 
@@ -143,9 +143,8 @@ const Header = () => {
                 </div>
                 
                 <div className="hidden lg:block">
-                  <p className={`text-[10px] uppercase font-black opacity-60 leading-none mb-1 ${scrolled ? "text-slate-500" : "text-white/70"}`}>Hey,</p>
                   <p className={`text-sm font-black transition-colors ${scrolled ? "text-slate-800" : "text-white"} group-hover/profile:text-[#7C3AED]`}>
-                    {user?.first_name || "Traveler"}
+                    Hi, {user?.first_name || "Traveler"}
                   </p>
                 </div>
                 <FiChevronDown size={14} className={`opacity-40 transition-transform group-hover/profile:rotate-180 ${scrolled ? "text-slate-800" : "text-white"}`} />

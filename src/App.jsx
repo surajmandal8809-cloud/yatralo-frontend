@@ -62,29 +62,29 @@ function App() {
             <Route path="destinations" element={<DestinationsPage />} />
             <Route path="deals" element={<DealsPage />} />
             <Route path="benefits" element={<BenefitsPage />} />
-            
+
             {/* Flights */}
             <Route path="flights" element={<FlightLandingPage />} />
             <Route path="flights/results" element={<FlightSearchResultsPage />} />
-            
+
             {/* Hotels */}
             <Route path="hotels" element={<HotelLandingPage />} />
             <Route path="hotels/results" element={<HotelSearchResultsPage />} />
             <Route path="hotels/booking" element={<HotelBookingSelectionPage />} />
             <Route path="hotels/checkout" element={<HotelCheckoutPage />} />
-            
+
             {/* Trains */}
             <Route path="trains" element={<TrainLandingPage />} />
             <Route path="trains/results" element={<TrainSearchResultsPage />} />
             <Route path="trains/booking" element={<TrainBookingSelectionPage />} />
             <Route path="trains/checkout" element={<TrainCheckoutPage />} />
-            
+
             {/* Buses */}
             <Route path="buses" element={<BusLandingPage />} />
             <Route path="buses/results" element={<BusSearchResultsPage />} />
             <Route path="buses/booking" element={<BusBookingSelectionPage />} />
             <Route path="buses/checkout" element={<BusCheckoutPage />} />
-            
+
             <Route path="checkout/:step" element={<CheckoutPage />} />
             <Route path="checkout" element={<CheckoutPage />} />
 
@@ -92,14 +92,14 @@ function App() {
           </Route>
 
           {/* Auth routes */}
-          <Route path="/auth" element={<AuthLayout />}>
-            <Route path="login" element={<LoginPage />} />
-            <Route path="register" element={<RegisterPage />} />
-            <Route path="forgotpassword" element={<ForgotPassword />} />
-            <Route path="resetpassword" element={<ResetPassword />} />
-            <Route path="login/success" element={<LoginSuccessPage />} />
-            <Route path="verify" element={<VerifyPage />} />
-            <Route path="otp-verify" element={<Otpverifypage />} />
+          <Route path="/" element={<AuthLayout />}>
+            <Route path="/auth/login" element={<LoginPage />} />
+            <Route path="/auth/register" element={<RegisterPage />} />
+            <Route path="/auth/forgotpassword" element={<ForgotPassword />} />
+            <Route path="/auth/resetpassword" element={<ResetPassword />} />
+            <Route path="/auth/success" element={<LoginSuccessPage />} />
+            <Route path="/auth/verify" element={<VerifyPage />} />
+            <Route path="/auth/otp-verify" element={<Otpverifypage />} />
           </Route>
 
           {/* 404 */}

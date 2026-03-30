@@ -66,7 +66,7 @@ const Logo = ({ className = "", showText = true, variant = "dark" }) => {
           >
             Yatra
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] to-[#f97316]">
-              lo
+              Lo
             </span>
           </span>
           <span

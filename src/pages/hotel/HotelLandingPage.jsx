@@ -89,11 +89,10 @@ const HotelLandingPage = () => {
             playsInline
             className="w-full h-full object-cover"
           >
-            <source src="https://assets.mixkit.co/videos/preview/mixkit-resort-swimming-pool-area-at-night-4433-large.mp4" type="video/mp4" />
+            <source src="/assets/video/hotel.mp4" type="video/mp4" />
           </video>
 
           {/* Premium Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#0f172a]/80 via-[#1e293b]/60 to-slate-50"></div>
         </div>
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 text-center">
@@ -105,7 +104,7 @@ const HotelLandingPage = () => {
             <span className="inline-block px-4 py-1.5 bg-blue-500/20 backdrop-blur-md rounded-full text-blue-400 text-[10px] font-black uppercase tracking-[0.3em] mb-6">
               Exclusive Hotel Stays
             </span>
-            <h1 className="text-white text-5xl md:text-8xl font-black mb-8 tracking-tighter leading-[0.9]">
+            <h1 className="text-white text-5xl md:text-8xl font-black mb-4 tracking-tighter leading-[0.9]">
               Find your <br />
               <span className="text-blue-400">Perfect Stay.</span>
             </h1>

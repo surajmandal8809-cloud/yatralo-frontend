@@ -164,7 +164,7 @@ const Benefits = () => {
         <div className="text-center mt-16">
           <button
             onClick={() => navigate("/benefits")}
-            className="px-8 py-4 bg-[#7c3aed] text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg hover:bg-[#b82e1f] transition-all"
+            className="px-8 py-4 bg-[#7c3aed] text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg hover:bg-[#6d28d9] transition-all"
           >
             Explore Exclusive Benefits
             <ArrowRight size={16} className="inline ml-2" />

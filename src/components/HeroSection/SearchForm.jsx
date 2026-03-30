@@ -216,7 +216,7 @@ const HotelCityAutocomplete = ({ name, value, onChange }) => {
                     onFocus={() => setShowSuggestions(true)}
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     type="text"
-                    placeholder="E.g. City1 or Miami"
+                    placeholder="E.g. Dubai, New York or London"
                     className="w-full bg-slate-50 border border-slate-100 p-3 pl-10 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-[#7c3aed]/20 focus:border-[#7c3aed] outline-none transition-all h-12"
                 />
                 

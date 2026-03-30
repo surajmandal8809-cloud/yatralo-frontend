@@ -66,7 +66,7 @@ const TrainLandingPage = () => {
                     >
                         <source src="/assets/video/Train.mp4" type="video/mp4" />
                     </video>
-                    <div className="absolute inset-0 bg-gradient-to-b from-[#1e1b4b]/80 via-[#7c3aed]/40 to-slate-50"></div>
+                 
                 </div>
 
                 <div className="relative z-10 w-full max-w-7xl mx-auto px-6 text-center">

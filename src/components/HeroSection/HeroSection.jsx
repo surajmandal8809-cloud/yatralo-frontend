@@ -16,9 +16,8 @@ const HeroSection = () => {
   playsInline
   className="absolute inset-0 w-full h-full object-cover"
 >
-  <source src="/assets/Banner.mp4" type="video/mp4" />
+  <source src="/assets/video/Destination.mp4" type="video/mp4" />
 </video>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#1e1b4b] via-[#7c3aed]/30 to-slate-50"></div>
       </div>
 
       {/* Ambient Luxury Glows */}

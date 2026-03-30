@@ -88,7 +88,6 @@ const FlightLandingPage = () => {
           </video>
 
           {/* Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1e1b4b]/80 via-[#7c3aed]/40 to-slate-50"></div>
         </div>
 
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 text-center">
@@ -177,14 +176,14 @@ const FlightLandingPage = () => {
       </section>
 
       {/* DESTINATIONS */}
-      <section className="bg-slate-900 py-24 text-white">
+      <section className="bg-[#F8FAFC] py-24 text-white">
         <div className="max-w-7xl mx-auto px-6">
 
           <div className="text-center mb-16">
             <h2 className="text-4xl font-black mb-4">
               Trending Destinations
             </h2>
-            <p className="text-white/50">
+            <p className="text-black">
               Explore top international hotspots
             </p>
           </div>

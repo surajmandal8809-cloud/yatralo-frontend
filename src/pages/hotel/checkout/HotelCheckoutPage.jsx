@@ -174,7 +174,7 @@ export default function HotelCheckoutPage() {
                     email: contactInfo.email,
                     contact: contactInfo.phone,
                 },
-                theme: { color: "#2563eb" },
+                theme: { color: "#7c3aed" },
                 modal: { ondismiss: () => setIsProcessing(false) }
             };
 
@@ -248,8 +248,8 @@ export default function HotelCheckoutPage() {
                                   </div>
                                   <div>
                                      <p className="text-sm font-black text-slate-900 tracking-tight leading-none uppercase italic">{hotel.name}</p>
-                                     <div className="flex items-center gap-1 mt-1 font-black text-blue-600">
-                                        <Star size={10} className="fill-blue-600" />
+                                     <div className="flex items-center gap-1 mt-1 font-black text-[#f97316]">
+                                        <Star size={10} className="fill-[#f97316]" />
                                         <span className="text-[10px] uppercase tracking-widest">{hotel.rating} Excellent</span>
                                      </div>
                                   </div>

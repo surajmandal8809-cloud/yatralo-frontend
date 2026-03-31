@@ -93,7 +93,7 @@ const HotelBookingSelectionPage = () => {
                            <p className="text-[9px] font-black text-slate-400 uppercase leading-none mb-1">Starting from</p>
                            <p className="text-xl font-black text-slate-900 leading-none">₹ {baseFare.toLocaleString()}</p>
                         </div>
-                        <button onClick={() => document.getElementById('rooms')?.scrollIntoView({behavior:'smooth'})} className="px-8 py-3 bg-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">Select Room</button>
+                        <button onClick={() => document.getElementById('rooms')?.scrollIntoView({behavior:'smooth'})} className="px-8 py-3 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-orange-100 hover:saturate-150 transition-all">Select Room</button>
                     </div>
                 </div>
             </div>
@@ -126,7 +126,7 @@ const HotelBookingSelectionPage = () => {
                       {/* Tabs Header */}
                       <div className="flex border-b border-slate-200 sticky top-[152px] bg-[#f8fafc] z-30 pt-4">
                          {['overview', 'rooms', 'amenities', 'reviews'].map(t => (
-                           <button key={t} onClick={() => { setActiveTab(t); document.getElementById(t)?.scrollIntoView({behavior:'smooth', block:'center'}) }} className={`px-8 py-4 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === t ? 'text-blue-600 border-b-4 border-blue-600' : 'text-slate-400 hover:text-slate-600'}`}>{t}</button>
+                           <button key={t} onClick={() => { setActiveTab(t); document.getElementById(t)?.scrollIntoView({behavior:'smooth', block:'center'}) }} className={`px-8 py-4 text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === t ? 'text-[#f97316] border-b-4 border-b-[#f97316]' : 'text-slate-400 hover:text-slate-600'}`}>{t}</button>
                          ))}
                       </div>
 
@@ -182,7 +182,7 @@ const HotelBookingSelectionPage = () => {
                                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Room Rate</p>
                                           <p className="text-2xl font-black text-slate-900">₹ {(baseFare + room.price).toLocaleString()} <span className="text-[10px] text-slate-400 not-italic uppercase font-bold ml-1">/ Night</span></p>
                                        </div>
-                                       <button onClick={() => handleContinue(room)} className="px-10 py-5 bg-slate-900 text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-200">Book This Room</button>
+                                       <button onClick={() => handleContinue(room)} className="px-10 py-5 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl text-[11px] font-black uppercase tracking-widest hover:saturate-150 transition-all shadow-xl shadow-orange-100">Book This Room</button>
                                     </div>
                                  </div>
                               </div>

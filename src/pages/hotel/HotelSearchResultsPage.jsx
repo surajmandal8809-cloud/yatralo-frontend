@@ -183,7 +183,7 @@ export default function HotelSearchResultsPage() {
                     <p className="text-sm font-black text-slate-800">{guests} Adult{guests>1?'s':''}, 1 Room</p>
                 </div>
              </div>
-             <button onClick={handleUpdateSearch} className="bg-[#008cff] hover:bg-[#0070cc] text-white px-10 h-10 rounded-full text-xs font-black uppercase tracking-widest transition-all shadow-lg">Update</button>
+             <button onClick={handleUpdateSearch} className="bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:saturate-150 text-white px-10 h-10 rounded-full text-xs font-black uppercase tracking-widest transition-all shadow-lg active:scale-95">Update</button>
           </div>
 
           <div className="flex items-center gap-6 mt-3 px-1 text-[11px] font-bold text-white/70">
@@ -283,10 +283,10 @@ export default function HotelSearchResultsPage() {
                        <button
                          key={i}
                          onClick={() => { setCheckin(d.toISOString().split("T")[0]); handleUpdateSearch(); }}
-                         className={`flex-1 min-w-[120px] py-4 text-center transition-all border-r border-slate-50 ${active ? 'bg-blue-50 border-b-4 border-b-blue-600' : 'hover:bg-slate-50'}`}
+                         className={`flex-1 min-w-[120px] py-4 text-center transition-all border-r border-slate-50 ${active ? 'bg-orange-50 border-b-4 border-b-orange-500' : 'hover:bg-slate-50'}`}
                        >
                           <p className="text-[9px] text-slate-500 font-black uppercase tracking-widest leading-none">{d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' })}</p>
-                          <p className={`text-[13px] font-black mt-1 ${active ? 'text-blue-600' : 'text-slate-800'}`}>₹{(6500 + i * 200).toLocaleString()}</p>
+                          <p className={`text-[13px] font-black mt-1 ${active ? 'text-orange-600' : 'text-slate-800'}`}>₹{(6500 + i * 200).toLocaleString()}</p>
                        </button>
                      );
                    })}
@@ -304,12 +304,12 @@ export default function HotelSearchResultsPage() {
                 ].map(s => {
                   const active = sortBy === s.id;
                   return (
-                    <button key={s.id} onClick={() => setSortBy(s.id)} className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${active ? 'bg-blue-50 border-blue-600 shadow-md' : 'bg-white border-slate-100 hover:border-blue-200'}`}>
-                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${active ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                    <button key={s.id} onClick={() => setSortBy(s.id)} className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${active ? 'bg-orange-50 border-orange-500 shadow-md' : 'bg-white border-slate-100 hover:border-orange-200'}`}>
+                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${active ? 'bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white' : 'bg-slate-100 text-slate-400'}`}>
                           <s.icon size={20} />
                        </div>
                        <div>
-                          <p className={`text-[9px] font-black uppercase tracking-widest ${active ? 'text-blue-600' : 'text-slate-400'}`}>{s.label}</p>
+                          <p className={`text-[9px] font-black uppercase tracking-widest ${active ? 'text-[#7c3aed]' : 'text-slate-400'}`}>{s.label}</p>
                           {s.price && <p className={`text-sm font-black ${active ? 'text-slate-900' : 'text-slate-600'}`}>{s.id === 'rating' ? '' : '₹'} {s.price} <span className="text-[8px] font-bold text-slate-400 ml-1">avg/night</span></p>}
                        </div>
                     </button>

@@ -118,7 +118,7 @@ export default function FareModal({ isOpen, onClose, selectedFlight, onBook }) {
                       
                       <button 
                         onClick={() => onBook(selectedFlight, fare.type)}
-                        className={`w-full py-2.5 rounded-lg font-black text-[9px] tracking-widest uppercase transition-all active:scale-[0.98] ${fare.type === 'CLASSIC' ? 'bg-indigo-600 text-white hover:bg-slate-900' : 'bg-slate-100 text-slate-900 hover:bg-indigo-600 hover:text-white'}`}
+                        className={`w-full py-2.5 rounded-lg font-black text-[9px] tracking-widest uppercase transition-all active:scale-[0.98] ${fare.type === 'CLASSIC' ? 'bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white' : 'bg-slate-100 text-slate-900 hov:hover:bg-slate-800 hover:text-white'}`}
                       >
                        {fare.type === 'CLASSIC' ? 'Select & Book' : 'Select'}
                       </button>

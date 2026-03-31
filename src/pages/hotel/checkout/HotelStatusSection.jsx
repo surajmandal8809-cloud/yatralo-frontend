@@ -34,7 +34,7 @@ export default function HotelStatusSection({ bookingResult, guests, fromName, to
         <div className="max-w-4xl mx-auto space-y-8 pb-32 animate-in fade-in zoom-in duration-700 pt-10 px-4">
             
             {/* Header / Success Message */}
-            <div className="bg-white rounded-[2.5rem] shadow-sm border border-[#e7e7e7] p-10 text-center bg-gradient-to-r from-blue-50 to-white relative overflow-hidden">
+            <div className="bg-white rounded-[2.5rem] shadow-sm border border-[#e7e7e7] p-10 text-center bg-gradient-to-r from-orange-50 to-white relative overflow-hidden">
                <div className="relative z-10 space-y-6">
                   <div className="w-20 h-20 bg-green-500 text-white rounded-full flex items-center justify-center mx-auto shadow-xl">
                      <CheckCircle2 size={48} strokeWidth={3} />
@@ -46,14 +46,14 @@ export default function HotelStatusSection({ bookingResult, guests, fromName, to
                   
                   <div className="flex items-center justify-center gap-6 pt-4">
                      <div className="px-8 py-3 bg-white border border-[#e7e7e7] rounded-2xl shadow-sm text-xs font-black text-slate-900 uppercase tracking-widest">
-                        Booking ID: <span className="text-blue-600 ml-1">{bookingResult.bookingId || "YTR-12345678"}</span>
+                        Booking ID: <span className="text-[#f97316] ml-1">{bookingResult.bookingId || "YTR-12345678"}</span>
                      </div>
                      <div className="px-8 py-3 bg-white border border-[#e7e7e7] rounded-2xl shadow-sm text-xs font-black text-green-600 uppercase tracking-widest">
                         Status: <span className="ml-1">Confirmed</span>
                      </div>
                   </div>
                </div>
-               <div className="absolute top-0 right-0 w-64 h-64 bg-blue-100/30 rounded-full blur-[80px] -mr-32 -mt-32" />
+               <div className="absolute top-0 right-0 w-64 h-64 bg-orange-100/30 rounded-full blur-[80px] -mr-32 -mt-32" />
             </div>
 
             {/* Hotel Voucher (MMT Style) */}
@@ -61,8 +61,8 @@ export default function HotelStatusSection({ bookingResult, guests, fromName, to
                <div className="p-6 border-b border-[#f2f2f2] flex items-center justify-between bg-[#f9f9f9]">
                   <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest italic">Electronic Hotel Voucher</h3>
                   <div className="flex gap-4">
-                     <button onClick={handlePrint} className="text-blue-600 hover:text-blue-700 transition-colors"><Printer size={18} /></button>
-                     <button onClick={handleDownload} className="text-blue-600 hover:text-blue-700 transition-colors"><Download size={18} /></button>
+                     <button onClick={handlePrint} className="text-[#f97316] hover:text-blue-700 transition-colors"><Printer size={18} /></button>
+                     <button onClick={handleDownload} className="text-[#f97316] hover:text-blue-700 transition-colors"><Download size={18} /></button>
                   </div>
                </div>
 
@@ -75,7 +75,7 @@ export default function HotelStatusSection({ bookingResult, guests, fromName, to
                      <div className="text-center md:text-left flex-1">
                         <h4 className="text-2xl font-black text-slate-900 uppercase italic tracking-tight mb-2">{toName}</h4>
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                           <p className="flex items-center gap-1.5 text-xs font-black text-slate-400 uppercase tracking-widest"><MapPin size={14} className="text-blue-600" /> {fromName} | View on Map</p>
+                           <p className="flex items-center gap-1.5 text-xs font-black text-slate-400 uppercase tracking-widest"><MapPin size={14} className="text-[#f97316]" /> {fromName} | View on Map</p>
                            <div className="h-1 w-1 rounded-full bg-slate-300"></div>
                            <p className="flex items-center gap-1.5 text-xs font-black text-slate-400 uppercase tracking-widest"><ShieldCheck size={14} className="text-emerald-500" /> Sanitized Stay</p>
                         </div>
@@ -86,11 +86,11 @@ export default function HotelStatusSection({ bookingResult, guests, fromName, to
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                      <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-100 space-y-6">
                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600"><Calendar size={18} /></div>
-                            <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Duration</p><p className="text-sm font-black text-slate-800 italic uppercase">{bookingResult.checkIn} - {bookingResult.checkOut} <span className="text-blue-600 ml-1">({bookingResult.nights} {bookingResult.nights > 1 ? 'Nights' : 'Night'})</span></p></div>
+                            <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-[#f97316]"><Calendar size={18} /></div>
+                            <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Duration</p><p className="text-sm font-black text-slate-800 italic uppercase">{bookingResult.checkIn} - {bookingResult.checkOut} <span className="text-[#f97316] ml-1">({bookingResult.nights} {bookingResult.nights > 1 ? 'Nights' : 'Night'})</span></p></div>
                          </div>
                         <div className="flex items-center gap-4">
-                           <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600"><Users size={18} /></div>
+                           <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-[#f97316]"><Users size={18} /></div>
                            <div><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Occupancy</p><p className="text-sm font-black text-slate-800 italic uppercase">{guests.length} Adults | 1 Room</p></div>
                         </div>
                      </div>
@@ -100,7 +100,7 @@ export default function HotelStatusSection({ bookingResult, guests, fromName, to
                         <div className="space-y-4">
                            {guests.map((p, i) => (
                               <div key={i} className="flex items-center gap-4 group">
-                                 <div className="w-8 h-8 rounded-full bg-white text-blue-600 flex items-center justify-center font-black text-xs shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">{i + 1}</div>
+                                 <div className="w-8 h-8 rounded-full bg-white text-[#f97316] flex items-center justify-center font-black text-xs shadow-sm group-hover:bg-[#f97316] group-hover:text-white transition-all">{i + 1}</div>
                                  <p className="text-sm font-black text-slate-800 uppercase italic tracking-tight">{p.title}. {p.firstName} {p.lastName}</p>
                               </div>
                            ))}
@@ -109,8 +109,8 @@ export default function HotelStatusSection({ bookingResult, guests, fromName, to
                   </div>
 
                   {/* Policy Summary */}
-                  <div className="mt-12 p-8 bg-blue-50/50 rounded-[2rem] border border-blue-100/50 flex items-start gap-4">
-                     <Info size={20} className="text-blue-600 shrink-0 mt-0.5" />
+                  <div className="mt-12 p-8 bg-orange-50/50 rounded-[2rem] border border-[#f97316]/50 flex items-start gap-4">
+                     <Info size={20} className="text-[#f97316] shrink-0 mt-0.5" />
                      <div>
                         <p className="text-xs font-black text-slate-900 uppercase tracking-tight mb-1">Important Information</p>
                         <p className="text-[10px] font-bold text-slate-500 leading-relaxed uppercase tracking-widest italic">Check-in at 14:00 • Check-out at 11:00 • Standard photo ID required for all guests during check-in. Cancellation policies apply as per booking type.</p>
@@ -128,10 +128,10 @@ export default function HotelStatusSection({ bookingResult, guests, fromName, to
 
             {/* Bottom Actions */}
             <div className="flex flex-wrap items-center justify-center gap-6">
-               <button onClick={handleEmail} className="px-12 py-4 bg-white border-2 border-blue-600 text-blue-600 rounded-[2rem] font-black text-[12px] uppercase tracking-widest flex items-center gap-3 hover:bg-blue-50 transition-all shadow-xl shadow-blue-50">
+               <button onClick={handleEmail} className="px-12 py-4 bg-white border-2 border-[#f97316] text-[#f97316] rounded-[2rem] font-black text-[12px] uppercase tracking-widest flex items-center gap-3 hover:bg-blue-50 transition-all shadow-xl shadow-orange-50">
                   <Mail size={18} /> Send to Email
                </button>
-               <button onClick={() => navigate("/")} className="px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-[2rem] font-black text-[12px] uppercase tracking-widest shadow-2xl shadow-blue-200 transition-all flex items-center gap-3">
+               <button onClick={() => navigate("/")} className="px-12 py-4 bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:saturate-150 text-white rounded-[2rem] font-black text-[12px] uppercase tracking-widest shadow-2xl shadow-orange-200 transition-all flex items-center gap-3">
                   STAY SOMEWHERE ELSE <ChevronRight size={18} />
                </button>
             </div>

@@ -12,7 +12,7 @@ export default function CheckoutStepper({ currentStep, steps }) {
                 idx < currentStep 
                   ? "bg-emerald-500 text-white shadow-lg shadow-emerald-100" 
                   : idx === currentStep 
-                    ? "bg-slate-900 text-white shadow-xl shadow-slate-200" 
+                    ? "bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white shadow-xl shadow-orange-100" 
                     : "bg-white border-2 border-slate-100 text-slate-300"
               }`}
             >

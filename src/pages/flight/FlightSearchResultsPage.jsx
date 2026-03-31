@@ -235,7 +235,7 @@ export default function FlightSearchResultsPage() {
                     <p className="text-sm font-black text-slate-800">{pax} Traveller{pax>1?'s':''}, Economy</p>
                 </div>
              </div>
-             <button onClick={handleSearch} className="bg-[#008cff] hover:bg-[#0070cc] text-white px-10 h-10 rounded-full text-xs font-black uppercase tracking-widest transition-all shadow-lg">Search</button>
+             <button onClick={handleSearch} className="bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:saturate-150 text-white px-10 h-10 rounded-full text-xs font-black uppercase tracking-widest transition-all shadow-lg active:scale-95">Search</button>
           </div>
 
           <div className="flex items-center gap-6 mt-3 px-1 text-[11px] font-bold text-white/70">
@@ -366,12 +366,12 @@ export default function FlightSearchResultsPage() {
                 ].map(s => {
                   const active = sortBy === s.id;
                   return (
-                    <button key={s.id} onClick={() => setSortBy(s.id)} className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${active ? 'bg-blue-50 border-blue-600 shadow-md' : 'bg-white border-slate-100 hover:border-blue-200'}`}>
-                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${active ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                    <button key={s.id} onClick={() => setSortBy(s.id)} className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left ${active ? 'bg-orange-50 border-orange-500 shadow-md' : 'bg-white border-slate-100 hover:border-orange-200'}`}>
+                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${active ? 'bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white' : 'bg-slate-100 text-slate-400'}`}>
                           <s.icon size={20} />
                        </div>
                        <div>
-                          <p className={`text-[9px] font-black uppercase tracking-widest ${active ? 'text-blue-600' : 'text-slate-400'}`}>{s.label}</p>
+                          <p className={`text-[9px] font-black uppercase tracking-widest ${active ? 'text-[#7c3aed]' : 'text-slate-400'}`}>{s.label}</p>
                           {s.price && <p className={`text-sm font-black ${active ? 'text-slate-900' : 'text-slate-600'}`}>₹ {s.price} <span className="text-[8px] font-bold text-slate-400 ml-1">| 02h 50m</span></p>}
                        </div>
                     </button>

@@ -21,7 +21,7 @@ const HotelGuestDetails = ({ guests, setGuests, contactInfo, setContactInfo, onN
       <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
          <div className="flex items-center gap-6 mb-4">
-            <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-500/20 group-hover:scale-110 transition-transform">
+            <div className="w-14 h-14 bg-gradient-to-r from-[#7c3aed] to-[#f97316] rounded-2xl flex items-center justify-center text-white shadow-xl shadow-orange-500/20 group-hover:scale-110 transition-transform">
                <UserCheck size={28} />
             </div>
             <div>
@@ -35,7 +35,7 @@ const HotelGuestDetails = ({ guests, setGuests, contactInfo, setContactInfo, onN
         {/* Contact Information Card */}
         <section className="bg-white rounded-[2.5rem] p-10 border border-slate-200 shadow-sm hover:shadow-xl transition-all duration-500">
           <h3 className="text-xs font-black text-slate-400 font-black uppercase tracking-[0.2em] mb-10 flex items-center gap-3">
-             <div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+             <div className="w-1.5 h-1.5 rounded-full bg-[#f97316] animate-pulse" />
              Communication Details
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -74,14 +74,14 @@ const HotelGuestDetails = ({ guests, setGuests, contactInfo, setContactInfo, onN
               </div>
 
               <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-10 flex items-center gap-3">
-                 <div className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse" />
+                 <div className="w-1.5 h-1.5 rounded-full bg-[#f97316] animate-pulse" />
                  Guest {i + 1}
               </h3>
               
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div className="relative group">
                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Salutation</label>
-                   <select value={guest.title} onChange={(e) => updateGuest(i, "title", e.target.value)} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-black text-slate-800 text-sm appearance-none">
+                   <select value={guest.title} onChange={(e) => updateGuest(i, "title", e.target.value)} className="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl outline-none focus:bg-white focus:border-[#f97316] transition-all font-black text-slate-800 text-sm appearance-none">
                       <option>Mr</option>
                       <option>Ms</option>
                       <option>Mrs</option>
@@ -89,11 +89,11 @@ const HotelGuestDetails = ({ guests, setGuests, contactInfo, setContactInfo, onN
                 </div>
                 <div className="md:col-span-2 relative group">
                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">First & Middle Name</label>
-                   <input type="text" value={guest.firstName} onChange={(e) => updateGuest(i, "firstName", e.target.value)} placeholder="As per valid ID proof" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-black text-slate-800 text-sm" />
+                   <input type="text" value={guest.firstName} onChange={(e) => updateGuest(i, "firstName", e.target.value)} placeholder="As per valid ID proof" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl outline-none focus:bg-white focus:border-[#f97316] transition-all font-black text-slate-800 text-sm" />
                 </div>
                 <div className="relative group">
                    <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">Last Name</label>
-                   <input type="text" value={guest.lastName} onChange={(e) => updateGuest(i, "lastName", e.target.value)} placeholder="Surname" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl outline-none focus:bg-white focus:border-blue-500 transition-all font-black text-slate-800 text-sm" />
+                   <input type="text" value={guest.lastName} onChange={(e) => updateGuest(i, "lastName", e.target.value)} placeholder="Surname" className="w-full bg-slate-50 border border-slate-100 p-4 rounded-xl outline-none focus:bg-white focus:border-[#f97316] transition-all font-black text-slate-800 text-sm" />
                 </div>
               </div>
             </motion.section>
@@ -105,7 +105,7 @@ const HotelGuestDetails = ({ guests, setGuests, contactInfo, setContactInfo, onN
       <div className="pt-8 flex justify-end">
          <button 
            onClick={onNext} 
-           className="px-14 py-5 bg-slate-900 text-white rounded-[2rem] font-black uppercase tracking-[0.25em] shadow-2xl shadow-slate-200 transition-all flex items-center gap-4 hover:bg-blue-600 text-xs active:scale-95 group"
+           className="px-14 py-5 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-[2rem] font-black uppercase tracking-[0.25em] shadow-2xl shadow-orange-200 transition-all flex items-center gap-4 hover:saturate-150 text-xs active:scale-95 group"
          >
            Review & Pay <ChevronRight size={18} className="group-hover:translate-x-2 transition-transform" />
          </button>

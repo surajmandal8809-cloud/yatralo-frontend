@@ -104,7 +104,7 @@ const FlightSearchWidget = () => {
               onClick={() => setTripType(tab.id)}
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all ${
                 tripType === tab.id 
-                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" 
+                ? "bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white shadow-lg shadow-orange-100" 
                 : "bg-transparent text-slate-500 hover:bg-slate-50"
               }`}
             >
@@ -208,7 +208,7 @@ const FlightSearchWidget = () => {
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSearchFlights}
-            className="px-12 py-5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white rounded-full font-black text-lg uppercase tracking-[0.2em] shadow-2xl shadow-indigo-300 flex items-center gap-3"
+            className="px-12 py-5 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-full font-black text-lg uppercase tracking-[0.2em] shadow-2xl shadow-orange-200 flex items-center gap-3"
           >
             Search Flights <Search size={24} strokeWidth={3} />
           </motion.button>
@@ -377,7 +377,7 @@ const FlightSearchWidget = () => {
                                setDepartureDate(d.toISOString().split("T")[0]);
                              }}
                              className={`relative h-14 flex flex-col items-center justify-center rounded-xl transition-all ${
-                               isSelected ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "bg-white hover:bg-indigo-50"
+                               isSelected ? "bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white shadow-lg shadow-orange-100" : "bg-white hover:bg-indigo-50"
                              }`}
                            >
                              <span className="text-sm font-black">{day}</span>
@@ -441,7 +441,7 @@ const FlightSearchWidget = () => {
                         <span className="text-lg font-black text-slate-900 min-w-4">{travellers[type.id]}</span>
                         <button 
                           onClick={() => setTravellers(p => ({ ...p, [type.id]: Math.min(9, p[type.id] + 1) }))}
-                          className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-100"
+                          className="w-8 h-8 rounded-lg bg-gradient-to-r from-[#7c3aed] to-[#f97316] flex items-center justify-center text-white shadow-lg shadow-orange-100"
                         >+</button>
                       </div>
                     </div>
@@ -480,7 +480,7 @@ const FlightSearchWidget = () => {
 
                 <button 
                   onClick={() => setActiveModal(null)}
-                  className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-indigo-100"
+                  className="w-full py-4 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-orange-100"
                 >
                   Apply Selection
                 </button>

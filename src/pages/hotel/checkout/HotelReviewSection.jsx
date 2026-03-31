@@ -14,7 +14,7 @@ const HotelReviewSection = ({ hotel, guests, contactInfo, totalAmount, onNext, o
       <div className="bg-slate-900 rounded-[2.5rem] p-10 text-white shadow-2xl relative overflow-hidden group">
          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
          <div className="flex items-center gap-6">
-            <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
+            <div className="w-14 h-14 bg-gradient-to-r from-[#7c3aed] to-[#f97316] rounded-2xl flex items-center justify-center text-white shadow-xl shadow-orange-500/20">
                <ShieldCheck size={28} />
             </div>
             <div>
@@ -28,7 +28,7 @@ const HotelReviewSection = ({ hotel, guests, contactInfo, totalAmount, onNext, o
         
         {/* Detailed Property Review */}
         <section className="bg-white rounded-[2.5rem] p-10 border border-slate-200 shadow-sm relative group overflow-hidden hover:shadow-xl transition-all duration-700">
-           <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
+           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#7c3aed] to-[#f97316]" />
            <div className="flex flex-col md:flex-row gap-10">
               <div className="w-full md:w-64 h-48 rounded-[1.8rem] overflow-hidden"><img src={hotel.image || hotel.images?.[0] || 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80'} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="" /></div>
               <div className="flex-1 flex flex-col justify-center">
@@ -37,7 +37,7 @@ const HotelReviewSection = ({ hotel, guests, contactInfo, totalAmount, onNext, o
                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">YatraLo Verified Property</span>
                  </div>
                  <h3 className="text-3xl font-black text-slate-900 tracking-tight italic uppercase mb-2">{hotel.name}</h3>
-                 <p className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest mb-6"><MapPin size={12} className="text-blue-500" /> {hotel.city || 'India'} | <span className="text-blue-600">View Policies</span></p>
+                 <p className="flex items-center gap-2 text-xs font-black text-slate-400 uppercase tracking-widest mb-6"><MapPin size={12} className="text-[#f97316]" /> {hotel.city || 'India'} | <span className="text-[#f97316]">View Policies</span></p>
                  
                  <div className="flex flex-wrap gap-8">
                     <div className="bg-slate-50 p-4 px-6 rounded-2xl border border-slate-100 flex items-center gap-4">
@@ -92,7 +92,7 @@ const HotelReviewSection = ({ hotel, guests, contactInfo, totalAmount, onNext, o
               <button 
                 onClick={onNext} 
                 disabled={isLoading}
-                className="px-16 py-5 bg-blue-600 text-white rounded-[2rem] font-black uppercase tracking-[0.25em] shadow-2xl shadow-blue-200 transition-all flex items-center justify-center gap-4 hover:bg-blue-700 text-xs active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
+                className="px-16 py-5 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-[2rem] font-black uppercase tracking-[0.25em] shadow-2xl shadow-orange-200 transition-all flex items-center justify-center gap-4 hover:saturate-150 text-xs active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed group"
               >
                 {isLoading ? 'Processing Transaction...' : 'Pay & Confirm'} <ChevronRight size={18} className="group-hover:translate-x-2 transition-transform" />
               </button>

@@ -68,11 +68,14 @@ const BusLandingPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-12"
           >
-            <h1 className="text-white text-5xl md:text-7xl font-black mb-6 tracking-tighter leading-tight">
+            <h1 className="text-white text-5xl md:text-7xl font-bold mb-6 tracking-tighter leading-tight">
               Travel Smart <br />
-              with <span className="text-[#f97316]">Comfort</span>
+              with <span className="relative inline-block">
+                <span className="relative z-10 text-white">Comfort</span>
+                <div className="absolute top-[0.4em] left-0 w-full h-[0.55em] bg-gradient-to-r from-[#7c3aed] to-[#f97316] -z-0 opacity-80 rounded-sm"></div>
+              </span>
             </h1>
-            <p className="text-white/80 text-lg md:text-xl max-w-2xl mx-auto font-medium">
+            <p className="text-white/90 text-sm md:text-xl max-w-4xl mx-auto font-semibold mb-12">
               Book AC, Sleeper, and Luxury buses at lowest prices.
               100% Secure bookings with live bus tracking.
             </p>

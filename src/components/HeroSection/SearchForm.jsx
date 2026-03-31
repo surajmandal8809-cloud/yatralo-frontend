@@ -92,10 +92,10 @@ const SearchForm = ({ defaultTab = "flight" }) => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`relative flex-1 flex items-center justify-center gap-2 px-6 py-4 text-xs font-black uppercase tracking-[0.15em] transition-all ${
-                  isActive ? "text-[#7c3aed]" : "text-slate-500 hover:text-slate-800"
+                  isActive ? "text-[#f97316]" : "text-slate-500 hover:text-slate-800"
                 }`}
               >
-                {isActive && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#7c3aed]" />}
+                {isActive && <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#7c3aed] to-[#f97316]" />}
                 <Icon size={16} />
                 {tab.label}
               </button>
@@ -161,7 +161,7 @@ const SearchForm = ({ defaultTab = "flight" }) => {
                 key={dest}
                 type="button"
                 onClick={() => setFormData((p) => ({ ...p, to: activeTab === 'hotel' ? p.to : dest, from: activeTab === 'hotel' ? dest : p.from }))}
-                className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full hover:border-[#7c3aed] hover:text-[#7c3aed] transition-colors font-medium"
+                className="px-3 py-1 bg-slate-50 border border-slate-200 rounded-full hover:border-[#f97316] hover:text-[#f97316] transition-colors font-medium"
               >
                 {dest}
               </button>
@@ -184,7 +184,7 @@ const HotelCityAutocomplete = ({ name, value, onChange }) => {
         }
         const fetchCities = async () => {
              try {
-                const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
+                const apiUrl = import.meta.env.VITE_API_URL ;
                 const res = await fetch(`${apiUrl}/hotels/cities/suggest?keyword=${value}`);
                 const result = await res.json();
                 if (result.status) {
@@ -202,7 +202,7 @@ const HotelCityAutocomplete = ({ name, value, onChange }) => {
         <div className="group relative">
             <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Destination</label>
             <div className="relative">
-                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#7c3aed] transition-colors">
+                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#f97316] transition-colors">
                     <MapPin size={16} />
                 </div>
                 <input
@@ -217,7 +217,7 @@ const HotelCityAutocomplete = ({ name, value, onChange }) => {
                     onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
                     type="text"
                     placeholder="E.g. Dubai, New York or London"
-                    className="w-full bg-slate-50 border border-slate-100 p-3 pl-10 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-[#7c3aed]/20 focus:border-[#7c3aed] outline-none transition-all h-12"
+                    className="w-full bg-slate-50 border border-slate-100 p-3 pl-10 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-[#f97316]/20 focus:border-[#f97316] outline-none transition-all h-12"
                 />
                 
                 {showSuggestions && suggestions.length > 0 && (
@@ -232,7 +232,7 @@ const HotelCityAutocomplete = ({ name, value, onChange }) => {
                                 className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex flex-col border-b border-slate-50 last:border-none"
                             >
                                 <span className="font-bold text-slate-800 text-sm">{c.city}</span>
-                                <span className="text-[10px] font-black tracking-widest text-[#7c3aed] uppercase mt-0.5">{c.iataCode} - {c.country}</span>
+                                <span className="text-[10px] font-black tracking-widest text-[#f97316] uppercase mt-0.5">{c.iataCode} - {c.country}</span>
                             </li>
                         ))}
                     </ul>
@@ -246,7 +246,7 @@ const Input = ({ icon: Icon, label, placeholder, type = "text", name, value, onC
   <div className="group relative">
     <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">{label}</label>
     <div className="relative">
-      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#7c3aed] transition-colors">
+      <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#f97316] transition-colors">
         <Icon size={16} />
       </div>
       <input
@@ -256,7 +256,7 @@ const Input = ({ icon: Icon, label, placeholder, type = "text", name, value, onC
         onChange={onChange}
         type={type}
         placeholder={placeholder}
-        className="w-full bg-slate-50 border border-slate-100 p-3 pl-10 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-[#7c3aed]/20 focus:border-[#7c3aed] outline-none transition-all h-12"
+        className="w-full bg-slate-50 border border-slate-100 p-3 pl-10 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-[#f97316]/20 focus:border-[#f97316] outline-none transition-all h-12"
       />
     </div>
   </div>
@@ -269,7 +269,7 @@ const SearchButton = ({ text }) => (
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
       type="submit"
-      className="h-14 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl font-black uppercase tracking-[0.1em] flex items-center justify-center gap-3 shadow-lg shadow-violet-100 transition-all text-[12px] group"
+      className="h-14 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl font-black uppercase tracking-[0.1em] flex items-center justify-center gap-3 shadow-lg shadow-orange-100 transition-all text-[12px] group"
     >
       <Search size={16} />
       {text}

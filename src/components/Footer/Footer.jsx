@@ -6,11 +6,11 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   const links = [
-    { name: "About Us", path: "#" },
+    { name: "About Us", path: "/about-us" },
     { name: "Destinations", path: "/destinations" },
     { name: "Deals", path: "/deals" },
     { name: "Benefits", path: "/benefits" },
-    { name: "Help Center", path: "/help" },
+    { name: "Help Center", path: "/support" },
   ];
 
   return (
@@ -19,8 +19,8 @@ const Footer = () => {
 
         {/* Logo & About */}
         <div>
-          <h3 className="text-xl font-black tracking-tighter text-slate-900 mb-2">
-            Yatra<span className="text-[#f97316]">Lo</span>
+          <h3 className="text-2xl font-black text-slate-900 tracking-tighter mb-4">
+            Yatra<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] to-[#f97316]">Lo</span>
           </h3>
           <p className="text-sm text-gray-600 mt-3">
             YatraLo is your premium gateway to global travel, offering meticulously curated flights, hotels, and transport experiences.

@@ -82,7 +82,7 @@ const FlightCard = ({ flight, onViewPrices, pax = 1 }) => {
              </div>
              <button 
               onClick={() => onViewPrices(flight)}
-              className="bg-blue-500 hover:bg-blue-600 active:scale-[0.98] text-white px-8 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all shadow-md"
+              className="bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:saturate-150 active:scale-[0.98] text-white px-8 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all shadow-md shadow-orange-100"
              >
                 View Prices
              </button>

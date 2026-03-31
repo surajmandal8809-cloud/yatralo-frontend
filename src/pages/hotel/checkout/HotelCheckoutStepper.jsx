@@ -13,7 +13,7 @@ const HotelCheckoutStepper = ({ currentStep, steps }) => {
       
       {/* Active Line Progress */}
       <div 
-        className="absolute top-1/2 left-0 h-[2.5px] bg-blue-600 -translate-y-1/2 z-0 transition-all duration-700 ease-in-out" 
+        className="absolute top-1/2 left-0 h-[2.5px] bg-gradient-to-r from-[#7c3aed] to-[#f97316] -translate-y-1/2 z-0 transition-all duration-700 ease-in-out" 
         style={{ width: `${(currentStep / (steps.length - 1)) * 100}%` }}
       />
 
@@ -26,9 +26,9 @@ const HotelCheckoutStepper = ({ currentStep, steps }) => {
             <div 
               className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 scale-[0.85] group-hover:scale-100 border-4 border-[#f5f7fa] shadow-sm ${
                 isCompleted 
-                  ? "bg-blue-600 text-white" 
+                  ? "bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white" 
                   : isActive 
-                    ? "bg-white text-blue-600 ring-4 ring-blue-100" 
+                    ? "bg-white text-[#7c3aed] ring-4 ring-orange-100" 
                     : "bg-slate-200 text-slate-400"
               }`}
             >
@@ -42,7 +42,7 @@ const HotelCheckoutStepper = ({ currentStep, steps }) => {
                 {step}
               </p>
               {isActive && (
-                <div className="h-1 w-4 bg-blue-600 mx-auto mt-1 rounded-full animate-pulse" />
+                <div className="h-1 w-4 bg-[#f97316] mx-auto mt-1 rounded-full animate-pulse" />
               )}
             </div>
           </div>

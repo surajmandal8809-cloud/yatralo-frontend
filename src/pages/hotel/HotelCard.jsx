@@ -80,7 +80,7 @@ const HotelCard = ({ hotel, index = 0, onBook }) => {
               </div>
               <button 
                 onClick={(e) => { e.stopPropagation(); onBook(hotel); }}
-                className="text-blue-600 font-black text-[11px] uppercase tracking-widest flex items-center gap-2 group/btn"
+                className="text-[#f97316] font-black text-[11px] uppercase tracking-widest flex items-center gap-2 group/btn"
               >
                 View Details <ChevronRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
               </button>
@@ -97,7 +97,7 @@ const HotelCard = ({ hotel, index = 0, onBook }) => {
            </div>
            <button 
              onClick={(e) => { e.stopPropagation(); onBook(hotel); }}
-             className="w-full py-4 bg-blue-600 text-white rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-[0.98]"
+             className="w-full py-4 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-orange-100 hover:saturate-150 transition-all active:scale-[0.98]"
            >
              Book Room
            </button>

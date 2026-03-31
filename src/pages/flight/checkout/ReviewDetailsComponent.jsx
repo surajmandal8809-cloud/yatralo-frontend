@@ -157,7 +157,7 @@ export default function ReviewDetailsComponent({
            whileTap={{ scale: 0.98 }}
            onClick={onNext}
            disabled={isLoading}
-           className={`px-8 py-4 bg-slate-900 text-white rounded-xl font-black text-[12px] uppercase tracking-[0.15em] shadow-lg transition-all flex items-center gap-3 group/btn ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-600'}`}
+           className={`px-8 py-4 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-xl font-black text-[12px] uppercase tracking-[0.15em] shadow-lg transition-all flex items-center gap-3 group/btn ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:saturate-150 shadow-orange-200'}`}
          >
             {isLoading ? 'Processing...' : 'Proceed to Payment'}
             {!isLoading && <ArrowRight size={16} strokeWidth={3} className="group-hover/btn:translate-x-1 transition-transform" />}

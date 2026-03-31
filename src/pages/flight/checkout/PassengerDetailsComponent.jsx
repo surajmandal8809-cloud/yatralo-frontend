@@ -59,7 +59,7 @@ export default function PassengerDetailsComponent({ passengers, setPassengers, p
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm">
          <div className="flex items-center gap-5">
-            <div className="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg shadow-blue-100">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#f97316] text-white flex items-center justify-center shadow-lg shadow-orange-100">
                <User size={28} strokeWidth={2.5} />
             </div>
             <div>
@@ -69,7 +69,7 @@ export default function PassengerDetailsComponent({ passengers, setPassengers, p
          </div>
          <button 
           onClick={() => setShowSavedModal(true)}
-          className="flex items-center justify-center gap-2 px-6 py-4 bg-blue-50 text-blue-700 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-blue-100 transition-all border border-blue-100"
+          className="flex items-center justify-center gap-2 px-6 py-4 bg-orange-50 text-[#f97316] rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-orange-100 transition-all border border-orange-100"
          >
             <UserCheck size={18} /> View Saved Travellers
          </button>
@@ -266,7 +266,7 @@ export default function PassengerDetailsComponent({ passengers, setPassengers, p
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onNext}
-          className="px-10 py-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-[0.15em] shadow-xl flex items-center gap-4 group/btn transition-all hover:bg-blue-600 hover:shadow-blue-200"
+          className="px-10 py-5 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl font-black uppercase tracking-[0.15em] shadow-xl flex items-center gap-4 group/btn transition-all hover:saturate-150 shadow-orange-100"
          >
             Continue to Review <ArrowRight size={20} strokeWidth={3} className="group-hover/btn:translate-x-2 transition-transform" />
          </motion.button>

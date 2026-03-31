@@ -122,7 +122,7 @@ export default function CheckoutPage() {
         const airportTax = 420 * pCount;
         const convenienceFee = 300;
 
-        const addOnsPrice = ((addOns?.insurance ? 249 : 0) * pCount) + ((addOns?.baggage || 0) * 450) + (addOns?.seatPrice || 0);
+        const addOnsPrice = ((addOns?.insurance ? 249 : 0) * pCount) + ((addOns?.baggage || 0) * 450) + (Number(addOns?.seatPrice) || 0);
         return (total + fuelSurcharge + airportTax + convenienceFee + addOnsPrice) - discount;
     };
 
@@ -327,7 +327,7 @@ export default function CheckoutPage() {
                                      </div>
                                    )}
                                 </div>
-                                <button type="submit" className="px-6 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all">Apply</button>
+                                <button type="submit" className="px-6 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:saturate-150 transition-all">Apply</button>
                              </form>
 
                              <div className="mt-6 space-y-3">

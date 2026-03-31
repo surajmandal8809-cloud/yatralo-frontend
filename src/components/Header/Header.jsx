@@ -68,7 +68,8 @@ const Header = () => {
     { name: "Trains", path: "/trains" },
     { name: "Buses", path: "/buses" },
     { name: "Destinations", path: "/destinations" },
-    { name: "Offers", path: "/deals" }
+    { name: "Offers", path: "/offers" },
+    { name: "Support", path: "/support" }
   ];
 
   const isHomePage = location.pathname === "/";
@@ -80,8 +81,8 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
 
         <Link to="/" className="flex items-center gap-2 group">
-          <span className={`text-2xl font-black tracking-tighter ${scrolled ? "text-violet-600" : "text-white"}`}>
-            Yatra<span className="text-[#f97316]">Lo</span>
+          <span className={`text-2xl md:text-3xl font-black tracking-tighter ${scrolled ? "text-slate-900" : "text-white"}`}>
+            Yatra<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7c3aed] to-[#f97316]">Lo</span>
           </span>
         </Link>
 
@@ -171,6 +172,7 @@ const Header = () => {
                             <DropdownItem to="/settings" icon={<FiSettings />} label="Manage Settings" desc="2FA, Login & Security" />
                             <DropdownItem to="/activity" icon={<FiActivity />} label="Security Activity" desc="Login history & IP logs" />
                             <DropdownItem to="/account" icon={<FiLock />} label="My Account" desc="VIP Status & Identity" />
+                            <DropdownItem to="/support" icon={<FiSettings />} label="Help Center" desc="FAQs & Support" />
                         </ul>
                         <div className="h-px bg-slate-50 my-2 mx-2" />
                         <button onClick={handleLogout} className="w-full flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-slate-50 text-slate-800 transition-all group/item">

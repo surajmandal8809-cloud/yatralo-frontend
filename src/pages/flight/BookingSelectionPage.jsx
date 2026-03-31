@@ -268,7 +268,7 @@ const BookingSelectionPage = () => {
 
                      <button 
                       onClick={handleContinue}
-                      className="w-full mt-6 py-3 bg-[#008cff] hover:bg-[#007ad9] text-white rounded font-bold text-[14px] uppercase shadow-lg shadow-blue-100 transition-colors"
+                      className="w-full mt-6 py-3 bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:saturate-150 text-white rounded font-bold text-[14px] uppercase shadow-lg shadow-orange-100 transition-all active:scale-95"
                      >
                         Proceed to Checkout
                      </button>

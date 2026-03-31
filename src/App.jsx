@@ -14,12 +14,18 @@ import BookingsPage from "./pages/User/BookingsPage";
 import SettingsPage from "./pages/User/SettingsPage";
 import ActivityPage from "./pages/User/ActivityPage";
 import AccountPage from "./pages/User/AccountPage";
-import DestinationsPage from "./pages/DestinationsPage";
-import BenefitsPage from "./pages/BenefitsPage";
+import DestinationsPage from "./components/Destination/DestinationsPage";
+import BenefitsPage from "./components/Benefits/BenefitsPage";
 import DealsPage from "./components/Deals/DealsPage";
+import OffersPage from "./components/Deals/OffersPage";
 import VerifyPage from "./pages/auth/Verify";
 import Otpverifypage from "./pages/auth/Otpverifypage";
 import NotFound from "./pages/NotFound";
+import AboutUs from "./components/AboutUs/AboutUs";
+import TravelGuidelines from "./pages/info/TravelGuidelines";
+import WebCheckin from "./pages/info/WebCheckin";
+import Safety from "./pages/info/Safety";
+import HelpCenter from "./pages/support/HelpCenter";
 
 // Flight Pages
 import FlightLandingPage from "./pages/flight/FlightLandingPage";
@@ -61,7 +67,13 @@ function App() {
             <Route path="account" element={<AccountPage />} />
             <Route path="destinations" element={<DestinationsPage />} />
             <Route path="deals" element={<DealsPage />} />
+            <Route path="offers" element={<OffersPage />} />
             <Route path="benefits" element={<BenefitsPage />} />
+            <Route path="about-us" element={<AboutUs />} />
+            <Route path="travel-guidelines" element={<TravelGuidelines />} />
+            <Route path="web-checkin" element={<WebCheckin />} />
+            <Route path="safety" element={<Safety />} />
+            <Route path="support" element={<HelpCenter />} />
 
             {/* Flights */}
             <Route path="flights" element={<FlightLandingPage />} />

@@ -249,11 +249,12 @@ const DestinationsPage = () => {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.1 }}
-                        className="text-5xl md:text-7xl font-black text-white tracking-tighter leading-none mb-6"
+                        className="text-3xl sm:text-5xl md:text-7xl font-bold text-white tracking-tighter leading-tight md:leading-none mb-6"
                     >
                         Discover{" "}
-                        <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-                            Incredible
+                        <span className="relative inline-block px-1">
+                            <span className="relative z-10 text-white">Incredible</span>
+                            <div className="absolute top-[0.4em] left-0 w-full h-[0.55em] bg-gradient-to-r from-[#7c3aed] to-[#f97316] -z-0 opacity-80 rounded-sm"></div>
                         </span>{" "}
                         Destinations
                     </motion.h1>
@@ -262,7 +263,7 @@ const DestinationsPage = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.2 }}
-                        className="text-white/75 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed mb-10"
+                        className="text-white/90 text-xs sm:text-sm md:text-xl max-w-4xl mx-auto font-semibold mb-8 md:mb-12 italic"
                     >
                         From snow-capped peaks to sun-kissed beaches — find your perfect
                         escape among {DESTINATIONS.length}+ handpicked destinations.
@@ -400,7 +401,7 @@ const DestinationsPage = () => {
                         <Sparkles size={12} className="text-yellow-400" />
                         Can't decide?
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-6">
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tighter mb-6">
                         Let us plan your{" "}
                         <span className="text-yellow-400">dream trip</span>
                     </h2>

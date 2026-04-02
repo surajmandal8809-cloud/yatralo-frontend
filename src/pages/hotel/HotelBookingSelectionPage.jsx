@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { 
   ChevronRight, 
   Calendar, 
@@ -26,21 +26,32 @@ import { motion } from "framer-motion";
 const HotelBookingSelectionPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [searchParams] = useSearchParams();
     const [selectedHotel, setSelectedHotel] = useState(null);
     const [activeTab, setActiveTab] = useState("overview");
 
     useEffect(() => {
         window.scrollTo(0, 0);
-        // Fallback if location state is missing
+        // Fallback to URL search params if state is missing
+        const hotelId = searchParams.get("id");
+        const city = searchParams.get("city");
+        const checkIn = searchParams.get("checkInDate");
+        const checkOut = searchParams.get("checkOutDate");
+        const guests = searchParams.get("guests");
+
         const savedHotel = localStorage.getItem("yatralo-selected-hotel");
-        if (location.state?.hotel) {
-            setSelectedHotel(location.state.hotel);
-        } else if (savedHotel) {
-            setSelectedHotel(JSON.parse(savedHotel));
+        let hotelToUse = location.state?.hotel;
+        
+        if (!hotelToUse && savedHotel) {
+            hotelToUse = JSON.parse(savedHotel);
+        }
+
+        if (hotelToUse) {
+            setSelectedHotel(hotelToUse);
         } else {
             navigate("/hotels");
         }
-    }, [location.state, navigate]);
+    }, [location.state, searchParams, navigate]);
 
     const rooms = useMemo(() => [
       { id: 'standard', name: 'Standard Deluxe Room', price: 0, perks: ["Free WiFi", "Garden View", "Breakfast Included"], img: 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80' },
@@ -50,22 +61,27 @@ const HotelBookingSelectionPage = () => {
 
     if (!selectedHotel) return <div className="h-screen bg-slate-50 flex items-center justify-center animate-pulse"><div className="w-20 h-20 bg-blue-100 rounded-full"></div></div>;
 
-    const nights = 1; 
-    const guestsCount = location.state?.pax || 2;
+    const guestsCount = Number(searchParams.get("guests") || location.state?.pax || 2);
+    const checkInDate = searchParams.get("checkInDate") || location.state?.checkIn || "20 Apr 2026";
+    const checkOutDate = searchParams.get("checkOutDate") || location.state?.checkOut || "21 Apr 2026";
+
     const baseFare = selectedHotel.price;
     const taxesAndFees = Math.round(baseFare * 0.18);
     const totalPayable = baseFare + taxesAndFees;
 
     const handleContinue = (roomType) => {
         const finalPrice = baseFare + (roomType?.price || 0) + taxesAndFees;
-        navigate("/hotels/checkout", {
+        const hotelId = selectedHotel.id;
+        const checkoutUrl = `/hotels/checkout?id=${hotelId}&room=${roomType?.name || 'Standard'}&guests=${guestsCount}&checkIn=${checkInDate}&checkOut=${checkOutDate}`;
+        
+        navigate(checkoutUrl, {
             state: { 
                 hotel: { ...selectedHotel, roomType: roomType?.name || 'Standard' }, 
                 pax: guestsCount, 
                 totalAmount: finalPrice, 
-                nights, 
-                checkIn: location.state?.checkIn || "20 Apr 2026", 
-                checkOut: location.state?.checkOut || "21 Apr 2026"
+                nights: 1, 
+                checkIn: checkInDate, 
+                checkOut: checkOutDate
             }
         });
     };

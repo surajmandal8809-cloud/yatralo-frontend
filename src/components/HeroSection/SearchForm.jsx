@@ -54,6 +54,7 @@ const SearchForm = ({ defaultTab = "flight" }) => {
 
     if (activeTab === "hotel") {
       params.append("location", formData.from.trim());
+      if (formData.cityCode) params.append("cityCode", formData.cityCode);
       params.append("checkInDate", formData.date);
       params.append("checkOutDate", formData.dateEnd);
       params.append("guests", formData.guests?.split(" ")[0] || "2");
@@ -134,7 +135,7 @@ const SearchForm = ({ defaultTab = "flight" }) => {
                 )}
                 {activeTab === "hotel" && (
                   <>
-                    <HotelCityAutocomplete name="from" value={formData.from} onChange={(val) => setFormData(p => ({...p, from: val}))} />
+                    <HotelCityAutocomplete name="from" value={formData.from} onChange={(val, code) => setFormData(p => ({...p, from: val, cityCode: code}))} />
                     <Input name="date" label="Check-in" type="date" icon={Calendar} value={formData.date} onChange={handleInputChange} />
                     <Input name="dateEnd" label="Check-out" type="date" icon={Calendar} value={formData.dateEnd} onChange={handleInputChange} />
                     <Input name="guests" label="Guests" icon={Users} value={formData.guests} onChange={handleInputChange} />
@@ -226,13 +227,13 @@ const HotelCityAutocomplete = ({ name, value, onChange }) => {
                             <li 
                                 key={i}
                                 onClick={() => {
-                                    onChange(c.city);
+                                    onChange(c.city, c.iataCode);
                                     setShowSuggestions(false);
                                 }}
                                 className="px-4 py-3 hover:bg-slate-50 cursor-pointer flex flex-col border-b border-slate-50 last:border-none"
                             >
                                 <span className="font-bold text-slate-800 text-sm">{c.city}</span>
-                                <span className="text-[10px] font-black tracking-widest text-[#f97316] uppercase mt-0.5">{c.iataCode} - {c.country}</span>
+                                <span className="text-[10px] font-black tracking-widest text-[#f97316] uppercase mt-0.5">{c.country} ({c.iataCode})</span>
                             </li>
                         ))}
                     </ul>

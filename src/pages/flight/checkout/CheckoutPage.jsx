@@ -139,9 +139,8 @@ export default function CheckoutPage() {
         localStorage.setItem("yatralo-passengers", JSON.stringify(passengersLocal));
         localStorage.setItem("yatralo-contact", JSON.stringify(contactInfoLocal));
         
-        const searchParams = new URLSearchParams(window.location.search);
-        const urlToken = searchParams.get("token");
-        navigate(`/checkout/review${urlToken ? `?token=${urlToken}` : ''}`);
+        const searchString = window.location.search;
+        navigate(`/checkout/review${searchString}`);
     };
 
     const handleRazorpayPayment = async () => {
@@ -249,7 +248,8 @@ export default function CheckoutPage() {
             console.error("Failed to add booking to local history", e);
         }
 
-        navigate("/checkout/status");
+        const searchString = window.location.search;
+        navigate(`/checkout/status${searchString}`);
         localStorage.setItem("yatralo-last-booking", JSON.stringify({
             result,
             passengers: passengersLocal,

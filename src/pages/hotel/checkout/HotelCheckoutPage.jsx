@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import HotelCheckoutStepper from "./HotelCheckoutStepper";
 import HotelGuestDetails from "./HotelGuestDetails";
@@ -14,6 +14,7 @@ const STEPS = ["Guests", "Review & Pay", "Confirmation"];
 export default function HotelCheckoutPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    const [searchParams] = useSearchParams();
     
     const [currentStep, setCurrentStep] = useState(0);
     const [hotel, setHotel] = useState(null);
@@ -28,20 +29,28 @@ export default function HotelCheckoutPage() {
     const [verifyPayment] = useVerifyPaymentMutation();
 
     useEffect(() => {
-        // Find hotel from state or fallback
+        // Source selection overview
         const state = location.state;
-        const savedHotel = localStorage.getItem("yatralo-selected-hotel");
+        const hotelId = searchParams.get("id");
+        const roomName = searchParams.get("room") || "Standard Room";
+        const paxCount = Number(searchParams.get("guests") || state?.pax || 2);
+        const checkIn = searchParams.get("checkIn") || state?.checkIn;
+        const checkOut = searchParams.get("checkOut") || state?.checkOut;
 
-        if (state?.hotel) {
-            setHotel(state.hotel);
-            setTotalAmount(state.totalAmount || state.hotel.price);
-            const pax = state.pax || 2;
-            setGuests(Array.from({ length: pax }, () => ({ title: "Mr", firstName: "", lastName: "" })));
-        } else if (savedHotel) {
-            const h = JSON.parse(savedHotel);
-            setHotel(h);
-            setTotalAmount(h.price);
-            setGuests(Array.from({ length: 2 }, () => ({ title: "Mr", firstName: "", lastName: "" })));
+        const savedHotel = localStorage.getItem("yatralo-selected-hotel");
+        let hotelToUse = state?.hotel;
+
+        if (!hotelToUse && (hotelId || savedHotel)) {
+            if (savedHotel) {
+                const h = JSON.parse(savedHotel);
+                if (!hotelId || h.id === hotelId) hotelToUse = h;
+            }
+        }
+
+        if (hotelToUse) {
+            setHotel({ ...hotelToUse, roomType: roomName });
+            setTotalAmount(state?.totalAmount || hotelToUse.price);
+            setGuests(Array.from({ length: paxCount }, () => ({ title: "Mr", firstName: "", lastName: "" })));
         } else {
             navigate("/hotels");
             return;
@@ -51,7 +60,7 @@ export default function HotelCheckoutPage() {
         const savedContact = localStorage.getItem("yatralo-contact");
         if (savedContact) setContactInfo(JSON.parse(savedContact));
 
-    }, [location.state, navigate]);
+    }, [location.state, searchParams, navigate]);
 
     useEffect(() => {
         const script = document.createElement("script");
@@ -97,7 +106,7 @@ export default function HotelCheckoutPage() {
                 type: "hotel",
                 from: hotel.city,
                 to: hotel.name,
-                travelDate: location.state?.checkIn || new Date().toLocaleDateString(),
+                travelDate: searchParams.get("checkIn") || location.state?.checkIn || new Date().toLocaleDateString(),
                 totalPrice: totalAmount,
                 providerName: hotel.name,
                 passengers: guests.length,
@@ -142,9 +151,9 @@ export default function HotelCheckoutPage() {
                                 amount: totalAmount,
                                 guests: guests,
                                 date: new Date().toLocaleDateString(),
-                                checkIn: location.state?.checkIn || "20 Apr 2026",
-                                checkOut: location.state?.checkOut || "21 Apr 2026",
-                                nights: location.state?.nights || 1
+                                checkIn: searchParams.get("checkIn") || location.state?.checkIn || "20 Apr 2026",
+                                checkOut: searchParams.get("checkOut") || location.state?.checkOut || "21 Apr 2026",
+                                nights: Number(searchParams.get("nights") || location.state?.nights || 1)
                             };
                             
                             setBookingResult(result);
@@ -216,9 +225,9 @@ export default function HotelCheckoutPage() {
                                 onNext={handleNext} 
                                 onBack={handleBack} 
                                 isLoading={isProcessing}
-                                checkIn={location.state?.checkIn}
-                                checkOut={location.state?.checkOut}
-                                nights={location.state?.nights}
+                                checkIn={searchParams.get("checkIn") || location.state?.checkIn}
+                                checkOut={searchParams.get("checkOut") || location.state?.checkOut}
+                                nights={Number(searchParams.get("nights") || location.state?.nights || 1)}
                             />
                         )}
                         {currentStep === 2 && (
@@ -257,7 +266,7 @@ export default function HotelCheckoutPage() {
                                <div className="space-y-4 pt-6 border-t border-slate-200/50">
                                   <div className="flex items-center gap-3">
                                      <Calendar size={14} className="text-slate-300" />
-                                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{location.state?.checkIn || '20 Apr'} - {location.state?.checkOut || '21 Apr'}</p>
+                                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{searchParams.get("checkIn") || location.state?.checkIn || '20 Apr'} - {searchParams.get("checkOut") || location.state?.checkOut || '21 Apr'}</p>
                                   </div>
                                   <div className="flex items-center gap-3">
                                      <Users size={14} className="text-slate-300" />

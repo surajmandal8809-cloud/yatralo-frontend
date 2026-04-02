@@ -11,6 +11,14 @@ const Login = () => {
     useLoginMutation();
 
     const navigate = useNavigate();
+    const query = new URLSearchParams(window.location.search);
+
+  useEffect(() => {
+    const errorParam = query.get("error");
+    if (errorParam === "google_failed") {
+      toast.error("Google authentication failed. Please try again.");
+    }
+  }, []);
 
   useEffect(() => {
   if (isSuccess && data?.status === true) {

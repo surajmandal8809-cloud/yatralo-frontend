@@ -28,80 +28,95 @@ const FlightCard = ({ flight, onViewPrices, pax = 1 }) => {
     <div className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-all overflow-hidden font-sans group">
       
       {/* Main Card Content */}
-      <div className="p-5 md:p-6 pb-2">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 md:gap-4">
+      <div className="p-4 md:p-6 pb-2">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-4">
           
           {/* Airline Info */}
-          <div className="flex items-center gap-4 min-w-[120px]">
-             <div className="w-10 h-10 flex items-center justify-center p-1.5 bg-slate-50 rounded-lg group-hover:bg-slate-100 transition-colors">
+          <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto md:min-w-[120px]">
+             <div className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center p-1.5 bg-slate-50 rounded-xl group-hover:bg-slate-100 transition-colors shrink-0">
                 <img 
                   src={getAirlineLogo(flight.code)} 
                   alt={flight.airline} 
+                  loading="lazy"
                   className="w-full h-full object-contain"
                   onError={(e) => { e.target.onerror = null; e.target.src = "https://imgak.mmtcdn.com/flights/assets/media/dt/common/icons/6E.png"; }}
                 />
              </div>
-             <div>
-                <p className="text-[12px] font-black text-slate-800 leading-tight mb-0.5">{flight.airline}</p>
-                <p className="text-[10px] text-slate-400 font-bold uppercase">{flight.flightNo}</p>
+             <div className="flex-1 md:flex-none">
+                <p className="text-[12px] md:text-[14px] font-black text-slate-800 leading-tight mb-0.5">{flight.airline}</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{flight.flightNo}</p>
+             </div>
+             <div className="md:hidden flex flex-col items-end">
+                <p className="text-sm font-black text-slate-900 italic">₹{flight.price.toLocaleString()}</p>
+                <p className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter">Per Adult</p>
              </div>
           </div>
 
           {/* Time & Route Info */}
-          <div className="flex-1 w-full grid grid-cols-3 gap-0">
+          <div className="flex-1 w-full grid grid-cols-3 gap-2 py-4 md:py-0 border-y md:border-y-0 border-slate-50">
              <div className="text-left flex flex-col justify-center">
-                <p className="text-[20px] font-black text-slate-900 tracking-tighter leading-none mb-1">{flight.dep}</p>
-                <p className="text-[12px] font-bold text-slate-400 truncate uppercase mt-1">{flight.origin}</p>
+                <p className="text-[18px] md:text-[22px] font-black text-slate-900 tracking-tighter leading-none mb-1">{flight.dep}</p>
+                <p className="text-[10px] md:text-[12px] font-black text-slate-400 truncate uppercase mt-0.5">{flight.from || flight.origin}</p>
              </div>
 
-             <div className="flex flex-col items-center justify-center px-4">
-                <p className="text-[10px] text-slate-400 font-black mb-1.5 uppercase tracking-widest">{flight.durationStr}</p>
+             <div className="flex flex-col items-center justify-center px-2">
+                <p className="text-[8px] md:text-[10px] text-slate-400 font-black mb-1.5 uppercase tracking-[0.2em]">{flight.durationStr}</p>
                 <div className="w-full flex items-center gap-1.5">
                    <div className="h-[2px] bg-slate-100 flex-1 relative rounded-full">
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-slate-200" />
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-slate-300" />
                    </div>
                 </div>
-                <p className={`text-[10px] mt-1.5 font-bold uppercase tracking-tight ${flight.stops === 0 ? 'text-emerald-500' : 'text-orange-500'}`}>
+                <p className={`text-[8px] md:text-[10px] mt-1.5 font-bold uppercase tracking-tight ${flight.stops === 0 ? 'text-emerald-500' : 'text-orange-500'}`}>
                    {flight.stops === 0 ? 'Non-stop' : `${flight.stops} Stop${flight.stops > 1 ? 's' : ''}`}
                 </p>
              </div>
 
              <div className="text-right flex flex-col justify-center">
-                <p className="text-[20px] font-black text-slate-900 tracking-tighter leading-none mb-1">{flight.arr}</p>
-                <p className="text-[12px] font-bold text-slate-400 truncate uppercase mt-1">{flight.destination}</p>
+                <p className="text-[18px] md:text-[22px] font-black text-slate-900 tracking-tighter leading-none mb-1">{flight.arr}</p>
+                <p className="text-[10px] md:text-[12px] font-black text-slate-400 truncate uppercase mt-0.5">{flight.to || flight.destination}</p>
              </div>
           </div>
 
-          {/* Pricing & CTA */}
-          <div className="flex items-center md:flex-col md:items-end gap-6 md:pl-10 md:border-l md:border-slate-100 min-w-[160px]">
-             <div className="text-right md:mb-1">
+          {/* Pricing & CTA - Desktop Only Section */}
+          <div className="hidden md:flex flex-col items-end gap-3 pl-8 border-l border-slate-100 min-w-[160px]">
+             <div className="text-right">
                 <div className="flex items-center justify-end gap-1.5 mb-0.5">
-                   <span className="text-[18px] font-black text-slate-900 italic">₹{flight.price.toLocaleString()}</span>
+                   <span className="text-[20px] font-black text-slate-900 italic">₹{flight.price.toLocaleString()}</span>
                 </div>
                 <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">per adult</p>
              </div>
              <button 
               onClick={() => onViewPrices(flight)}
-              className="bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:saturate-150 active:scale-[0.98] text-white px-8 py-2.5 rounded-lg font-black text-[11px] uppercase tracking-widest transition-all shadow-md shadow-orange-100"
+              className="w-full bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:saturate-150 active:scale-[0.98] text-white px-8 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all shadow-lg shadow-orange-100"
              >
                 View Prices
              </button>
           </div>
+          
+          {/* Mobile CTA */}
+          <div className="md:hidden w-full">
+             <button 
+              onClick={() => onViewPrices(flight)}
+              className="w-full bg-slate-900 text-white h-12 rounded-xl font-black text-[11px] uppercase tracking-widest active:scale-[0.98] transition-all"
+             >
+                Select & View Prices
+             </button>
+          </div>
         </div>
 
-        {/* Footer Promo Line (from image) */}
-        <div className="mt-6 py-2 px-1 border-t border-slate-50 flex items-center justify-between">
-           <div className="flex items-center gap-4">
-              <p className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 italic">
-                 <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></div>
-                 Get Flat <span className="text-slate-600 font-black">12% off</span> on AXIS Bank Credit Cards using <span className="text-blue-500">MMTAXISFEST</span> | Flat ₹ 261 OFF using <span className="text-blue-500">MMTSUPER</span>
+        {/* Footer Promo Line */}
+        <div className="mt-4 md:mt-6 py-2 border-t border-slate-50 flex items-center justify-between gap-4 overflow-hidden">
+           <div className="flex flex-1 items-center gap-2 overflow-hidden">
+              <div className="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse shrink-0"></div>
+              <p className="text-[8px] md:text-[10px] font-bold text-slate-400 italic truncate">
+                 Get Flat <span className="text-slate-600 font-black">12% off</span> with AXIS Bank | <span className="text-blue-500 font-black">MMTAXISFEST</span>
               </p>
            </div>
            <button 
             onClick={() => setIsExpanded(!isExpanded)}
-            className="text-[11px] font-black text-blue-500 hover:underline uppercase tracking-tight flex items-center gap-1"
+            className="text-[9px] md:text-[11px] font-black text-[#7c3aed] hover:underline uppercase tracking-tight flex items-center gap-1 shrink-0"
            >
-              Flight Details {isExpanded ? <ChevronUp size={14}/> : <ChevronDown size={14} />}
+              Details {isExpanded ? <ChevronUp size={12}/> : <ChevronDown size={12} />}
            </button>
         </div>
       </div>

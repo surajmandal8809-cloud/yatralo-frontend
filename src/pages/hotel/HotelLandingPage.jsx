@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import HotelSearchWidget from "./HotelSearchWidget";
-import HotelCategoryBar from "./components/HotelCategoryBar";
+import CategoryBar from "../flight/components/CategoryBar";
 import HotelOffers from "./components/HotelOffers";
 import GuidelineCards from "./components/GuidelineCards";
 import AppPromotion from "./components/AppPromotion";
@@ -50,11 +50,11 @@ const HotelLandingPage = () => {
                         </p>
                     </motion.div>
 
-                    {/* Floating Search Hub */}
-                    <div className="relative w-full max-w-7xl mx-auto mt-10">
-                        <div className="flex flex-col gap-6">
-                            {/* Main Search Widget */}
-                            <div className="relative z-10 w-full">
+                    {/* Integrated Search Box as in image */}
+                    <div className="relative w-full max-w-7xl mx-auto">
+                        <div className="bg-white rounded-[3rem] shadow-2xl shadow-black/20 overflow-hidden border border-white/20">
+                            <CategoryBar activeCategory="Hotels" />
+                            <div className="p-2 md:p-6 pb-12">
                                 <HotelSearchWidget />
                             </div>
                         </div>

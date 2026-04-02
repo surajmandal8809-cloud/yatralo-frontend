@@ -194,6 +194,7 @@ const DestinationCard = ({ img, name, rating, tag, flights, hotels }) => {
       <img
         src={img}
         alt={name}
+        loading="lazy"
         className="w-full h-full object-cover group-hover:scale-110 transition duration-700 ease-out"
         onError={(e) => {
           e.target.src =

@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Plane, 
@@ -28,6 +28,7 @@ import toast from "react-hot-toast";
 
 const BookingSelectionPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedFlight, setSelectedFlight] = useState(null);
   
   const [selectedSeat, setSelectedSeat] = useState([]);
@@ -95,11 +96,10 @@ const BookingSelectionPage = () => {
       totalPrice: totalPayable
     };
     
-    const searchParams = new URLSearchParams(window.location.search);
-    const token = searchParams.get("token");
+    const searchString = window.location.search;
     
     localStorage.setItem("yatralo-addons", JSON.stringify(addOns));
-    navigate(`/checkout/passengers${token ? `?token=${token}` : ''}`);
+    navigate(`/checkout/passengers${searchString}`);
   };
 
   return (

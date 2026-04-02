@@ -106,6 +106,7 @@ const DealsPage = () => {
                                 <img
                                     src={deal.img}
                                     alt={deal.title}
+                                    loading="lazy"
                                     className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
                                 />
                                 <div className="absolute top-4 right-4 bg-[#f97316] text-white px-3 py-1 text-[10px] font-black rounded-xl shadow-lg ring-4 ring-orange-500/10">

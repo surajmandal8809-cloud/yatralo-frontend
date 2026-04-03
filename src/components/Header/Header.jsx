@@ -91,7 +91,7 @@ const Header = () => {
             const isActive = location.pathname === item.path;
             return (
               <Link key={item.name} to={item.path}
-                className={`relative text-[10px] font-bold uppercase tracking-[0.15em] transition-all duration-200 hover:text-[#7C3AED] group/nav ${scrolled ? "text-slate-600" : "text-white/90"
+                className={`relative text-[13px] font-bold uppercase tracking-[0.12em] transition-all duration-200 hover:text-[#7C3AED] group/nav ${scrolled ? "text-slate-600" : "text-white/90"
                   }`}
               >
                 {item.name}
@@ -118,8 +118,8 @@ const Header = () => {
                 <FiUser size={12} className="text-[#7C3AED]" />
               </div>
               <div className="text-left leading-tight">
-                <p className="text-[9px] uppercase font-black opacity-80">Login or</p>
-                <p className="text-xs font-black">Create Account</p>
+                <p className="text-[11px] uppercase font-black opacity-80 leading-none">Login or</p>
+                <p className="text-sm font-black leading-none">Create Account</p>
               </div>
               <FiChevronDown size={14} className="opacity-80 group-hover:rotate-180 transition-transform" />
             </button>

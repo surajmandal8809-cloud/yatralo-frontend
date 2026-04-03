@@ -69,7 +69,7 @@ const DealsPage = () => {
                 <div>
                   <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-100 px-3 py-1 rounded-full mb-4">
                       <Tag size={12} className="text-[#f97316]" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-[#f97316]">Limited Time</span>
+                      <span className="text-[12.5px] font-black uppercase tracking-widest text-[#f97316]">Limited Time</span>
                   </div>
                   <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter">
                       Travel <span className="text-[#7c3aed]">Deals</span>
@@ -80,7 +80,7 @@ const DealsPage = () => {
                 </div>
                 <button 
                     onClick={() => navigate("/deals")}
-                    className="flex items-center gap-2 bg-white border border-slate-200 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all shadow-sm"
+                    className="flex items-center gap-2 bg-white border border-slate-200 px-6 py-3 rounded-2xl text-[12px] font-black uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all shadow-sm"
                 >
                     View All Deals <ArrowRight size={14} />
                 </button>
@@ -109,10 +109,10 @@ const DealsPage = () => {
                                     loading="lazy"
                                     className="w-full h-full object-cover group-hover:scale-110 transition duration-700"
                                 />
-                                <div className="absolute top-4 right-4 bg-[#f97316] text-white px-3 py-1 text-[10px] font-black rounded-xl shadow-lg ring-4 ring-orange-500/10">
+                                <div className="absolute top-4 right-4 bg-[#f97316] text-white px-3 py-1 text-[12px] font-black rounded-xl shadow-lg ring-4 ring-orange-500/10">
                                     {deal.discount}
                                 </div>
-                                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 text-[9px] font-black text-[#7c3aed] rounded-xl shadow-lg uppercase tracking-widest">
+                                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 text-[11px] font-black text-[#7c3aed] rounded-xl shadow-lg uppercase tracking-widest">
                                     {deal.category}
                                 </div>
                             </div>
@@ -122,14 +122,14 @@ const DealsPage = () => {
                                     <h3 className="text-lg font-black text-slate-900 leading-tight group-hover:text-[#7c3aed] transition-colors">{deal.title}</h3>
                                     <div className="flex items-center gap-1 bg-indigo-50 px-2 py-0.5 rounded-lg">
                                         <Star size={10} className="fill-[#7c3aed] text-[#7c3aed]" />
-                                        <span className="text-[10px] font-black text-[#7c3aed]">{deal.rating}</span>
+                                        <span className="text-[12.5px] font-black text-[#7c3aed]">{deal.rating}</span>
                                     </div>
                                 </div>
-                                <p className="text-slate-500 font-medium text-[10px] mb-6 italic leading-relaxed">{deal.desc}</p>
+                                <p className="text-slate-500 font-medium text-[12.5px] mb-6 italic leading-relaxed">{deal.desc}</p>
                                 
                                 <div className="flex items-center justify-between pt-6 border-t border-slate-50">
                                     <div>
-                                        <p className="text-[9px] font-black uppercase text-slate-300 tracking-widest mb-1">Starting from</p>
+                                        <p className="text-[11px] font-black uppercase text-slate-300 tracking-widest mb-1">Starting from</p>
                                         <p className="text-xl font-black text-slate-900">₹{deal.price}</p>
                                     </div>
                                     <button 

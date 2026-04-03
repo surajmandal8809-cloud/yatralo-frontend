@@ -39,11 +39,13 @@ const FlightSearchResultsPage = lazy(() => import("./pages/flight/FlightSearchRe
 const CheckoutPage = lazy(() => import("./pages/flight/checkout/CheckoutPage"));
 const BookingSelectionPage = lazy(() => import("./pages/flight/BookingSelectionPage"));
 
-// Hotel Pages
+// New Premium Hotel Pages
+// Hotel Module - MakeMyTrip Style
 const HotelLandingPage = lazy(() => import("./pages/hotel/HotelLandingPage"));
 const HotelSearchResultsPage = lazy(() => import("./pages/hotel/HotelSearchResultsPage"));
-const HotelBookingSelectionPage = lazy(() => import("./pages/hotel/HotelBookingSelectionPage"));
-const HotelCheckoutPage = lazy(() => import("./pages/hotel/checkout/HotelCheckoutPage"));
+const HotelDetailsPage = lazy(() => import("./pages/hotel/HotelDetailsPage"));
+const ReviewBookingPage = lazy(() => import("./pages/hotel/ReviewBookingPage"));
+const PaymentStatusPage = lazy(() => import("./pages/hotel/PaymentStatusPage"));
 
 // Train Pages
 const TrainLandingPage = lazy(() => import("./pages/train/TrainLandingPage"));
@@ -86,11 +88,13 @@ function App() {
               <Route path="flights" element={<FlightLandingPage />} />
               <Route path="flights/results" element={<FlightSearchResultsPage />} />
 
-              {/* Hotels */}
+              {/* Premium Hotels Module */}
+              {/* Premium Hotel Module (MakeMyTrip Inspired) */}
               <Route path="hotels" element={<HotelLandingPage />} />
               <Route path="hotels/results" element={<HotelSearchResultsPage />} />
-              <Route path="hotels/booking" element={<HotelBookingSelectionPage />} />
-              <Route path="hotels/checkout" element={<HotelCheckoutPage />} />
+              <Route path="hotels/details" element={<HotelDetailsPage />} />
+              <Route path="hotels/review" element={<ReviewBookingPage />} />
+              <Route path="hotels/status" element={<PaymentStatusPage />} />
 
               {/* Trains */}
               <Route path="trains" element={<TrainLandingPage />} />

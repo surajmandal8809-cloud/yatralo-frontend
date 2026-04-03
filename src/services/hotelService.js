@@ -20,16 +20,22 @@ export const hotelService = createApi({
     getCitySuggestions: builder.query({
       query: (keyword) => ({
         url: `/hotels/cities/suggest`,
-        params: { keyword: keyword
-           
-         },
+        params: { keyword: keyword },
         method: "GET",
       }),
     }),
-  }), 
+    getHotelDetails: builder.query({
+      query: ({ hotelId, checkin, checkout, adults }) => ({
+        url: `/hotels/${hotelId}/offers`,
+        params: { checkInDate: checkin, checkOutDate: checkout, adults },
+        method: "GET"
+      })
+    })
+  }),
 });
 
 export const { 
   useSearchHotelsQuery, 
-  useLazyGetCitySuggestionsQuery 
+  useLazyGetCitySuggestionsQuery,
+  useGetHotelDetailsQuery
 } = hotelService;

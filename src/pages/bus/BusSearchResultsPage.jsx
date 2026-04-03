@@ -137,12 +137,13 @@ export default function BusSearchResultsPage() {
   }, [from, to]);
 
   useEffect(() => {
+    setLoading(true);
     const timer = setTimeout(() => setLoading(false), 1500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [searchParams]);
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-16 md:pt-20 pb-20">
+    <div className="min-h-screen bg-slate-50 pt-14 md:pt-16 pb-20">
       
       {/* Mobile Sticky Summary */}
       <div className="md:hidden sticky top-16 z-40 bg-[#1a2232] px-4 py-3 border-b border-white/5 flex items-center justify-between shadow-lg" onClick={() => setShowMobileSearch(true)}>
@@ -162,7 +163,7 @@ export default function BusSearchResultsPage() {
 
 
       {/* Desktop Sticky Header Filter */}
-      <section className="hidden md:block bg-white border-b border-slate-200 py-6 px-6 sticky top-20 z-40 shadow-sm">
+      <section className="hidden md:block bg-white border-b border-slate-200 py-3 px-6 sticky top-20 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center gap-4">
           <div className="flex-1 min-w-[200px] bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 flex items-center gap-3">
              <MapPin size={16} className="text-[#7c3aed]" />
@@ -205,7 +206,7 @@ export default function BusSearchResultsPage() {
                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Journey Date</p>
                      <p className="text-lg font-black text-slate-900">{date}</p>
                   </div>
-                  <button onClick={() => navigate("/buses")} className="w-full h-16 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-violet-100 mt-4">Redefine Route</button>
+                  <button type="button" onClick={() => navigate("/buses")} className="w-full h-16 bg-gradient-to-r from-[#7c3aed] to-[#f97316] text-white rounded-2xl text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-violet-100 mt-4">Redefine Route</button>
                </div>
             </motion.div>
           </div>

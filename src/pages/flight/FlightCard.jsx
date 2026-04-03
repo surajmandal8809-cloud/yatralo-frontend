@@ -44,11 +44,11 @@ const FlightCard = ({ flight, onViewPrices, pax = 1 }) => {
              </div>
              <div className="flex-1 md:flex-none">
                 <p className="text-[12px] md:text-[14px] font-black text-slate-800 leading-tight mb-0.5">{flight.airline}</p>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{flight.flightNo}</p>
+                <p className="text-[11.5px] text-slate-400 font-bold uppercase tracking-widest">{flight.flightNo}</p>
              </div>
              <div className="md:hidden flex flex-col items-end">
                 <p className="text-sm font-black text-slate-900 italic">₹{flight.price.toLocaleString()}</p>
-                <p className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter">Per Adult</p>
+                <p className="text-[10.5px] text-slate-400 font-bold uppercase tracking-tighter">Per Adult</p>
              </div>
           </div>
 
@@ -56,24 +56,24 @@ const FlightCard = ({ flight, onViewPrices, pax = 1 }) => {
           <div className="flex-1 w-full grid grid-cols-3 gap-2 py-4 md:py-0 border-y md:border-y-0 border-slate-50">
              <div className="text-left flex flex-col justify-center">
                 <p className="text-[18px] md:text-[22px] font-black text-slate-900 tracking-tighter leading-none mb-1">{flight.dep}</p>
-                <p className="text-[10px] md:text-[12px] font-black text-slate-400 truncate uppercase mt-0.5">{flight.from || flight.origin}</p>
+                <p className="text-[12px] md:text-[13px] font-black text-slate-400 truncate uppercase mt-0.5">{flight.from || flight.origin}</p>
              </div>
 
              <div className="flex flex-col items-center justify-center px-2">
-                <p className="text-[8px] md:text-[10px] text-slate-400 font-black mb-1.5 uppercase tracking-[0.2em]">{flight.durationStr}</p>
+                <p className="text-[10.5px] md:text-[11.5px] text-slate-400 font-black mb-1.5 uppercase tracking-[0.2em]">{flight.durationStr}</p>
                 <div className="w-full flex items-center gap-1.5">
                    <div className="h-[2px] bg-slate-100 flex-1 relative rounded-full">
                       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-slate-300" />
                    </div>
                 </div>
-                <p className={`text-[8px] md:text-[10px] mt-1.5 font-bold uppercase tracking-tight ${flight.stops === 0 ? 'text-emerald-500' : 'text-orange-500'}`}>
+                <p className={`text-[10.5px] md:text-[11.5px] mt-1.5 font-bold uppercase tracking-tight ${flight.stops === 0 ? 'text-emerald-500' : 'text-orange-500'}`}>
                    {flight.stops === 0 ? 'Non-stop' : `${flight.stops} Stop${flight.stops > 1 ? 's' : ''}`}
                 </p>
              </div>
 
              <div className="text-right flex flex-col justify-center">
                 <p className="text-[18px] md:text-[22px] font-black text-slate-900 tracking-tighter leading-none mb-1">{flight.arr}</p>
-                <p className="text-[10px] md:text-[12px] font-black text-slate-400 truncate uppercase mt-0.5">{flight.to || flight.destination}</p>
+                <p className="text-[12px] md:text-[13px] font-black text-slate-400 truncate uppercase mt-0.5">{flight.to || flight.destination}</p>
              </div>
           </div>
 
@@ -83,11 +83,11 @@ const FlightCard = ({ flight, onViewPrices, pax = 1 }) => {
                 <div className="flex items-center justify-end gap-1.5 mb-0.5">
                    <span className="text-[20px] font-black text-slate-900 italic">₹{flight.price.toLocaleString()}</span>
                 </div>
-                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">per adult</p>
+                <p className="text-[11px] text-slate-400 font-bold uppercase tracking-tighter">per adult</p>
              </div>
              <button 
               onClick={() => onViewPrices(flight)}
-              className="w-full bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:saturate-150 active:scale-[0.98] text-white px-8 py-2.5 rounded-xl font-black text-[11px] uppercase tracking-widest transition-all shadow-lg shadow-orange-100"
+              className="w-full bg-gradient-to-r from-[#7c3aed] to-[#f97316] hover:saturate-150 active:scale-[0.98] text-white px-8 py-2.5 rounded-xl font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-orange-100"
              >
                 View Prices
              </button>

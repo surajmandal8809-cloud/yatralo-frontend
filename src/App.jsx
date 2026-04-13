@@ -1,7 +1,6 @@
 import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import Loader from "./components/Loader/Loader";
 import Chatbot from "./components/Chat/Chatbot";
 
 // Layouts
@@ -63,7 +62,6 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Suspense fallback={<Loader />}>
           <Routes>
             {/* App routes with Header + Footer */}
             <Route path="/" element={<AppLayout />}>
@@ -127,7 +125,7 @@ function App() {
             {/* 404 */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-        </Suspense>
+       
       </BrowserRouter>
       <Toaster position="top-center" reverseOrder={false} />
       <Chatbot />

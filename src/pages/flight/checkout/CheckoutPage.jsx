@@ -184,7 +184,7 @@ export default function CheckoutPage() {
             }
 
             const options = {
-                key: "rzp_test_SSesz1GFvxuPR3", 
+                key: createResponse.razorpayKey, 
                 amount: Math.round(totalAmount * 100),
                 currency: "INR",
                 name: "Yatralo Travels",

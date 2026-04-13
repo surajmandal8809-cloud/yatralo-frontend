@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Loader from "./components/Loader/Loader";
+import Chatbot from "./components/Chat/Chatbot";
 
 // Layouts
 const AppLayout = lazy(() => import("./layouts/AppLayout"));
@@ -40,7 +41,6 @@ const CheckoutPage = lazy(() => import("./pages/flight/checkout/CheckoutPage"));
 const BookingSelectionPage = lazy(() => import("./pages/flight/BookingSelectionPage"));
 
 // New Premium Hotel Pages
-// Hotel Module - MakeMyTrip Style
 const HotelLandingPage = lazy(() => import("./pages/hotel/HotelLandingPage"));
 const HotelSearchResultsPage = lazy(() => import("./pages/hotel/HotelSearchResultsPage"));
 const HotelDetailsPage = lazy(() => import("./pages/hotel/HotelDetailsPage"));
@@ -63,7 +63,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <Suspense fallback={null}>
+        <Suspense fallback={<Loader />}>
           <Routes>
             {/* App routes with Header + Footer */}
             <Route path="/" element={<AppLayout />}>
@@ -88,8 +88,7 @@ function App() {
               <Route path="flights" element={<FlightLandingPage />} />
               <Route path="flights/results" element={<FlightSearchResultsPage />} />
 
-              {/* Premium Hotels Module */}
-              {/* Premium Hotel Module (MakeMyTrip Inspired) */}
+              {/* Premium Hotels */}
               <Route path="hotels" element={<HotelLandingPage />} />
               <Route path="hotels/results" element={<HotelSearchResultsPage />} />
               <Route path="hotels/details" element={<HotelDetailsPage />} />
@@ -131,6 +130,7 @@ function App() {
         </Suspense>
       </BrowserRouter>
       <Toaster position="top-center" reverseOrder={false} />
+      <Chatbot />
     </>
   );
 }

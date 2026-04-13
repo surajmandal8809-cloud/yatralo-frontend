@@ -17,7 +17,7 @@ import {
     User,
     ArrowRight
 } from "lucide-react";
-import { createBooking, verifyPayment } from "../../services/hotelRoutes";
+import { useCreateBookingMutation, useVerifyPaymentMutation } from "../../services/bookingService";
 
 const ReviewBookingPage = () => {
     const [searchParams] = useSearchParams();
@@ -44,6 +44,9 @@ const ReviewBookingPage = () => {
     const [insurance, setInsurance] = useState("no");
     const [agreed, setAgreed] = useState(false);
 
+
+    const [createBooking] = useCreateBookingMutation();
+    const [verifyPaymentMutation] = useVerifyPaymentMutation();
     const [loading, setLoading] = useState(false);
 
     // Dynamic Calculations
@@ -74,6 +77,7 @@ const ReviewBookingPage = () => {
 
         setLoading(true);
 
+
         const res = await loadRazorpay();
         if (!res) {
             alert("Razorpay SDK failed to load. Are you online?");
@@ -81,50 +85,90 @@ const ReviewBookingPage = () => {
             return;
         }
 
-        const options = {
-            key: "rzp_test_dummykey",
-            amount: totalAmount * 100,
-            currency: "INR",
-            name: "YatraLo Hotels",
-            description: `Booking for ${hotelName}`,
-            image: "/assets/logo.png",
-            handler: async (response) => {
-                try {
-                    await createBooking({
-                        hotelId,
-                        hotelName,
-                        roomType,
-                        totalAmount,
-                        paymentId: response.razorpay_payment_id,
-                        userDetails: formData,
-                        checkInDate,
-                        checkOutDate,
-                        adults
-                    });
-
-                    const successParams = new URLSearchParams({
-                        status: "success",
-                        bookingId: `BK-${Date.now()}`,
-                        hotelName,
-                        roomType,
-                        amount: totalAmount
-                    });
-                    navigate(`/hotels/status?${successParams.toString()}`);
-                } catch (err) {
-                    navigate(`/hotels/status?status=failed`);
+        try {
+            // 1. Create Booking & Order in backend
+            const createResponse = await createBooking({
+                type: "hotel",
+                from: hotelName,
+                to: roomType,
+                travelDate: checkInDate,
+                totalPrice: totalAmount,
+                providerName: "YatraLo Hotels",
+                passengers: adults,
+                details: {
+                    hotel: {
+                        name: hotelName,
+                        id: hotelId,
+                        roomType: roomType,
+                        checkIn: checkInDate,
+                        checkOut: checkOutDate,
+                        adults: adults
+                    },
+                    guest: formData
                 }
-            },
-            prefill: {
-                name: `${formData.firstName} ${formData.lastName}`,
-                email: formData.email,
-                contact: formData.phone
-            },
-            theme: { color: "#008cff" }
-        };
+            }).unwrap();
 
-        const paymentObject = new window.Razorpay(options);
-        paymentObject.open();
-        setLoading(false);
+            if (!createResponse.success) {
+                alert("Failed to initiate booking");
+                setLoading(false);
+                return;
+            }
+
+            const options = {
+                key: createResponse.razorpayKey,
+                amount: createResponse.amount,
+                currency: createResponse.currency,
+                name: "YatraLo Hotels",
+                description: `Booking for ${hotelName}`,
+                order_id: createResponse.orderId,
+                handler: async (response) => {
+                    try {
+                        setLoading(true);
+                        // 2. Verify payment in backend
+                        const verifyRes = await verifyPaymentMutation({
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                            bookingId: createResponse.bookingId
+                        }).unwrap();
+
+                        if (verifyRes.success) {
+                            const successParams = new URLSearchParams({
+                                status: "success",
+                                bookingId: createResponse.bookingId,
+                                hotelName,
+                                roomType,
+                                amount: totalAmount
+                            });
+                            navigate(`/hotels/status?${successParams.toString()}`);
+                        } else {
+                            navigate(`/hotels/status?status=failed`);
+                        }
+                    } catch (err) {
+                        console.error("Verification error:", err);
+                        navigate(`/hotels/status?status=failed`);
+                    } finally {
+                        setLoading(false);
+                    }
+                },
+                prefill: {
+                    name: `${formData.firstName} ${formData.lastName}`,
+                    email: formData.email,
+                    contact: formData.phone
+                },
+                theme: { color: "#008cff" },
+                modal: {
+                    ondismiss: () => setLoading(false)
+                }
+            };
+
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+        } catch (error) {
+            console.error("Booking creation error:", error);
+            alert(error?.data?.message || "Something went wrong. Please try again.");
+            setLoading(false);
+        }
     };
 
     return (

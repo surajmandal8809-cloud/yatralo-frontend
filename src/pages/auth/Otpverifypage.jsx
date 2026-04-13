@@ -111,4 +111,4 @@ const OtpVerifyPage = () => {
   );
 };
 
-export default OtpVerifyPage;
+export default OtpVerifyPage;

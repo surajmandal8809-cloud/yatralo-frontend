@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ShieldCheck, Bus } from "lucide-react";
-import { addBooking } from "../../utils/bookingUtils";
+import { useCreateBookingMutation, useVerifyPaymentMutation } from "../../services/bookingService";
 
 export default function BusCheckoutPage() {
     const navigate = useNavigate();
@@ -12,6 +12,9 @@ export default function BusCheckoutPage() {
     const [addOns, setAddOns] = useState(null);
     const [pax, setPax] = useState(1);
     const [totalAmount, setTotalAmount] = useState(0);
+
+    const [createBooking] = useCreateBookingMutation();
+    const [verifyPaymentMutation] = useVerifyPaymentMutation();
     const [isProcessing, setIsProcessing] = useState(false);
 
     const [passengers, setPassengers] = useState([]);
@@ -48,29 +51,57 @@ export default function BusCheckoutPage() {
             return;
         }
 
-        setIsProcessing(true);
-        toast.loading("Initiating Payment...", { duration: 1500 });
 
-        setTimeout(() => {
-            setIsProcessing(false);
+        setIsProcessing(true);
+        try {
+            const createResponse = await createBooking({
+                type: 'bus',
+                from: bus.from,
+                to: bus.to,
+                travelDate: bus.depDate || new Date().toLocaleDateString(),
+                totalPrice: totalAmount,
+                providerName: bus.operator,
+                passengers: passengers.length,
+                details: { bus, passengers, contactInfo }
+            }).unwrap();
+
+            if (!createResponse.success) {
+                toast.error("Failed to initiate booking");
+                setIsProcessing(false);
+                return;
+            }
+
             const rzp = new window.Razorpay({
-                 key: "rzp_test_SSesz1GFvxuPR3",
-                 amount: Math.round(totalAmount * 100),
-                 currency: "INR",
+                 key: createResponse.razorpayKey,
+                 amount: createResponse.amount,
+                 currency: createResponse.currency,
                  name: "Yatralo Bus",
                  description: "Bus Booking Payment",
-                 handler: function (response) {
-                     addBooking({
-                         type: 'bus',
-                         fromCode: bus.from,
-                         toCode: bus.to,
-                         travelDate: bus.depDate || new Date().toLocaleDateString(),
-                         totalPrice: totalAmount,
-                         providerName: bus.operator,
-                         status: 'confirmed',
-                         details: { bus, passengers, contactInfo }
-                     });
-                     navigate("/bookings");
+                 order_id: createResponse.orderId,
+                 handler: async function (response) {
+                     try {
+                         setIsProcessing(true);
+                         const verifyRes = await verifyPaymentMutation({
+                             razorpay_order_id: response.razorpay_order_id,
+                             razorpay_payment_id: response.razorpay_payment_id,
+                             razorpay_signature: response.razorpay_signature,
+                             bookingId: createResponse.bookingId
+                         }).unwrap();
+
+                         if (verifyRes.success) {
+                             toast.success("Bus ticket booked!");
+                             navigate("/bookings");
+                         } else {
+                             toast.error("Payment verification failed");
+                         }
+                     } catch (err) {
+                         toast.error("Verification error");
+                     } finally {
+                         setIsProcessing(false);
+                     }
+                 },
+                 modal: {
+                    ondismiss: () => setIsProcessing(false)
                  },
                  prefill: {
                      name: passengers[0].firstName + " " + passengers[0].lastName,
@@ -80,7 +111,11 @@ export default function BusCheckoutPage() {
                  theme: { color: "#f97316" }
             });
             rzp.open();
-        }, 1500);
+        } catch (error) {
+            console.error("Bus booking error:", error);
+            toast.error(error?.data?.message || "Something went wrong");
+            setIsProcessing(false);
+        }
     };
 
     if (!bus) return null;

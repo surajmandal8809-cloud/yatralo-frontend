@@ -20,7 +20,7 @@ import {
   X
 } from "lucide-react";
 import toast from "react-hot-toast";
-import Loader from "../../components/Loader/Loader";
+
 
 const OPERATORS = [
   { name: "SRM Travels", type: "AC Sleeper", rating: "4.5", bg: "#7c3aed" },
@@ -158,8 +158,6 @@ export default function BusSearchResultsPage() {
          </div>
          <button className="text-white/40 p-2"><Search size={18} /></button>
       </div>
-
-      {/* Premium Loader Overlay */}
 
 
       {/* Desktop Sticky Header Filter */}

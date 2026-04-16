@@ -27,7 +27,7 @@ import { useSearchFlightsQuery, useLazySearchAirportsQuery } from "../../service
 import FlightCard from "./FlightCard";
 import FareModal from "./FareModal";
 import AuthModal from "../../components/Auth/AuthModal";
-import Loader from "../../components/Loader/Loader";
+
 
 // Dynamic Airport Search Box for the result page
 function AirportSearchBox({ label, value, iata, onSelect }) {
@@ -308,8 +308,6 @@ export default function FlightSearchResultsPage() {
         </div>
       </section>
       
-      {/* Premium Loader Overlay */}
-
 
       {/* Mobile Search Edit Drawer */}
       <AnimatePresence>

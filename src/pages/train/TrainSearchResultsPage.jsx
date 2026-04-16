@@ -20,7 +20,7 @@ import {
   X
 } from "lucide-react";
 import toast from "react-hot-toast";
-import Loader from "../../components/Loader/Loader";
+
 
 const TrainCard = ({ t, index, onBook }) => (
   <motion.div
@@ -138,8 +138,6 @@ export default function TrainSearchResultsPage() {
          </div>
          <button className="text-white/40 p-2"><Search size={18} /></button>
       </div>
-
-      {/* Premium Loader Overlay */}
 
 
       {/* Desktop Sticky Filter Header */}
